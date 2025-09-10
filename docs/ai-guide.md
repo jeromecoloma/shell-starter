@@ -13,9 +13,9 @@ This guide provides AI coding assistants with the information needed to generate
 ./bin/generate-ai-workflow my-cli-tool
 
 # Install commands for your AI coding agent
-cp -r .ai-workflow/commands/.claude/commands/ .claude/     # Claude Code
-cp -r .ai-workflow/commands/.cursor/commands/ .cursor/     # Cursor
-cp -r .ai-workflow/commands/.gemini/commands/ .gemini/     # Gemini CLI
+cp -r .ai-workflow/commands/.claude/commands/ .claude/commands/     # Claude Code
+cp -r .ai-workflow/commands/.cursor/commands/ .cursor/commands/     # Cursor
+cp -r .ai-workflow/commands/.gemini/commands/ .gemini/commands/     # Gemini CLI
 
 # Customize project requirements
 vim .ai-workflow/state/requirements.md

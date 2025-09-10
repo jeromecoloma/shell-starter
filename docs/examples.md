@@ -851,7 +851,7 @@ main() {
     log::info "Next steps:"
     log::info "1. Edit .ai-workflow/state/requirements.md with your project details"
     log::info "2. Copy commands to your AI coding agent:"
-    log::info "   • Claude Code:  cp -r .ai-workflow/commands/.claude/commands/ .claude/"
+    log::info "   • Claude Code:  cp -r .ai-workflow/commands/.claude/commands/ .claude/commands/"
     log::info "3. Start development with: /dev start"
 }
 

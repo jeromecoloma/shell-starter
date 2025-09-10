@@ -182,16 +182,16 @@ Copy the appropriate commands to your coding agent:
 
 ```bash
 # For Claude Code users:
-cp -r .ai-workflow/commands/.claude/commands/ .claude/
+cp -r .ai-workflow/commands/.claude/commands/ .claude/commands/
 
 # For Cursor users:
-cp -r .ai-workflow/commands/.cursor/commands/ .cursor/
+cp -r .ai-workflow/commands/.cursor/commands/ .cursor/commands/
 
 # For Gemini CLI users:
-cp -r .ai-workflow/commands/.gemini/commands/ .gemini/
+cp -r .ai-workflow/commands/.gemini/commands/ .gemini/commands/
 
 # For OpenCode users:
-cp -r .ai-workflow/commands/.opencode/command/ .opencode/
+cp -r .ai-workflow/commands/.opencode/command/ .opencode/command/
 ```
 
 ### Step 7: Start Autonomous Development
