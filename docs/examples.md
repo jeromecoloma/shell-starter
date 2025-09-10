@@ -376,96 +376,60 @@ Usage: $(basename "$0") <command> [options]
 A multi-command CLI tool demonstrating Shell Starter patterns.
 
 COMMANDS:
-    user        User management commands
-    config      Configuration management
-    status      Show system status
-    help        Show this help message
+    status          Show system status information
+    config          Manage configuration settings
+    deploy          Deploy applications or services
+    backup          Create and manage backups
+    monitor         System monitoring utilities
 
 Use '$(basename "$0") <command> --help' for command-specific help.
 
 EXAMPLES:
-    $(basename "$0") user list
-    $(basename "$0") config set key value
-    $(basename "$0") status --verbose
+    $(basename "$0") status
+    $(basename "$0") config list
+    $(basename "$0") deploy --env prod app1
 EOF
 }
 
-# User management subcommands
-cmd_user() {
-    case "${1:-}" in
-        list|ls)
-            shift
-            user_list "$@"
-            ;;
-        add)
-            shift
-            user_add "$@"
-            ;;
-        remove|rm)
-            shift
-            user_remove "$@"
-            ;;
-        --help|-h|help|"")
-            user_help
-            ;;
-        *)
-            log::error "Unknown user command: $1"
-            user_help
-            exit 1
-            ;;
-    esac
-}
-
-user_list() {
-    log::info "Listing users..."
-    echo "User1 (active)"
-    echo "User2 (inactive)"
-    echo "User3 (active)"
-}
-
-user_add() {
-    local username="${1:-}"
+# Status command
+cmd_status() {
+    local verbose=false
     
-    if [[ -z "$username" ]]; then
-        log::error "Username required"
-        echo "Usage: $(basename "$0") user add <username>"
-        exit 1
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -v|--verbose)
+                verbose=true
+                shift
+                ;;
+            -h|--help)
+                status_help
+                exit 0
+                ;;
+            *)
+                log::error "Unknown option: $1"
+                status_help
+                exit 1
+                ;;
+        esac
+    done
+    
+    log::info "Gathering system status information..."
+    echo "${COLOR_BOLD}${COLOR_CYAN}System Status${COLOR_RESET}"
+    echo "================================"
+    printf "  ${COLOR_GREEN}Hostname:${COLOR_RESET} %s\n" "$(hostname)"
+    printf "  ${COLOR_GREEN}Timestamp:${COLOR_RESET} %s\n" "$(date)"
+    printf "  ${COLOR_GREEN}Uptime:${COLOR_RESET} %s\n" "$(uptime | awk -F'up ' '{print $2}' | awk -F', [0-9]* users' '{print $1}')"
+    printf "  ${COLOR_GREEN}Load Average:${COLOR_RESET} %s\n" "$(uptime | awk -F'load average: ' '{print $2}')"
+    
+    if [[ "$verbose" == true ]]; then
+        echo
+        log::info "Detailed system information..."
+        printf "  ${COLOR_GREEN}System:${COLOR_RESET} %s\n" "$(uname -s)"
+        printf "  ${COLOR_GREEN}Release:${COLOR_RESET} %s\n" "$(uname -r)"
+        printf "  ${COLOR_GREEN}Architecture:${COLOR_RESET} %s\n" "$(uname -m)"
     fi
     
-    log::info "Adding user: $username"
-    log::success "User $username added successfully"
-}
-
-user_remove() {
-    local username="${1:-}"
-    
-    if [[ -z "$username" ]]; then
-        log::error "Username required"
-        echo "Usage: $(basename "$0") user remove <username>"
-        exit 1
-    fi
-    
-    log::warn "Removing user: $username"
-    log::success "User $username removed successfully"
-}
-
-user_help() {
-    cat << EOF
-Usage: $(basename "$0") user <subcommand> [options]
-
-User management commands.
-
-SUBCOMMANDS:
-    list, ls         List all users
-    add <username>   Add a new user
-    remove <username> Remove a user
-    help             Show this help
-
-EXAMPLES:
-    $(basename "$0") user list
-    $(basename "$0") user add john
-    $(basename "$0") user remove jane
-EOF
+    log::success "Status check completed"
 }
 
 # Configuration management subcommands
@@ -599,33 +563,70 @@ EOF
 }
 
 main() {
+    local verbose=false
+    local quiet=false
+    
+    # Parse global options first
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -v|--version)
+                echo "$(basename "$0") $(get_version)"
+                exit 0
+                ;;
+            --verbose)
+                verbose=true
+                shift
+                ;;
+            --quiet)
+                quiet=true
+                shift
+                ;;
+            -*)
+                log::error "Unknown global option: $1"
+                show_help
+                exit 1
+                ;;
+            *)
+                # First non-option argument is the command
+                break
+                ;;
+        esac
+    done
+    
+    # Must have a command
     if [[ $# -eq 0 ]]; then
+        log::error "Command required"
         show_help
         exit 1
     fi
     
-    case $1 in
-        user)
-            shift
-            cmd_user "$@"
-            ;;
-        config)
-            shift
-            cmd_config "$@"
-            ;;
+    local command="$1"
+    shift
+    
+    # Dispatch to command handlers
+    case "$command" in
         status)
-            shift
             cmd_status "$@"
             ;;
-        -h|--help|help)
-            show_help
+        config)
+            cmd_config "$@"
             ;;
-        -v|--version)
-            echo "$(basename "$0") $(get_version)"
+        deploy)
+            cmd_deploy "$@"
+            ;;
+        backup)
+            cmd_backup "$@"
+            ;;
+        monitor)
+            cmd_monitor "$@"
             ;;
         *)
-            log::error "Unknown command: $1"
-            echo "Use '$(basename "$0") --help' for available commands."
+            log::error "Unknown command: $command"
+            show_help
             exit 1
             ;;
     esac

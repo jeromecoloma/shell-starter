@@ -83,8 +83,10 @@ Shell Starter includes several example scripts to demonstrate features:
 hello-world --help
 show-colors
 long-task
-greet-user --name "Developer" --enthusiastic
-my-cli user list
+greet-user --formal "Developer"
+my-cli status
+ai-action --help
+polyglot-example demo
 ```
 
 ## 🔧 Development
@@ -153,15 +155,54 @@ bats tests/
 
 Tests automatically run in CI on every push and pull request.
 
+### Development Tool Setup
+
+Install the required development tools:
+
+**macOS (using Homebrew):**
+```bash
+# Install code quality tools
+brew install shellcheck shfmt
+
+# Optional: Install act for local CI testing
+brew install act
+```
+
+**Ubuntu/Debian:**
+```bash
+# Install ShellCheck
+sudo apt-get update
+sudo apt-get install -y shellcheck
+
+# Install shfmt
+curl -L -o /tmp/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64
+sudo install /tmp/shfmt /usr/local/bin/shfmt
+
+# Optional: Install act for local CI testing
+curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
+```
+
+**Other Systems:**
+- **ShellCheck**: See [shellcheck.net](https://www.shellcheck.net/wiki/Installing) for installation options
+- **shfmt**: Download from [mvdan/sh releases](https://github.com/mvdan/sh/releases)
+- **Act**: See [nektos/act](https://github.com/nektos/act#installation) for installation options
+
 ### Code Quality
 
+Run code quality checks locally:
+
 ```bash
-# Lint all scripts
+# Lint all scripts (configured via .shellcheckrc)
 shellcheck bin/* lib/*.sh install.sh uninstall.sh
 
-# Format code
+# Check formatting
+shfmt -d bin/* lib/*.sh install.sh uninstall.sh
+
+# Apply formatting fixes
 shfmt -w bin/* lib/*.sh install.sh uninstall.sh
 ```
+
+**Shellcheck Configuration**: The `.shellcheckrc` file configures shellcheck to ignore warnings appropriate for shell libraries (unused variables meant for external use, file sourcing behavior, etc.).
 
 ## 🤖 AI Development
 

@@ -37,14 +37,20 @@ act pull_request --container-architecture linux/amd64
 
 - Use `--container-architecture linux/amd64` for Apple M-series compatibility
 - **Expected shellcheck output**:
-  - `SC2034` warnings for unused color variables in `lib/colors.sh` - **Expected** (library variables meant for external use)
-  - `SC1091` info about not following sourced files - **Expected** (normal shellcheck behavior when analyzing files individually)  
-  - `SC2317` info about unreachable code - **False positive** (can be ignored)
+  - Should pass cleanly (no errors/warnings) thanks to the `.shellcheckrc` configuration
+  - The config file suppresses expected warnings for shell library projects
 - **Expected shfmt output**:
-  - Formatting differences will be shown as diffs if code doesn't match shfmt's formatting rules
-  - Job fails with non-zero exit code when formatting issues are found - **Expected** (enforces consistent formatting)
+  - Should pass cleanly (no formatting differences)
+  - All files follow consistent formatting standards enforced by shfmt
 - **Expected test output**:
   - Should show all 96+ tests passing with "ok" status
   - Test results displayed in TAP (Test Anything Protocol) format
   - Job fails if any tests fail - **Expected** (ensures code quality)
 - The CI validates that linting, formatting, and testing tools are working correctly
+
+## Shellcheck Configuration
+
+The project includes a `.shellcheckrc` file that configures shellcheck for this project's needs:
+- Ignores `SC2034` (unused variables) since libraries define variables for external use
+- Ignores `SC1091` (sourcing files) which is normal when analyzing files individually
+- Ignores various style/info warnings that don't affect functionality

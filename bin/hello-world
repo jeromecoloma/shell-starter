@@ -11,7 +11,7 @@ SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SHELL_STARTER_ROOT}/lib/main.sh"
 
 show_help() {
-    cat << EOF
+	cat <<EOF
 Usage: $(basename "$0") [OPTIONS] [NAME]
 
 A simple greeting script that demonstrates Shell Starter features.
@@ -32,39 +32,39 @@ EOF
 }
 
 main() {
-    local quiet=false
-    local name="World"
-    
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            --quiet|-q)
-                quiet=true
-                shift
-                ;;
-            --help|-h|--version|-v)
-                parse_common_args "$(basename "$0")" "$@"
-                ;;
-            -*)
-                log::error "Unknown option: $1"
-                echo "Use --help for usage information."
-                exit 1
-                ;;
-            *)
-                name="$1"
-                shift
-                ;;
-        esac
-    done
-    
-    if [[ "$quiet" == "true" ]]; then
-        echo "Hello, $name!"
-    else
-        echo -e "${COLOR_GREEN}Hello, ${COLOR_BOLD}$name${COLOR_RESET}${COLOR_GREEN}!${COLOR_RESET}"
-    fi
-    
-    log::info "Greeting completed successfully"
+	local quiet=false
+	local name="World"
+
+	while [[ $# -gt 0 ]]; do
+		case $1 in
+		--quiet | -q)
+			quiet=true
+			shift
+			;;
+		--help | -h | --version | -v)
+			parse_common_args "$(basename "$0")" "$@"
+			;;
+		-*)
+			log::error "Unknown option: $1"
+			echo "Use --help for usage information."
+			exit 1
+			;;
+		*)
+			name="$1"
+			shift
+			;;
+		esac
+	done
+
+	if [[ "$quiet" == "true" ]]; then
+		echo "Hello, $name!"
+	else
+		echo -e "${COLOR_GREEN}Hello, ${COLOR_BOLD}$name${COLOR_RESET}${COLOR_GREEN}!${COLOR_RESET}"
+	fi
+
+	log::info "Greeting completed successfully"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
+	main "$@"
 fi

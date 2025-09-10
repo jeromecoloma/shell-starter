@@ -335,4 +335,63 @@ sleep 1
 - Include examples in help output
 - Keep help text concise but informative
 
+## 🔍 Code Quality Tools
+
+### Tool Installation
+
+Before contributing, install the required development tools:
+
+**macOS (Homebrew):**
+```bash
+brew install shellcheck shfmt
+```
+
+**Ubuntu/Debian:**
+```bash
+# ShellCheck
+sudo apt-get install -y shellcheck
+
+# shfmt  
+curl -L -o /tmp/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64
+sudo install /tmp/shfmt /usr/local/bin/shfmt
+```
+
+**Windows:**
+- Use WSL2 with Ubuntu setup above, or
+- Use package managers like Chocolatey or Scoop
+- See official tool documentation for Windows-specific instructions
+
+### Shellcheck Configuration
+
+The project includes a `.shellcheckrc` file that configures shellcheck for shell library development:
+
+```bash
+# Check if shellcheck passes
+shellcheck lib/*.sh bin/* install.sh uninstall.sh
+```
+
+The configuration suppresses warnings that are expected in a shell library project:
+- `SC2034`: Variables defined in libraries for external use
+- `SC1091`: File sourcing behavior when analyzing individual files  
+- Various style/info warnings that don't affect functionality
+
+### Code Formatting
+
+Use `shfmt` to ensure consistent formatting:
+
+```bash
+# Check formatting
+shfmt -d lib/*.sh bin/* install.sh uninstall.sh
+
+# Apply formatting fixes
+shfmt -w lib/*.sh bin/* install.sh uninstall.sh
+```
+
+### Continuous Integration
+
+The project uses GitHub Actions to automatically verify:
+- Shellcheck linting passes
+- Code formatting is consistent with shfmt
+- All Bats tests pass
+
 Following these conventions ensures that all Shell Starter scripts are consistent, maintainable, and follow bash best practices.
