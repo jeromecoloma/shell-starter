@@ -2,6 +2,43 @@
 
 This guide provides AI coding assistants with the information needed to generate compliant Shell Starter scripts. It includes prompt templates, examples, and best practices for AI-assisted development.
 
+## 🔄 Autonomous AI Development
+
+**New!** Shell Starter includes `generate-ai-workflow` - a tool that creates autonomous AI development workflows:
+
+### Quick Setup for Any Project
+
+```bash
+# Generate autonomous development workflow
+./bin/generate-ai-workflow my-cli-tool
+
+# Install commands for your AI coding agent
+cp -r .ai-workflow/commands/.claude/commands/ .claude/     # Claude Code
+cp -r .ai-workflow/commands/.cursor/commands/ .cursor/     # Cursor
+cp -r .ai-workflow/commands/.gemini/commands/ .gemini/     # Gemini CLI
+
+# Customize project requirements
+vim .ai-workflow/state/requirements.md
+
+# Start autonomous development
+/dev start
+```
+
+### Autonomous AI Commands
+
+- **`/dev start`**: Begin self-managing development cycle
+- **`/qa`**: Run comprehensive quality assurance  
+- **`/status`**: Show current project status
+
+The AI will automatically:
+- Break down tasks and track progress
+- Implement features following Shell Starter conventions
+- Run quality checks (shellcheck, shfmt, testing)
+- Resume development across context resets
+- Provide detailed progress reports
+
+See [Image Resizer Journey](journeys/ai-assisted/image-resizer.md) for a complete example.
+
 ## 🤖 AI Assistant Guidelines
 
 ### Core Principles

@@ -6,7 +6,7 @@ Build a professional batch image resizing tool using Shell Starter and an AI cod
 
 **What You'll Build:** A CLI tool that batch resizes images using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
 
-**AI Assistant:** Any coding AI (Claude, ChatGPT, Gemini, etc.)
+**AI Coding Agents:** Claude Code, Cursor, Codex, Gemini CLI, etc.
 
 **Final Result:** Production-ready `image-resize` script with professional UX
 
@@ -21,7 +21,7 @@ Build a professional batch image resizing tool using Shell Starter and an AI cod
 ## 📚 Prerequisites
 
 - Basic command line knowledge
-- Access to an AI coding assistant
+- Access to an AI coding agent
 - ImageMagick installed (`brew install imagemagick` or `apt-get install imagemagick`)
 - Some sample images for testing
 
@@ -97,99 +97,180 @@ image-resize --preview /path/to/input 1920x1080       # Preview only
 
 ## Phase 3: AI-Assisted Development (15 minutes)
 
-### Step 6: Craft the AI Prompt
+### Step 6: Setup Autonomous AI Development Workflow
 
-Copy this prompt to your AI assistant:
+Instead of crafting a single prompt, we'll set up a self-managing AI development system that can work across context windows and different AI coding agents.
 
-```
-Create a Shell Starter script named "image-resize" that batch resizes images using ImageMagick with the following features:
-
-CORE FUNCTIONALITY:
-- Interactive mode: prompts for input directory, output directory, and dimensions
-- Direct mode: accepts input/output paths and dimensions as arguments
-- Batch processing of common image formats (jpg, png, gif, tiff, bmp)
-- Maintain aspect ratio option or exact dimensions
-- Preview mode to show what would be processed without actually resizing
-
-SHELL STARTER REQUIREMENTS:
-- Follow Shell Starter conventions from docs/conventions.md
-- Use the standard script template with proper header
-- Include comprehensive help text with usage examples
-- Use logging functions (log::info, log::error, log::warn) instead of echo
-- Include proper argument parsing with --help and --version
-- Add input validation for all paths and dimensions
-- Handle errors gracefully with meaningful messages
-
-TECHNICAL REQUIREMENTS:
-- Check for ImageMagick dependency (convert command)
-- Validate input directory exists and is readable
-- Create output directory if it doesn't exist
-- Show progress with Shell Starter's spinner functions
-- Handle file permission errors, disk space issues
-- Support both "WIDTHxHEIGHT" and "WIDTH" (maintain aspect) formats
-- Skip already processed files or provide overwrite option
-
-ERROR HANDLING:
-- ImageMagick not installed
-- Invalid directory paths
-- No images found in input directory
-- Insufficient disk space
-- File permission issues
-- Invalid dimension formats
-
-The script should be saved as bin/image-resize (no .sh extension) and be executable.
-
-Include comprehensive help text with examples showing both interactive and direct usage modes.
-```
-
-### Step 7: Review and Understand the Generated Code
-
-The AI will generate a script following Shell Starter patterns. Key sections to review:
-
-1. **Header and imports** - Sources `lib/main.sh`
-2. **Help function** - Comprehensive usage examples
-3. **Input validation** - Checks for ImageMagick, paths, dimensions
-4. **Main logic** - Interactive vs direct modes
-5. **Error handling** - Meaningful error messages with logging
-
-### Step 8: Save and Make Executable
+#### 6A: Generate AI Workflow Structure
 
 ```bash
-# Save the AI-generated code to bin/image-resize
-# Make it executable
-chmod +x bin/image-resize
+# Generate the autonomous development workflow
+./bin/generate-ai-workflow image-resize
 ```
+
+This creates:
+- `.ai-workflow/state/` - Task tracking and progress files
+- `.ai-workflow/commands/` - Multi-agent command definitions
+
+#### 6B: Customize Project Requirements
+
+Edit the generated requirements file:
+
+```bash
+# Edit the project requirements
+# Update with image-resizer specific features
+open .ai-workflow/state/requirements.md
+```
+
+Update it with:
+
+```markdown
+# image-resize - Project Requirements
+
+## Overview
+Batch image resizing CLI tool using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
+
+## Core Features
+- [ ] Interactive mode: prompts for input directory, output directory, and dimensions
+- [ ] Direct mode: accepts input/output paths and dimensions as arguments
+- [ ] Batch processing of common image formats (jpg, png, gif, tiff, bmp)
+- [ ] Maintain aspect ratio option or exact dimensions
+- [ ] Preview mode to show what would be processed without actually resizing
+
+## Shell Starter Requirements
+- [ ] Follow Shell Starter conventions from docs/conventions.md
+- [ ] Use the standard script template with proper header
+- [ ] Include comprehensive help text with usage examples
+- [ ] Use logging functions (log::info, log::error, log::warn) instead of echo
+- [ ] Include proper argument parsing with --help and --version
+- [ ] Add input validation for all paths and dimensions
+- [ ] Handle errors gracefully with meaningful messages
+
+## Technical Requirements
+- [ ] Check for ImageMagick dependency (convert command)
+- [ ] Validate input directory exists and is readable
+- [ ] Create output directory if it doesn't exist
+- [ ] Show progress with Shell Starter's spinner functions
+- [ ] Handle file permission errors, disk space issues
+- [ ] Support both "WIDTHxHEIGHT" and "WIDTH" (maintain aspect) formats
+- [ ] Skip already processed files or provide overwrite option
+
+## Error Handling Scenarios
+- [ ] ImageMagick not installed
+- [ ] Invalid directory paths
+- [ ] No images found in input directory
+- [ ] Insufficient disk space
+- [ ] File permission issues
+- [ ] Invalid dimension formats
+
+## Success Criteria
+- [ ] Script exists at bin/image-resize and is executable
+- [ ] Passes shellcheck and shfmt quality checks
+- [ ] Help text includes comprehensive usage examples
+- [ ] All error conditions handled gracefully with log:: functions
+- [ ] Interactive mode prompts work correctly
+- [ ] Direct mode accepts all argument patterns
+- [ ] Preview mode shows processing plan without executing
+- [ ] Manual testing successful with real images
+```
+
+#### 6C: Install Commands for Your AI Agent
+
+Copy the appropriate commands to your coding agent:
+
+```bash
+# For Claude Code users:
+cp -r .ai-workflow/commands/.claude/commands/ .claude/
+
+# For Cursor users:
+cp -r .ai-workflow/commands/.cursor/commands/ .cursor/
+
+# For Gemini CLI users:
+cp -r .ai-workflow/commands/.gemini/commands/ .gemini/
+
+# For OpenCode users:
+cp -r .ai-workflow/commands/.opencode/command/ .opencode/
+```
+
+### Step 7: Start Autonomous Development
+
+Now launch the AI development cycle:
+
+```
+/dev start
+```
+
+Your AI coding agent will now:
+
+1. **Read** the current state from `.ai-workflow/state/` files
+2. **Analyze** the next incomplete task
+3. **Act** by implementing that specific feature
+4. **Verify** with quality checks (shellcheck, shfmt, manual testing)
+5. **Update** progress in the state files
+6. **Continue** to the next task automatically
+
+**Expected AI Output:**
+```
+🔄 AUTONOMOUS DEVELOPMENT CYCLE
+Current Task: IMAGE-RESIZE-1: Create project structure and basic executable
+Action: Creating bin/image-resize with Shell Starter template structure
+Progress: Implementing help text and argument parsing
+Next: IMAGE-RESIZE-2: Implement help text and version handling
+```
+
+### Step 8: Monitor and Resume Development
+
+If the AI reaches context limits, it will save state and prompt you:
+
+```
+Continue development with: /dev
+```
+
+Simply start a new conversation and run:
+
+```
+/dev
+```
+
+The AI will read the saved state and continue exactly where it left off.
 
 ---
 
 ## Phase 4: Testing & Refinement (10 minutes)
 
-### Step 9: Run Quality Checks
+### Step 9: Run Quality Assurance
 
-```bash
-# Lint the script (following Shell Starter conventions)
-shellcheck bin/image-resize
+The AI workflow includes built-in QA. Run comprehensive checks:
 
-# Check formatting
-shfmt -d bin/image-resize
-
-# Apply formatting fixes if needed
-shfmt -w bin/image-resize
+```
+/qa
 ```
 
-### Step 10: Basic Testing
+**Expected QA Output:**
+```
+🔍 QA REPORT
+Files Checked: bin/image-resize
+Issues Found: 0
+Critical: None
+Warnings: None
+Status: PASS - Ready for manual testing
+```
+
+If issues are found, the AI will provide specific fixes to implement.
+
+### Step 10: Manual Testing
+
+The autonomous development should have created a working script. Test it:
 
 ```bash
-# Test help and version
+# Test help and version (should work automatically)
 ./bin/image-resize --help
 ./bin/image-resize --version
 
-# Test dependency checking (if ImageMagick isn't installed)
-# The script should gracefully handle this
+# Test dependency checking
+./bin/image-resize --preview /nonexistent/path 800x600
 
-# Test with invalid arguments
-./bin/image-resize /nonexistent/path
-./bin/image-resize /some/path invalid-dimensions
+# The AI should have implemented proper error handling for all scenarios
 ```
 
 ### Step 11: Create Test Images and Directories
@@ -201,28 +282,30 @@ mkdir -p test-images/input test-images/output
 # Add some test images to test-images/input/
 # (download or copy some sample images)
 
-# Test the interactive mode
-./bin/image-resize
-# Follow the prompts: input dir, output dir, dimensions
-
-# Test direct mode
-./bin/image-resize test-images/input test-images/output 800x600
-
-# Test preview mode
-./bin/image-resize --preview test-images/input 1920x1080
+# Test the modes (AI should have implemented all these)
+./bin/image-resize                                    # Interactive mode
+./bin/image-resize test-images/input test-images/output 800x600  # Direct mode
+./bin/image-resize --preview test-images/input 1920x1080        # Preview mode
 ```
 
 ### Step 12: Handle Issues and Iterate
 
-If you encounter issues, ask the AI to fix them:
+If issues are found, the autonomous workflow handles fixes:
 
 ```
-The image-resize script has an issue with [describe the problem]. 
+/dev
+```
 
-Current behavior: [what's happening]
-Expected behavior: [what should happen]
+The AI will:
+1. Detect the issue from testing results
+2. Fix the problem automatically
+3. Re-run QA to verify the fix
+4. Update progress logs
 
-Please provide the corrected code section that follows Shell Starter conventions and handles this error gracefully.
+For complex issues, you can check development status:
+
+```
+/status
 ```
 
 ---
@@ -231,20 +314,29 @@ Please provide the corrected code section that follows Shell Starter conventions
 
 ### Step 13: Add Advanced Features
 
-Ask the AI to enhance the script:
+To add enhancements, update the requirements and let the AI continue:
 
+```bash
+# Edit requirements to add new features
+open .ai-workflow/state/requirements.md
 ```
-Enhance the image-resize script with these additional features:
 
-1. **Quality settings**: Add --quality option (1-100) for JPEG compression
-2. **Format conversion**: Allow output format different from input (--format jpg/png/etc)  
-3. **Recursive processing**: Add --recursive flag to process subdirectories
-4. **Batch operations**: Progress indicator showing "Processing image X of Y"
-5. **Dry run improvements**: Better preview showing before/after file sizes
-
-Update the help text to include these new options and provide usage examples.
-Maintain Shell Starter conventions throughout.
+Add to the requirements:
+```markdown
+## Advanced Features
+- [ ] Quality settings: --quality option (1-100) for JPEG compression
+- [ ] Format conversion: --format flag for output format (jpg/png/etc)
+- [ ] Recursive processing: --recursive flag to process subdirectories
+- [ ] Progress indicators: "Processing image X of Y" display
+- [ ] Enhanced preview: Show before/after file sizes
 ```
+
+Then continue development:
+```
+/dev
+```
+
+The AI will automatically pick up the new requirements and implement them following the same autonomous cycle.
 
 ### Step 14: Generate Comprehensive Tests
 

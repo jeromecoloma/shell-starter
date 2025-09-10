@@ -635,6 +635,246 @@ main() {
 main "$@"
 ```
 
+### 6. AI Workflow Generator Script
+
+A sophisticated script that generates multi-agent AI development workflows:
+
+```bash
+#!/usr/bin/env bash
+#
+# generate-ai-workflow - Generate multi-agent AI development workflow
+#
+# Description:
+#   Creates project-specific AI workflow commands and state management files
+#   for autonomous development across different AI coding agents.
+#
+# Usage:
+#   generate-ai-workflow <project-name>
+#   generate-ai-workflow --help
+#   generate-ai-workflow --version
+
+set -euo pipefail
+
+# Source the Shell Starter library
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
+
+# shellcheck source=../lib/main.sh
+source "$LIB_DIR/main.sh"
+
+# Script metadata
+SCRIPT_NAME="generate-ai-workflow"
+SCRIPT_DESCRIPTION="Generate multi-agent AI development workflow"
+
+show_help() {
+    cat <<EOF
+$SCRIPT_NAME - $SCRIPT_DESCRIPTION
+
+USAGE:
+    $SCRIPT_NAME <project-name>
+    $SCRIPT_NAME --help
+    $SCRIPT_NAME --version
+
+ARGUMENTS:
+    project-name    Name of the project to generate workflow for
+
+DESCRIPTION:
+    Generates a complete AI development workflow including:
+    - State management files (.ai-workflow/state/)
+    - Multi-agent command definitions (.ai-workflow/commands/)
+    - Development task templates
+    - QA and progress tracking
+
+    Supports these AI coding agents:
+    - Claude Code (.claude/commands/)
+    - Cursor (.cursor/commands/) 
+    - Gemini CLI (.gemini/commands/)
+    - OpenCode (.opencode/command/)
+
+EXAMPLES:
+    $SCRIPT_NAME image-resizer
+    $SCRIPT_NAME my-cli-tool
+    $SCRIPT_NAME web-scraper
+EOF
+}
+
+generate_state_files() {
+    local project_name="$1"
+    
+    log::info "Creating state management files for $project_name..."
+    
+    mkdir -p .ai-workflow/state
+    
+    # Generate tasks.md with project-specific task breakdown
+    local project_upper=$(echo "$project_name" | tr '[:lower:]' '[:upper:]')
+    cat >.ai-workflow/state/tasks.md <<EOF
+# $project_name - Development Tasks
+
+## Phase 1: Foundation Setup
+- [ ] **$project_upper-1:** Create project structure and basic executable
+- [ ] **$project_upper-2:** Implement help text and version handling
+- [ ] **$project_upper-3:** Add dependency checking and validation
+
+## Phase 2: Core Functionality  
+- [ ] **$project_upper-4:** Implement main feature logic
+- [ ] **$project_upper-5:** Add input validation and error handling
+- [ ] **$project_upper-6:** Integrate Shell Starter logging and UI components
+
+## Phase 3: Quality & Polish
+- [ ] **$project_upper-7:** Add comprehensive error handling
+- [ ] **$project_upper-8:** Implement progress indicators and user feedback
+- [ ] **$project_upper-9:** Add advanced features and options
+
+## Phase 4: Testing & Documentation
+- [ ] **$project_upper-10:** Create comprehensive test suite
+- [ ] **$project_upper-11:** Add usage examples and documentation
+- [ ] **$project_upper-12:** Final QA and release preparation
+EOF
+
+    # Generate requirements.md template
+    cat >.ai-workflow/state/requirements.md <<EOF
+# $project_name - Project Requirements
+
+## Overview
+[Edit this section with your project description]
+
+## Core Features
+- [ ] Feature 1: [Describe main functionality]
+- [ ] Feature 2: [Describe secondary functionality] 
+- [ ] Feature 3: [Describe additional functionality]
+
+## Shell Starter Requirements
+- [ ] Follow Shell Starter conventions
+- [ ] Use lib/main.sh and provided functions
+- [ ] Include --help and --version flags
+- [ ] Use log:: functions instead of echo
+- [ ] Handle all error conditions gracefully
+- [ ] Include progress indicators for long operations
+EOF
+}
+
+generate_claude_commands() {
+    local project_name="$1"
+    
+    mkdir -p .ai-workflow/commands/.claude/commands
+    
+    # /dev command for autonomous development
+    cat >.ai-workflow/commands/.claude/commands/dev.md <<'EOF'
+You are managing autonomous development for the current project. Follow this protocol exactly.
+
+**Arguments:**
+- No args or "start": Initialize/resume development cycle
+- "status": Show current development state only
+
+**AUTONOMOUS DEVELOPMENT PROTOCOL:**
+
+1. **READ STATE** (always check current state first):
+   - Read `.ai-workflow/state/tasks.md` - Find next incomplete task `[ ]`
+   - Read `.ai-workflow/state/requirements.md` - Understand project goals
+   - Read `.ai-workflow/state/progress.log` - Check recent progress
+
+2. **ANALYZE** (determine what to do):
+   - Identify the next incomplete task from tasks.md
+   - Understand what this task requires
+   - Check if any previous work needs to be continued
+
+3. **ACT** (execute development work):
+   - Work on ONLY the current incomplete task
+   - Follow Shell Starter conventions and patterns
+   - Create/modify files as needed for this specific task
+   - Use proper logging, error handling, and Shell Starter functions
+
+4. **VERIFY** (quality assurance):
+   - Run `shellcheck` on any shell scripts created/modified
+   - Run `shfmt -d` to check formatting
+   - Test the functionality manually if applicable
+   - Ensure the task is actually complete
+
+5. **UPDATE STATE** (record progress):
+   - Mark completed tasks with `[x]` in tasks.md
+   - Add detailed progress entry to progress.log with timestamp
+   - Identify next task or mark project complete
+
+**OUTPUT FORMAT:**
+```
+🔄 AUTONOMOUS DEVELOPMENT CYCLE
+Current Task: [task code and description]
+Action: [what you're implementing]
+Progress: [current progress status]
+Next: [next task or completion status]
+```
+
+Begin autonomous development now.
+EOF
+}
+
+main() {
+    local project_name=""
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+        --help | -h | --version | -v)
+            parse_common_args "$SCRIPT_NAME" "$@"
+            ;;
+        -*)
+            log::error "Unknown option: $1"
+            echo "Use --help for usage information."
+            exit 1
+            ;;
+        *)
+            project_name="$1"
+            shift
+            ;;
+        esac
+    done
+
+    if [[ -z "$project_name" ]]; then
+        log::error "Project name is required"
+        log::info "Usage: $SCRIPT_NAME <project-name>"
+        exit 1
+    fi
+
+    # Validate project name (alphanumeric, hyphens, underscores)
+    if [[ ! "$project_name" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+        log::error "Project name must contain only letters, numbers, hyphens, and underscores"
+        exit 1
+    fi
+
+    log::info "Generating AI workflow for project: $project_name"
+
+    # Generate all components
+    generate_state_files "$project_name"
+    generate_claude_commands "$project_name"
+
+    log::info "✓ AI workflow generated successfully!"
+    echo
+    log::info "Next steps:"
+    log::info "1. Edit .ai-workflow/state/requirements.md with your project details"
+    log::info "2. Copy commands to your AI coding agent:"
+    log::info "   • Claude Code:  cp -r .ai-workflow/commands/.claude/commands/ .claude/"
+    log::info "3. Start development with: /dev start"
+}
+
+# Run main function with all arguments
+main "$@"
+```
+
+**Key Features Demonstrated:**
+- **Advanced file generation**: Creates complex directory structures and template files
+- **String manipulation**: Project name validation and case conversion
+- **Heredoc usage**: Multiple file templates with variable substitution
+- **Multi-agent support**: Generates commands for different AI coding environments
+- **Professional UX**: Comprehensive help, validation, and user guidance
+- **State management**: Creates persistent workflow files for autonomous AI development
+
+**Usage:**
+```bash
+./bin/generate-ai-workflow my-project
+# Creates .ai-workflow/ with state management and AI commands
+# Copy appropriate commands to your AI agent's directory
+# Start autonomous development with /dev start
+```
+
 ## 🔗 Polyglot Integration Examples
 
 ### 6. Bash + Python Integration

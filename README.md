@@ -73,6 +73,7 @@ Shell Starter includes several example scripts to demonstrate features:
 | `my-cli` | Multi-command dispatcher (git-like subcommands) |
 | `ai-action` | Template for AI API integration with secure key handling |
 | `polyglot-example` | Bash + Python integration example |
+| `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
 
 ### Try the examples:
 
@@ -85,6 +86,7 @@ Shell Starter includes several example scripts to demonstrate features:
 ./bin/my-cli status
 ./bin/ai-action --help
 ./bin/polyglot-example demo
+./bin/generate-ai-workflow --help
 ```
 
 ## 🔧 Development
@@ -143,13 +145,23 @@ Access color variables directly: `$RED`, `$GREEN`, `$BLUE`, `$YELLOW`, `$PURPLE`
 Run the test suite:
 
 ```bash
-# Run tests locally
+# Run all tests
 ./tests/bats-core/bin/bats tests/*.bats
+
+# Run specific test suites
+./tests/bats-core/bin/bats tests/hello-world.bats
+./tests/bats-core/bin/bats tests/generate-ai-workflow.bats
+./tests/bats-core/bin/bats tests/lib-*.bats
 
 # Or install bats-core globally
 npm install -g bats
 bats tests/
 ```
+
+**Test Coverage**: The test suite includes comprehensive coverage of:
+- All example scripts (hello-world, generate-ai-workflow, etc.)
+- Library functions (logging, colors, spinners, utils)
+- Integration tests for Shell Starter framework
 
 Tests automatically run in CI on every push and pull request.
 
@@ -201,6 +213,45 @@ shfmt -w bin/* lib/*.sh install.sh uninstall.sh
 ```
 
 **Shellcheck Configuration**: The `.shellcheckrc` file configures shellcheck to ignore warnings appropriate for shell libraries (unused variables meant for external use, file sourcing behavior, etc.).
+
+## 🤖 AI Workflow Generator
+
+Shell Starter includes `generate-ai-workflow` - a tool that creates autonomous AI development workflows for any project:
+
+### Quick Start
+
+```bash
+# Generate AI workflow for your project
+./bin/generate-ai-workflow my-cli-tool
+
+# Copy commands to your AI coding agent
+cp -r .ai-workflow/commands/.claude/commands/ .claude/  # For Claude Code
+cp -r .ai-workflow/commands/.cursor/commands/ .cursor/  # For Cursor
+cp -r .ai-workflow/commands/.gemini/commands/ .gemini/ # For Gemini CLI
+
+# Edit project requirements
+vim .ai-workflow/state/requirements.md
+
+# Start autonomous development
+/dev start
+```
+
+### What It Creates
+
+- **State Management**: Task tracking, requirements, progress logs
+- **Multi-Agent Commands**: Works with Claude Code, Cursor, Gemini CLI, OpenCode
+- **Autonomous Development**: Self-managing AI development cycles
+- **Context Persistence**: Resume development across conversation resets
+
+### AI Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/dev start` | Begin/resume autonomous development |
+| `/qa` | Run comprehensive quality assurance |
+| `/status` | Show current project status |
+
+See the [Image Resizer Journey](docs/journeys/ai-assisted/image-resizer.md) for a complete example.
 
 ## 🤖 AI Development
 
