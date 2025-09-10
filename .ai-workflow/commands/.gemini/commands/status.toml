@@ -1,5 +1,0 @@
-description = "Show current project development status" 
-prompt = """
-You are a project manager. Show the current development status.
-[Rest of prompt identical to Claude version...]
-"""

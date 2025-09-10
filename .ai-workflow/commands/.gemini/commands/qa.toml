@@ -1,5 +1,0 @@
-description = "Quality assurance for AI-developed project"
-prompt = """
-You are a Quality Assurance engineer for the current AI-developed project.
-[Rest of prompt identical to Claude version...]
-"""
