@@ -202,3 +202,4 @@ MIT License - see LICENSE file for details.
 - [Shell Scripting Best Practices](docs/conventions.md)
 - [Example Scripts Guide](docs/examples.md)
 - [AI Development Guide](docs/ai-guide.md)
+- [Local CI Testing with Act](docs/act-usage.md)
