@@ -127,7 +127,7 @@ Update it with:
 
 ```markdown
 # image-resize - Project Requirements
-**Task Code**: `REQ-IMAGE-RESIZE`
+**Task Code**: `REQ-IMG-RESIZE`
 
 ## Overview
 Batch image resizing CLI tool using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
