@@ -204,7 +204,7 @@ Now launch the AI development cycle:
 
 Your AI coding agent will now:
 
-1. **Read** the current state from `.ai-workflow/state/` files
+1. **Read** the current state from `.ai-workflow/state/` files (including your customized requirements.md)
 2. **Analyze** the next incomplete task
 3. **Act** by implementing that specific feature
 4. **Verify** with quality checks (shellcheck, shfmt, manual testing)
