@@ -23,7 +23,7 @@ act push --container-architecture linux/amd64
 
 ### Run specific job
 ```bash
-act -j test --container-architecture linux/amd64
+act -j shellcheck --container-architecture linux/amd64
 ```
 
 ### Run for pull request event
@@ -34,5 +34,8 @@ act pull_request --container-architecture linux/amd64
 ## Notes
 
 - Use `--container-architecture linux/amd64` for Apple M-series compatibility
-- The CI will fail on shellcheck warnings until tasks SHS-28, SHS-29, SHS-30 are completed
-- This is expected behavior and validates that the CI pipeline is working correctly
+- **Expected shellcheck output**:
+  - `SC2034` warnings for unused color variables in `lib/colors.sh` - **Expected** (library variables meant for external use)
+  - `SC1091` info about not following sourced files - **Expected** (normal shellcheck behavior when analyzing files individually)  
+  - `SC2317` info about unreachable code - **False positive** (can be ignored)
+- The CI validates that linting and testing tools are working correctly
