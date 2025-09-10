@@ -118,35 +118,36 @@ EOF
 	# Generate requirements.md
 	cat >.ai-workflow/state/requirements.md <<EOF
 # $project_name - Project Requirements
+**Task Code**: \`REQ-$project_upper\`
 
 ## Overview
 [Edit this section with your project description]
 
 ## Core Features
-- [ ] Feature 1: [Describe main functionality]
-- [ ] Feature 2: [Describe secondary functionality] 
-- [ ] Feature 3: [Describe additional functionality]
+- [ ] **REQ-1:** [Describe main functionality]
+- [ ] **REQ-2:** [Describe secondary functionality] 
+- [ ] **REQ-3:** [Describe additional functionality]
 
 ## Shell Starter Requirements
-- [ ] Follow Shell Starter conventions
-- [ ] Use lib/main.sh and provided functions
-- [ ] Include --help and --version flags
-- [ ] Use log:: functions instead of echo
-- [ ] Handle all error conditions gracefully
-- [ ] Include progress indicators for long operations
+- [ ] **REQ-4:** Follow Shell Starter conventions
+- [ ] **REQ-5:** Use lib/main.sh and provided functions
+- [ ] **REQ-6:** Include --help and --version flags
+- [ ] **REQ-7:** Use log:: functions instead of echo
+- [ ] **REQ-8:** Handle all error conditions gracefully
+- [ ] **REQ-9:** Include progress indicators for long operations
 
 ## Technical Requirements  
-- [ ] Input validation for all parameters
-- [ ] Dependency checking with helpful error messages
-- [ ] Cross-platform compatibility (macOS/Linux)
-- [ ] Professional CLI UX patterns
+- [ ] **REQ-10:** Input validation for all parameters
+- [ ] **REQ-11:** Dependency checking with helpful error messages
+- [ ] **REQ-12:** Cross-platform compatibility (macOS/Linux)
+- [ ] **REQ-13:** Professional CLI UX patterns
 
 ## Success Criteria
-- [ ] Script executable and follows naming conventions
-- [ ] Passes shellcheck and shfmt quality checks
-- [ ] Comprehensive help text with usage examples
-- [ ] All error scenarios handled with meaningful messages
-- [ ] Manual testing successful across different scenarios
+- [ ] **REQ-14:** Script executable and follows naming conventions
+- [ ] **REQ-15:** Passes shellcheck and shfmt quality checks
+- [ ] **REQ-16:** Comprehensive help text with usage examples
+- [ ] **REQ-17:** All error scenarios handled with meaningful messages
+- [ ] **REQ-18:** Manual testing successful across different scenarios
 EOF
 
 	# Generate progress.log

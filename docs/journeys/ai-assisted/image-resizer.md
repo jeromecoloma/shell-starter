@@ -1,4 +1,5 @@
 # Development Journey: AI-Assisted Image Resizer CLI
+**Task Code**: `JOURNEY-IMG-RESIZE`
 
 Build a professional batch image resizing tool using Shell Starter and an AI coding assistant.
 
@@ -126,52 +127,53 @@ Update it with:
 
 ```markdown
 # image-resize - Project Requirements
+**Task Code**: `REQ-IMAGE-RESIZE`
 
 ## Overview
 Batch image resizing CLI tool using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
 
 ## Core Features
-- [ ] Interactive mode: prompts for input directory, output directory, and dimensions
-- [ ] Direct mode: accepts input/output paths and dimensions as arguments
-- [ ] Batch processing of common image formats (jpg, png, gif, tiff, bmp)
-- [ ] Maintain aspect ratio option or exact dimensions
-- [ ] Preview mode to show what would be processed without actually resizing
+- [ ] **REQ-1:** Interactive mode: prompts for input directory, output directory, and dimensions
+- [ ] **REQ-2:** Direct mode: accepts input/output paths and dimensions as arguments
+- [ ] **REQ-3:** Batch processing of common image formats (jpg, png, gif, tiff, bmp)
+- [ ] **REQ-4:** Maintain aspect ratio option or exact dimensions
+- [ ] **REQ-5:** Preview mode to show what would be processed without actually resizing
 
 ## Shell Starter Requirements
-- [ ] Follow Shell Starter conventions from docs/conventions.md
-- [ ] Use the standard script template with proper header
-- [ ] Include comprehensive help text with usage examples
-- [ ] Use logging functions (log::info, log::error, log::warn) instead of echo
-- [ ] Include proper argument parsing with --help and --version
-- [ ] Add input validation for all paths and dimensions
-- [ ] Handle errors gracefully with meaningful messages
+- [ ] **REQ-6:** Follow Shell Starter conventions from docs/conventions.md
+- [ ] **REQ-7:** Use the standard script template with proper header
+- [ ] **REQ-8:** Include comprehensive help text with usage examples
+- [ ] **REQ-9:** Use logging functions (log::info, log::error, log::warn) instead of echo
+- [ ] **REQ-10:** Include proper argument parsing with --help and --version
+- [ ] **REQ-11:** Add input validation for all paths and dimensions
+- [ ] **REQ-12:** Handle errors gracefully with meaningful messages
 
 ## Technical Requirements
-- [ ] Check for ImageMagick dependency (convert command)
-- [ ] Validate input directory exists and is readable
-- [ ] Create output directory if it doesn't exist
-- [ ] Show progress with Shell Starter's spinner functions
-- [ ] Handle file permission errors, disk space issues
-- [ ] Support both "WIDTHxHEIGHT" and "WIDTH" (maintain aspect) formats
-- [ ] Skip already processed files or provide overwrite option
+- [ ] **REQ-13:** Check for ImageMagick dependency (convert command)
+- [ ] **REQ-14:** Validate input directory exists and is readable
+- [ ] **REQ-15:** Create output directory if it doesn't exist
+- [ ] **REQ-16:** Show progress with Shell Starter's spinner functions
+- [ ] **REQ-17:** Handle file permission errors, disk space issues
+- [ ] **REQ-18:** Support both "WIDTHxHEIGHT" and "WIDTH" (maintain aspect) formats
+- [ ] **REQ-19:** Skip already processed files or provide overwrite option
 
 ## Error Handling Scenarios
-- [ ] ImageMagick not installed
-- [ ] Invalid directory paths
-- [ ] No images found in input directory
-- [ ] Insufficient disk space
-- [ ] File permission issues
-- [ ] Invalid dimension formats
+- [ ] **REQ-20:** ImageMagick not installed
+- [ ] **REQ-21:** Invalid directory paths
+- [ ] **REQ-22:** No images found in input directory
+- [ ] **REQ-23:** Insufficient disk space
+- [ ] **REQ-24:** File permission issues
+- [ ] **REQ-25:** Invalid dimension formats
 
 ## Success Criteria
-- [ ] Script exists at bin/image-resize and is executable
-- [ ] Passes shellcheck and shfmt quality checks
-- [ ] Help text includes comprehensive usage examples
-- [ ] All error conditions handled gracefully with log:: functions
-- [ ] Interactive mode prompts work correctly
-- [ ] Direct mode accepts all argument patterns
-- [ ] Preview mode shows processing plan without executing
-- [ ] Manual testing successful with real images
+- [ ] **REQ-26:** Script exists at bin/image-resize and is executable
+- [ ] **REQ-27:** Passes shellcheck and shfmt quality checks
+- [ ] **REQ-28:** Help text includes comprehensive usage examples
+- [ ] **REQ-29:** All error conditions handled gracefully with log:: functions
+- [ ] **REQ-30:** Interactive mode prompts work correctly
+- [ ] **REQ-31:** Direct mode accepts all argument patterns
+- [ ] **REQ-32:** Preview mode shows processing plan without executing
+- [ ] **REQ-33:** Manual testing successful with real images
 ```
 
 #### 6C: Install Commands for Your AI Agent
