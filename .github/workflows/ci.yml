@@ -25,3 +25,22 @@ jobs:
         if ls bin/* 1> /dev/null 2>&1; then shellcheck bin/*; fi
         if [ -f install.sh ]; then shellcheck install.sh; fi
         if [ -f uninstall.sh ]; then shellcheck uninstall.sh; fi
+
+  shfmt:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+        
+    - name: Install shfmt
+      run: |
+        sudo curl -L -o /usr/local/bin/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64
+        sudo chmod +x /usr/local/bin/shfmt
+        
+    - name: Run shfmt
+      run: |
+        if ls lib/*.sh 1> /dev/null 2>&1; then shfmt -d lib/*.sh; fi
+        if ls bin/* 1> /dev/null 2>&1; then shfmt -d bin/*; fi
+        if [ -f install.sh ]; then shfmt -d install.sh; fi
+        if [ -f uninstall.sh ]; then shfmt -d uninstall.sh; fi

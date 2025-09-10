@@ -24,6 +24,7 @@ act push --container-architecture linux/amd64
 ### Run specific job
 ```bash
 act -j shellcheck --container-architecture linux/amd64
+act -j shfmt --container-architecture linux/amd64
 ```
 
 ### Run for pull request event
@@ -38,4 +39,7 @@ act pull_request --container-architecture linux/amd64
   - `SC2034` warnings for unused color variables in `lib/colors.sh` - **Expected** (library variables meant for external use)
   - `SC1091` info about not following sourced files - **Expected** (normal shellcheck behavior when analyzing files individually)  
   - `SC2317` info about unreachable code - **False positive** (can be ignored)
-- The CI validates that linting and testing tools are working correctly
+- **Expected shfmt output**:
+  - Formatting differences will be shown as diffs if code doesn't match shfmt's formatting rules
+  - Job fails with non-zero exit code when formatting issues are found - **Expected** (enforces consistent formatting)
+- The CI validates that linting, formatting, and testing tools are working correctly
