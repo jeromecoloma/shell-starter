@@ -85,9 +85,26 @@ _run_python_script() {
 		log::debug "Activating Python virtual environment: $venv_path"
 		# shellcheck source=/dev/null
 		source "$venv_path/bin/activate"
-		python_cmd="python"
+		# Check if python command is available in the activated venv, fallback to python3
+		if command -v python >/dev/null 2>&1; then
+			python_cmd="python"
+		elif command -v python3 >/dev/null 2>&1; then
+			python_cmd="python3"
+		else
+			log::error "No Python interpreter found in virtual environment"
+			return 1
+		fi
 	else
 		log::debug "No Python virtual environment found, using system Python"
+		# Use python3 as default, fallback to python if available
+		if command -v python3 >/dev/null 2>&1; then
+			python_cmd="python3"
+		elif command -v python >/dev/null 2>&1; then
+			python_cmd="python"
+		else
+			log::error "No Python interpreter found on system"
+			return 1
+		fi
 	fi
 
 	# Execute the Python script

@@ -47,13 +47,16 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: recursive
         
     - name: Run Bats tests
       run: |
         if [ -d tests ] && ls tests/*.bats 1> /dev/null 2>&1; then
-          ./tests/bats-core/bin/bats tests/*.bats
+          ./tests/run-tests-ci.sh
         fi

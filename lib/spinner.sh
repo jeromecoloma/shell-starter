@@ -29,6 +29,13 @@ spinner::start() {
 	# Stop any existing spinner
 	spinner::stop
 
+	# Skip spinner in CI environments or when disabled
+	if [[ -n "${SHELL_STARTER_SPINNER_DISABLED:-}" ]] || [[ -n "${CI:-}" ]] || [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+		SPINNER_MESSAGE="$message"
+		SPINNER_PID="disabled"
+		return 0
+	fi
+
 	# Hide cursor and start spinner in background
 	printf "\033[?25l" # Hide cursor
 	SPINNER_MESSAGE="$message"
@@ -39,6 +46,12 @@ spinner::start() {
 # Stop the spinner and clean up
 spinner::stop() {
 	if [[ -n "$SPINNER_PID" ]]; then
+		# Handle disabled spinner case
+		if [[ "$SPINNER_PID" == "disabled" ]]; then
+			SPINNER_PID=""
+			return 0
+		fi
+
 		# Kill the background process and suppress job control messages
 		{
 			kill "$SPINNER_PID" 2>/dev/null
@@ -63,5 +76,6 @@ spinner::update() {
 	local new_message="${1:-Loading...}"
 	if [[ -n "$SPINNER_PID" ]]; then
 		SPINNER_MESSAGE="$new_message"
+		# No need to do anything special for disabled spinner
 	fi
 }

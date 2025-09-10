@@ -157,7 +157,7 @@ EOF
 		result=$(echo "$input_data" | run::script "$python_script" "$operation" $python_args 2>/dev/null || echo "ERROR")
 	elif [[ -n "$input_file" ]]; then
 		# Pass file content via stdin to Python script
-		result=$(cat "$input_file" | run::script "$python_script" "$operation" $python_args 2>/dev/null || echo "ERROR")
+		result=$(run::script "$python_script" "$operation" $python_args < "$input_file" 2>/dev/null || echo "ERROR")
 	else
 		# Generate sample data for demonstration
 		result=$(run::script "$python_script" generate --count 5 --type generic --pretty 2>/dev/null || echo "ERROR")
@@ -437,7 +437,7 @@ EOF
 	# Prepare input data
 	local input_data=""
 	if [[ -n "$input_file" && -f "$input_file" ]]; then
-		input_data=$(cat "$input_file")
+		input_data=$(<"$input_file")
 		log::info "Using input file: $input_file"
 	else
 		log::info "Generating sample data for pipeline"

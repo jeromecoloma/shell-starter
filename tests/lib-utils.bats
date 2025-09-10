@@ -66,8 +66,8 @@ EOF
     # Create script with unknown extension
     local test_script="$TEST_TEMP_DIR/test.unknown"
     cat > "$test_script" << 'EOF'
-#!/bin/echo
-Test unknown script
+#!/bin/bash
+echo "Test unknown script"
 EOF
     chmod +x "$test_script"
     
@@ -205,6 +205,7 @@ EOF
     # Test the internal function directly
     run bash -c "
         export LOG_LEVEL=ERROR
+        export PATH='$venv_dir/bin:$PATH'
         source $PROJECT_ROOT/lib/utils.sh
         _run_python_script '$test_script' '$script_dir'
     "
@@ -229,10 +230,18 @@ export VIRTUAL_ENV_ACTIVATED=1
 deactivate() { unset VIRTUAL_ENV_ACTIVATED; }
 EOF
     
+    # Create mock python in venv
+    cat > "$venv_dir/bin/python" << 'EOF'
+#!/bin/bash
+echo "Virtual env python executed: $1"
+EOF
+    chmod +x "$venv_dir/bin/python"
+    
     echo 'print("test")' > "$test_script"
     
     run bash -c "
         export LOG_LEVEL=ERROR
+        export PATH='$venv_dir/bin:$PATH'
         source $PROJECT_ROOT/lib/utils.sh
         _run_python_script '$test_script' '$script_dir'
     "
