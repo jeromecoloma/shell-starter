@@ -4,37 +4,33 @@ A bash-first template repository for creating professional CLI scripts with buil
 
 ## 🚀 Quick Start
 
-### Installation
+### Use as Template
 
-Clone this repository and install the example scripts:
-
-```bash
-git clone https://github.com/jeromecoloma/shell-starter.git
-cd shell-starter
-./install.sh
-```
-
-Or install directly from GitHub (⚠️ **Security Warning**: Only run this from trusted sources):
+Shell Starter is a template for building your own CLI tools:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/jeromecoloma/shell-starter/main/install.sh | bash
+# Use GitHub's "Use this template" button, or clone directly:
+git clone https://github.com/jeromecoloma/shell-starter.git my-cli-project
+cd my-cli-project
+
+# Explore the example scripts to understand Shell Starter's capabilities:
+./bin/hello-world --help
+./bin/show-colors
+./bin/long-task
 ```
 
-### Custom Installation Path
+### Your CLI Distribution
 
-By default, scripts are installed to `~/.config/shell-starter/bin`. To install elsewhere:
+Once you build your CLI tool, users install it with the built-in installer:
 
 ```bash
-./install.sh --prefix /usr/local
+# Your users run this to install YOUR CLI tool:
+curl -fsSL https://raw.githubusercontent.com/your-username/your-cli-tool/main/install.sh | bash
 ```
 
-### Uninstallation
+**Custom Installation Path**: The installer supports `--prefix /custom/path` (default: `~/.config/your-project/bin`)
 
-```bash
-./uninstall.sh
-# Or skip confirmation prompt:
-./uninstall.sh -y
-```
+**Uninstallation**: Built-in uninstaller with confirmation: `./uninstall.sh` or `./uninstall.sh -y`
 
 ## 📋 Features
 
@@ -47,6 +43,7 @@ By default, scripts are installed to `~/.config/shell-starter/bin`. To install e
 - **🧪 Testing Framework**: Bats-core integration for reliable script testing
 - **🤖 CI/CD Ready**: GitHub Actions with ShellCheck, shfmt, and Bats test automation
 - **🤖 AI-Friendly**: Comprehensive documentation for AI-assisted development
+- **🗺️ Development Journeys**: Step-by-step guides for real-world CLI tool creation
 
 ## 📂 Project Structure
 
@@ -80,13 +77,14 @@ Shell Starter includes several example scripts to demonstrate features:
 ### Try the examples:
 
 ```bash
-hello-world --help
-show-colors
-long-task
-greet-user --formal "Developer"
-my-cli status
-ai-action --help
-polyglot-example demo
+# Run examples directly from the bin/ directory
+./bin/hello-world --help
+./bin/show-colors
+./bin/long-task
+./bin/greet-user --formal "Developer"
+./bin/my-cli status
+./bin/ai-action --help
+./bin/polyglot-example demo
 ```
 
 ## 🔧 Development
@@ -243,6 +241,7 @@ MIT License - see LICENSE file for details.
 
 ## 📚 Learn More
 
+- **[Development Journeys](docs/journeys/)** - Step-by-step guides for building real CLI tools
 - [Shell Scripting Best Practices](docs/conventions.md)
 - [Example Scripts Guide](docs/examples.md)
 - [AI Development Guide](docs/ai-guide.md)
