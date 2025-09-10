@@ -34,16 +34,22 @@ spinner::start() {
     SPINNER_MESSAGE="$message"
     _spinner_animate "$message" &
     SPINNER_PID=$!
-    
-    # Trap to ensure cleanup on script exit
-    trap 'spinner::stop' EXIT INT TERM
 }
 
 # Stop the spinner and clean up
 spinner::stop() {
     if [[ -n "$SPINNER_PID" ]]; then
-        kill "$SPINNER_PID" 2>/dev/null
-        wait "$SPINNER_PID" 2>/dev/null
+        # Kill the background process and suppress job control messages
+        {
+            kill "$SPINNER_PID" 2>/dev/null
+            
+            # Give it a moment to die, then forcefully kill if needed
+            sleep 0.1
+            if kill -0 "$SPINNER_PID" 2>/dev/null; then
+                kill -9 "$SPINNER_PID" 2>/dev/null
+            fi
+        } 2>/dev/null
+        
         SPINNER_PID=""
         
         # Clear the spinner line and show cursor
