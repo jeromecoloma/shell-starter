@@ -225,9 +225,9 @@ Shell Starter includes `generate-ai-workflow` - a tool that creates autonomous A
 ./bin/generate-ai-workflow my-cli-tool
 
 # Copy commands to your AI coding agent
-cp -r .ai-workflow/commands/.claude/commands/ .claude/commands/  # For Claude Code
-cp -r .ai-workflow/commands/.cursor/commands/ .cursor/commands/  # For Cursor
-cp -r .ai-workflow/commands/.gemini/commands/ .gemini/commands/ # For Gemini CLI
+mkdir -p .claude && cp -r .ai-workflow/commands/.claude/commands .claude/  # For Claude Code
+mkdir -p .cursor && cp -r .ai-workflow/commands/.cursor/commands .cursor/  # For Cursor
+mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/ # For Gemini CLI
 
 # Edit project requirements
 vim .ai-workflow/state/requirements.md

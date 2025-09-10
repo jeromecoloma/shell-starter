@@ -379,10 +379,10 @@ main() {
 	log::info "Next steps:"
 	log::info "1. Edit .ai-workflow/state/requirements.md with your project details"
 	log::info "2. Copy commands to your AI coding agent:"
-	log::info "   • Claude Code:  cp -r .ai-workflow/commands/.claude/commands/ .claude/commands/"
-	log::info "   • Cursor:       cp -r .ai-workflow/commands/.cursor/commands/ .cursor/commands/"
-	log::info "   • Gemini CLI:   cp -r .ai-workflow/commands/.gemini/commands/ .gemini/commands/"
-	log::info "   • OpenCode:     cp -r .ai-workflow/commands/.opencode/command/ .opencode/command/"
+	log::info "   • Claude Code:  mkdir -p .claude && cp -r .ai-workflow/commands/.claude/commands .claude/"
+	log::info "   • Cursor:       mkdir -p .cursor && cp -r .ai-workflow/commands/.cursor/commands .cursor/"
+	log::info "   • Gemini CLI:   mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/"
+	log::info "   • OpenCode:     mkdir -p .opencode && cp -r .ai-workflow/commands/.opencode/command .opencode/"
 	log::info "3. Start development with: /dev start"
 }
 
