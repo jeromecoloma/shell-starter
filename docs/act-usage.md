@@ -25,6 +25,7 @@ act push --container-architecture linux/amd64
 ```bash
 act -j shellcheck --container-architecture linux/amd64
 act -j shfmt --container-architecture linux/amd64
+act -j test --container-architecture linux/amd64
 ```
 
 ### Run for pull request event
@@ -42,4 +43,8 @@ act pull_request --container-architecture linux/amd64
 - **Expected shfmt output**:
   - Formatting differences will be shown as diffs if code doesn't match shfmt's formatting rules
   - Job fails with non-zero exit code when formatting issues are found - **Expected** (enforces consistent formatting)
+- **Expected test output**:
+  - Should show all 96+ tests passing with "ok" status
+  - Test results displayed in TAP (Test Anything Protocol) format
+  - Job fails if any tests fail - **Expected** (ensures code quality)
 - The CI validates that linting, formatting, and testing tools are working correctly

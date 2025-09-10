@@ -45,7 +45,7 @@ By default, scripts are installed to `~/.config/shell-starter/bin`. To install e
 - **📝 Centralized Versioning**: Single `VERSION` file for all scripts
 - **🔗 Polyglot Support**: Helper functions to call Python, Node.js, and other language scripts
 - **🧪 Testing Framework**: Bats-core integration for reliable script testing
-- **🤖 CI/CD Ready**: GitHub Actions with ShellCheck, shfmt, and automated testing
+- **🤖 CI/CD Ready**: GitHub Actions with ShellCheck, shfmt, and Bats test automation
 - **🤖 AI-Friendly**: Comprehensive documentation for AI-assisted development
 
 ## 📂 Project Structure
@@ -143,12 +143,15 @@ Access color variables directly: `$RED`, `$GREEN`, `$BLUE`, `$YELLOW`, `$PURPLE`
 Run the test suite:
 
 ```bash
-# Install bats-core if not already installed
-npm install -g bats
+# Run tests locally
+./tests/bats-core/bin/bats tests/*.bats
 
-# Run tests
+# Or install bats-core globally
+npm install -g bats
 bats tests/
 ```
+
+Tests automatically run in CI on every push and pull request.
 
 ### Code Quality
 

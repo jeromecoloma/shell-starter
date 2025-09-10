@@ -44,3 +44,16 @@ jobs:
         if ls bin/* 1> /dev/null 2>&1; then shfmt -d bin/*; fi
         if [ -f install.sh ]; then shfmt -d install.sh; fi
         if [ -f uninstall.sh ]; then shfmt -d uninstall.sh; fi
+
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+        
+    - name: Run Bats tests
+      run: |
+        if [ -d tests ] && ls tests/*.bats 1> /dev/null 2>&1; then
+          ./tests/bats-core/bin/bats tests/*.bats
+        fi
