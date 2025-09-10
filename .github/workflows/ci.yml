@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Bats
+      uses: mig4/setup-bats@v1
+      with:
+        bats-version: 1.10.0
+        
+    - name: Install shellcheck
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y shellcheck
+        
+    - name: Install shfmt
+      run: |
+        curl -L https://github.com/mvdan/sh/releases/download/v3.7.0/shfmt_v3.7.0_linux_amd64 -o shfmt
+        chmod +x shfmt
+        sudo mv shfmt /usr/local/bin/
+        
+    - name: Run shellcheck
+      run: |
+        if ls lib/*.sh 1> /dev/null 2>&1; then shellcheck lib/*.sh; fi
+        if ls bin/* 1> /dev/null 2>&1; then shellcheck bin/*; fi
+        if [ -f install.sh ]; then shellcheck install.sh; fi
+        if [ -f uninstall.sh ]; then shellcheck uninstall.sh; fi
+        
+    - name: Run shfmt check
+      run: |
+        if ls lib/*.sh 1> /dev/null 2>&1; then shfmt -d lib/*.sh; fi
+        if ls bin/* 1> /dev/null 2>&1; then shfmt -d bin/*; fi
+        if [ -f install.sh ]; then shfmt -d install.sh; fi
+        if [ -f uninstall.sh ]; then shfmt -d uninstall.sh; fi
+        
+    - name: Run Bats tests
+      run: |
+        if ls tests/*.bats 1> /dev/null 2>&1; then bats tests/*.bats; fi
