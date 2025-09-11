@@ -21,12 +21,26 @@ Generate a PRD following this exact structure with NO checkboxes or REQ-X codes:
 - Clear problem statement and solution approach
 - Target user identification
 
+### Primary Command/Tool Definition
+**CRITICAL:** Define the main command and its primary function - this drives implementation
+- Primary function description (what does this tool DO?)
+- Main command pattern with arguments
+- Required dependencies (external tools needed)
+- Input/output specification with examples
+
 ### User Stories  
 - 3-5 user stories in "As a [user], I want [goal] so that [benefit]" format
 
-### Core Features
-- 4-6 main features with clear acceptance criteria
-- Focus on user-facing functionality
+### Core Functionality (Implementation Requirements)
+**CRITICAL:** These define what must be implemented - be specific about the actual work
+- Primary feature with exact implementation steps
+- Input validation specifications
+- Error handling requirements
+- Verification criteria (how to test it works)
+
+### Advanced Features
+- 4-6 additional features with clear acceptance criteria
+- Focus on user-facing functionality beyond core implementation
 
 ### CLI Interface Requirements
 - Interactive mode specifications
@@ -53,12 +67,42 @@ Generate a PRD following this exact structure with NO checkboxes or REQ-X codes:
 - Testing requirements
 - Performance expectations
 
-### Success Criteria
-- Measurable completion indicators
-- User experience standards
-- Integration requirements
+### Success Criteria & Verification
+**CRITICAL:** How to verify the tool actually works
+- Functional test: tool successfully completes its primary purpose with real test data
+- Quality standards: passes shellcheck and shfmt with no errors
+- User experience: all user stories can be completed successfully
+- Integration requirements: works with Shell Starter installer system
+- Manual test cases: specific scenarios to verify functionality
 
 Format as clean markdown with bullet points only. No task codes or checkboxes.
+```
+
+## ⚠️ Critical Requirements for Functional Implementation
+
+**IMPORTANT:** Recent improvements to Shell Starter's AI workflow prevent a common issue where autonomous development would create perfectly compliant scripts that didn't actually perform their primary function.
+
+### Essential Sections for Working Tools
+
+**Always Include These Sections:**
+- **Primary Command/Tool Definition**: Forces specification of what the tool actually does
+- **Core Functionality (Implementation Requirements)**: Requires specific implementation steps, not generic descriptions
+- **Success Criteria & Verification**: Emphasizes functional testing over code quality metrics
+
+**Example of Specific vs Generic Requirements:**
+
+❌ **Generic (leads to wrapper scripts):**
+```
+- Core feature: Process files efficiently
+- Implementation: Add core processing logic
+- Verification: Test the functionality
+```
+
+✅ **Specific (leads to working tools):**
+```
+- Primary feature: Convert markdown to PDF using pandoc
+- Implementation: Call pandoc with proper arguments: pandoc "$input_file" -o "$output_file" --pdf-engine=xelatex
+- Verification: Generate PDF from sample markdown file and verify it opens correctly
 ```
 
 ## 🎯 Example Usage
@@ -129,11 +173,13 @@ Use this checklist to ensure your generated PRD is comprehensive:
 
 ### Content Completeness
 - [ ] Clear problem statement and target users identified
+- [ ] **Primary Command/Tool Definition section included** (critical for implementation)
+- [ ] **Core Functionality section with specific implementation steps** (prevents wrapper scripts)
 - [ ] 3+ user stories that cover main use cases
-- [ ] Core features have measurable acceptance criteria
+- [ ] Advanced features have measurable acceptance criteria
 - [ ] CLI interface patterns are specifically defined
 - [ ] Error scenarios include user guidance
-- [ ] Success criteria are objective and testable
+- [ ] **Success criteria emphasize functional testing** (tool must actually work)
 
 ### Shell Starter Alignment
 - [ ] References Shell Starter conventions
@@ -150,10 +196,13 @@ Use this checklist to ensure your generated PRD is comprehensive:
 - [ ] Performance expectations are realistic
 
 ### AI Implementation Readiness
-- [ ] Requirements are specific enough for AI to implement
-- [ ] Acceptance criteria are unambiguous
-- [ ] Technical details provide sufficient guidance
-- [ ] Error handling covers edge cases
+- [ ] **Primary function is explicitly defined** (what the tool actually does)
+- [ ] **Implementation steps are specific, not generic** (actual commands/code to execute)
+- [ ] **Functional verification is mandatory** (must test with real data)
+- [ ] Requirements are specific enough for AI to implement without guessing
+- [ ] Acceptance criteria are unambiguous and testable
+- [ ] Technical details provide sufficient guidance for actual implementation
+- [ ] Error handling covers edge cases with specific responses
 - [ ] Integration points are well-defined
 
 ## 🚀 Advanced Prompting Techniques
@@ -264,11 +313,14 @@ Enhance this PRD's user experience requirements by adding:
 5. **Consider Distribution**: Plan for installer integration
 
 ### AI Implementation Success
-1. **Provide Context**: Explain the "why" behind requirements
-2. **Be Measurable**: Include testable criteria
-3. **Show Relationships**: How features connect together
-4. **Include Priorities**: What's essential vs nice-to-have
-5. **Plan Phases**: How to build incrementally
+1. **Define Primary Function First**: Always specify what the tool actually does before adding features
+2. **Be Implementation-Specific**: Write "Call pandoc with..." not "Process files efficiently"
+3. **Require Functional Testing**: Tool must work with real data, not just pass code quality checks
+4. **Provide Context**: Explain the "why" behind requirements
+5. **Be Measurable**: Include testable criteria that verify actual functionality
+6. **Show Relationships**: How features connect together
+7. **Include Priorities**: Core implementation is essential, advanced features are nice-to-have
+8. **Plan Phases**: Always include "Core Implementation" phase between foundation and polish
 
 ---
 

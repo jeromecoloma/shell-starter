@@ -32,7 +32,8 @@ vim .ai-workflow/state/requirements.md
 
 The AI will automatically:
 - Break down tasks and track progress
-- Implement features following Shell Starter conventions
+- **Implement core functionality first** (preventing wrapper scripts that don't work)
+- Follow Shell Starter conventions for professional CLI experience
 - Run quality checks (shellcheck, shfmt, testing)
 - Resume development across context resets
 - Provide detailed progress reports
@@ -50,6 +51,7 @@ For creating comprehensive Product Requirements Documents, use the [PRD Generati
 ## 🤖 AI Assistant Guidelines
 
 ### Core Principles
+- **Implement functional core logic first** - ensure the tool actually works before polishing
 - Always follow the conventions in `docs/conventions.md`
 - Use the library functions from `lib/main.sh`
 - Include proper error handling and input validation
@@ -57,11 +59,12 @@ For creating comprehensive Product Requirements Documents, use the [PRD Generati
 - Follow the standard script structure template
 
 ### Development Workflow
-1. Read existing scripts in `bin/` for patterns
-2. Use the standard script template
-3. Include all required argument parsing
-4. Add appropriate logging and error handling
-5. Test with various inputs and edge cases
+1. **Define and implement core functionality first** - what does this tool actually do?
+2. Read existing scripts in `bin/` for patterns
+3. Use the standard script template
+4. Include all required argument parsing
+5. Add appropriate logging and error handling
+6. Test with various inputs and edge cases
 
 ## 📝 Prompt Templates
 
@@ -437,12 +440,14 @@ teardown() {
 
 ### When Creating Scripts
 
-1. **Always start with the standard template**
-2. **Replace placeholder content** with specific functionality
-3. **Add comprehensive input validation** for all parameters
-4. **Use semantic logging** (info, warn, error, success) instead of echo
-5. **Include examples in help text** that show real usage scenarios
-6. **Handle edge cases** and provide meaningful error messages
+1. **Define primary function first** - what does this script actually do?
+2. **Implement core functionality** - make it work before making it pretty
+3. **Always start with the standard template**
+4. **Replace placeholder content** with specific functionality
+5. **Add comprehensive input validation** for all parameters
+6. **Use semantic logging** (info, warn, error, success) instead of echo
+7. **Include examples in help text** that show real usage scenarios
+8. **Handle edge cases** and provide meaningful error messages
 
 ### When Adding Library Functions
 
@@ -464,6 +469,7 @@ teardown() {
 
 ### Code Generation Guidelines
 
+- **Implement core functionality first** - ensure the script actually does what its name suggests
 - **Read existing code first** to understand patterns and style
 - **Use library functions consistently** throughout the script
 - **Validate all user inputs** before processing

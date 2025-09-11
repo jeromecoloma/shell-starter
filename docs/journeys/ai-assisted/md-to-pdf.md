@@ -98,6 +98,26 @@ md-to-pdf --preview document.md       # Preview conversion plan
 
 ---
 
+## 🔧 Recent Workflow Improvements
+
+**IMPORTANT:** The Shell Starter AI workflow has been enhanced to prevent a critical issue where autonomous development would create perfectly compliant Shell Starter scripts that didn't actually perform their primary function.
+
+### What Was Fixed
+- **Problem:** AI would focus on Shell Starter compliance (error handling, logging, argument parsing) but skip the core business logic
+- **Example:** An "md-to-pdf" script that had perfect error handling but contained `TODO: Implement actual conversion logic here`
+- **Root Cause:** Task generation jumped from "Foundation Setup" directly to "Quality & Polish", missing "Core Implementation"
+
+### Improvements Made
+- **Mandatory Core Implementation Phase:** Every project now gets **Phase 2: Core Implementation** with specific action items
+- **Better PRD Analysis:** Detects tool purpose (converter, processor, analyzer) and generates appropriate tasks
+- **Specific Implementation Instructions:** Instead of "implement core functionality", generates "Call pandoc with proper arguments: pandoc '$input_file' -o '$output_file'"
+- **Functional Verification:** Tasks now require the tool to actually work with test data, not just pass linting
+
+### Result
+The workflow now prioritizes **building working tools** over perfect Shell Starter compliance, ensuring you get functional software that solves real problems.
+
+---
+
 ## Phase 3: AI-Assisted Development (15 minutes)
 
 ### Step 6: Setup Autonomous AI Development Workflow
@@ -141,12 +161,42 @@ Professional markdown to PDF conversion CLI tool with theme support and interact
 **Core Problem:** Need professional, consistently formatted PDF output from markdown files with minimal setup
 **Solution Approach:** Command-line tool using pandoc with built-in themes, interactive prompts, and comprehensive error handling
 
+## Primary Command/Tool Definition
+**CRITICAL:** Define the main command and its primary function - this drives implementation
+
+**Primary Function:** Convert markdown files to PDF format using pandoc
+**Main Command:** `md-to-pdf input.md [output.pdf] [options]`
+**Dependencies:** pandoc (required for markdown to PDF conversion)
+**Input/Output:** Takes markdown files (.md, .markdown) as input and produces PDF files as output
+
+**Example Usage:**
+```bash
+md-to-pdf document.md                    # Basic usage
+md-to-pdf document.md report.pdf        # With output specification
+md-to-pdf --help                        # Show help
+```
+
 ## User Stories
 - **US-1:** As a developer, I want to convert README.md to PDF for offline reading so that I can review documentation without internet access
 - **US-2:** As a writer, I want to generate styled PDFs from my markdown drafts so that I can share professional documents with clients
 - **US-3:** As a documentation team, I want consistent PDF formatting across all docs so that our brand appears professional and unified
 
-## Core Features
+## Core Functionality (Implementation Requirements)
+**CRITICAL:** These define what must be implemented - be specific about the actual work
+
+- **Primary Feature:** Convert markdown to PDF using pandoc
+  - Implementation: Call pandoc with proper arguments: pandoc "$input_file" -o "$output_file" --pdf-engine=xelatex
+  - Verification: Generate PDF from sample markdown file and verify it opens correctly
+
+- **Input Validation:** Accept markdown files and validate them
+  - File types: .md, .markdown, .txt
+  - Validation: Check file exists, readable, proper format
+
+- **Error Handling:** Specific error conditions and responses
+  - Missing dependencies: Check for pandoc and guide installation
+  - Invalid files: Clear error messages for bad input
+
+## Advanced Features
 - Interactive mode: prompts user for input file, output file, and theme selection with validation
 - Direct mode: accepts markdown input file and optional PDF output name via command-line arguments
 - Built-in themes: GitHub, Academic, Clean, Modern styles with preview capability
@@ -154,11 +204,11 @@ Professional markdown to PDF conversion CLI tool with theme support and interact
 - Smart defaults: auto-generate output filename (input.md → input.pdf) and detect optimal theme
 
 ## CLI Interface Requirements
-- Interactive mode with user prompts for all required inputs with input validation
-- Direct mode accepting: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
-- Preview/dry-run mode with `--preview` flag showing conversion plan without executing
-- Help text with comprehensive usage examples and theme descriptions
-- Version information display with dependency versions (pandoc, etc.)
+- **Interactive mode:** Prompt for input file, output location, and options
+- **Direct mode:** Accept file paths and options as command arguments: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
+- **Preview mode:** Show what would happen without executing (--preview flag)
+- **Help and version:** Standard --help and --version flags
+- **Progress feedback:** Show progress for long-running operations
 
 ## Shell Starter Compliance  
 - Follow Shell Starter conventions from docs/conventions.md (kebab-case, standard header)
@@ -168,37 +218,40 @@ Professional markdown to PDF conversion CLI tool with theme support and interact
 - Handle all error conditions gracefully with meaningful, actionable messages
 - Include progress indicators for conversion operations using spinner:: functions
 
-## Technical Requirements
-- Pandoc dependency checking with version validation and installation guidance
-- Input validation: markdown file exists, readable, valid extensions (.md, .markdown, .txt)
-- Output validation: directory writable, filename valid, no overwrite without confirmation
-- Theme system: CSS templates for GitHub, Academic, Clean, Modern styles
-- Cross-platform compatibility (macOS/Linux) with proper path handling
-- Safe file handling: spaces in paths, special characters, symbolic links
+## Technical Implementation Details
+**CRITICAL:** Specific technical requirements for implementation
+
+- **Dependencies:** pandoc (required for markdown to PDF conversion)
+- **File Handling:** Read markdown input, write PDF output, handle temp files
+- **Command Execution:** Execute pandoc with proper error handling and progress feedback
+- **Cross-platform:** Support macOS and Linux with proper path handling
+- **Performance:** Handle files up to 50MB efficiently
 
 ## Error Handling Scenarios
-- Pandoc not installed: helpful installation instructions for macOS/Linux
-- Invalid file paths: clear error messages with file existence and permission details
-- File permission issues: specific guidance for read/write permission problems
-- Invalid markdown syntax: pandoc error parsing and user-friendly explanations
-- Insufficient disk space: check available space before conversion
-- Invalid theme selection: list available themes and suggest closest match
-- Overwrite protection: confirm before overwriting existing PDF files
+**CRITICAL:** Specific error conditions that must be handled
 
-## Quality & Performance Requirements
-- Script passes shellcheck with no errors or warnings
-- Script passes shfmt formatting checks
-- Comprehensive bats test coverage for all functions and error scenarios
-- Conversion performance: handle files up to 50MB efficiently
-- Memory usage: appropriate for typical desktop/server environments
+- **Pandoc not installed:** Provide installation instructions for macOS/Linux
+- **File not found:** Clear error message with file path and suggestions
+- **Permission denied:** Specific guidance for read/write permission problems
+- **Invalid format:** Handle malformed markdown with helpful error messages
+- **Disk full:** Check available space before processing large files
+- **Interrupted operation:** Clean up partial files and provide recovery options
 
-## Success Criteria
-- Script exists at bin/md-to-pdf and is executable with proper permissions
-- All user stories completed successfully with intuitive UX
-- All error scenarios handled gracefully with helpful, actionable messages
-- Manual testing successful: various markdown files, all themes, edge cases
-- Integration testing: works with Shell Starter installer system
-- Documentation complete: help text, examples, troubleshooting guide
+## Success Criteria & Verification
+**CRITICAL:** How to verify the tool actually works
+
+- **Functional Test:** Tool successfully converts markdown to PDF with real test data
+- **Quality:** Passes shellcheck and shfmt with no errors
+- **Integration:** Works with Shell Starter installer system
+- **User Experience:** All user stories can be completed successfully
+- **Error Handling:** All error scenarios produce helpful, actionable messages
+- **Documentation:** Comprehensive help text with examples
+
+**Manual Test Cases:**
+- [ ] Basic conversion works: markdown file → PDF file
+- [ ] Error handling works: test with invalid input
+- [ ] Help and version flags work correctly
+- [ ] Progress indicators show during conversion operations
 ```
 
 **Option 2: Generate with AI assistance (Educational)**  
@@ -292,12 +345,15 @@ After customizing your requirements.md, generate project-specific tasks:
 ```
 
 This analyzes your requirements.md and creates specific tasks like:
+- **MD-TO-PDF-1:** Create project structure and basic executable
 - **MD-TO-PDF-2:** Implement dependency checking (because PRD mentions pandoc)
-- **MD-TO-PDF-3:** Implement interactive mode (because PRD mentions interactive prompts)  
+- **MD-TO-PDF-3:** Implement primary functionality - markdown to PDF converter
+  - **MD-TO-PDF-3.1:** Call pandoc with proper arguments: pandoc "$input_file" -o "$output_file" --pdf-engine=xelatex
+- **MD-TO-PDF-4:** Implement interactive mode (because PRD mentions interactive prompts)  
 - **MD-TO-PDF-5:** Implement theme system (because PRD mentions GitHub, Academic, Clean, Modern themes)
 - **MD-TO-PDF-6:** Implement preview mode (because PRD mentions --preview flag)
 
-**vs generic tasks** that would force unnecessary work for every project.
+**CRITICAL:** The improved workflow now ensures **Phase 2: Core Implementation** is always included, preventing the creation of "wrapper scripts" that don't actually do their primary function.
 
 #### 6D: Install Commands for Your AI Agent
 
@@ -557,14 +613,24 @@ git push -u origin main
 
 ### Verification Checklist
 
+**Functional Requirements (Most Important):**
+- [ ] **Actually converts markdown to PDF** - core functionality works with test data
+- [ ] **Generates valid PDF files** that can be opened and viewed
+- [ ] **Handles real markdown content** including headers, lists, code blocks, formatting
+
+**Shell Starter Integration:**
 - [ ] Script has `--help` and `--version` flags
 - [ ] Uses Shell Starter logging functions consistently
 - [ ] Handles missing dependencies gracefully (pandoc)
 - [ ] Validates all user inputs with helpful error messages
 - [ ] Shows progress during conversion operations
+
+**Quality Assurance:**
 - [ ] Passes shellcheck and shfmt quality checks
 - [ ] Has comprehensive test coverage
 - [ ] Works with various markdown files and theme selections
+
+**Critical Test:** If the script doesn't actually convert a markdown file to a viewable PDF, the journey has failed regardless of code quality scores.
 
 ### Key Learning Outcomes
 
@@ -610,4 +676,6 @@ Ready to take it further? Try these enhancements:
 
 **Total Development Time:** ~40 minutes from Shell Starter template to distributed CLI tool
 
-**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective. The AI has clear patterns to follow, resulting in consistent, professional CLI tools with minimal iteration. The md-to-pdf converter showcases how complex document processing can be made accessible through simple, well-designed command-line interfaces.
+**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective, but only when the workflow prioritizes functional implementation over compliance theater. The enhanced AI workflow now ensures that autonomous development builds **working tools that solve real problems** rather than perfectly formatted scripts that contain placeholder TODOs.
+
+**Critical Learning:** Process-heavy development workflows can create the illusion of progress while missing fundamental deliverables. The improved workflow balances Shell Starter compliance with functional implementation, ensuring every generated script actually performs its intended purpose.

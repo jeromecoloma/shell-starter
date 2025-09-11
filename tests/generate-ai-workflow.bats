@@ -158,9 +158,10 @@ teardown() {
 	run cat .ai-workflow/state/requirements.md
 	assert_output --partial "# test-project - Product Requirements Document"
 	assert_output --partial "## Product Overview"
-	assert_output --partial "## Core Features"
+	assert_output --partial "## Primary Command/Tool Definition"
+	assert_output --partial "## Core Functionality (Implementation Requirements)"
 	assert_output --partial "## Shell Starter Compliance"
-	assert_output --partial "## Success Criteria"
+	assert_output --partial "## Success Criteria & Verification"
 
 	# Check progress.log content
 	run cat .ai-workflow/state/progress.log

@@ -250,68 +250,96 @@ EOF
 # $project_name - Product Requirements Document
 
 ## Product Overview
-[Edit this section with your project description and goals]
+**REQUIRED:** Replace this template with specific project details
 
-**Target Users:** [Who will use this tool?]
-**Core Problem:** [What problem does this solve?]
-**Solution Approach:** [How does this tool solve the problem?]
+**Target Users:** [Who will use this tool? Be specific - developers, writers, system admins, etc.]
+**Core Problem:** [What specific problem does this solve? What pain point are you addressing?]
+**Solution Approach:** [How does this tool solve the problem? What approach will it take?]
+
+## Primary Command/Tool Definition
+**CRITICAL:** Define the main command and its primary function - this drives implementation
+
+**Primary Function:** [What does this tool DO? Convert files? Analyze data? Generate reports?]
+**Main Command:** \`$project_name input [output] [options]\`
+**Dependencies:** [What external tools does this require? pandoc? imagemagick? python?]
+**Input/Output:** [What does it take as input and what does it produce?]
+
+**Example Usage:**
+\`\`\`bash
+$project_name document.md                    # Basic usage
+$project_name document.md report.pdf        # With output specification
+$project_name --help                        # Show help
+\`\`\`
 
 ## User Stories
-- **US-1:** As a user, I want [describe user need] so that [benefit/outcome]
-- **US-2:** As a user, I want [describe user need] so that [benefit/outcome]
-- **US-3:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-1:** As a [specific user type], I want to [specific action] so that [specific benefit]
+- **US-2:** As a [specific user type], I want to [specific action] so that [specific benefit]  
+- **US-3:** As a [specific user type], I want to [specific action] so that [specific benefit]
 
-## Core Features
-- [Detailed feature description with acceptance criteria]
-- [Detailed feature description with acceptance criteria]  
-- [Detailed feature description with acceptance criteria]
+## Core Functionality (Implementation Requirements)
+**CRITICAL:** These define what must be implemented - be specific about the actual work
+
+- **Primary Feature:** [The main functionality - e.g., "Convert markdown to PDF using pandoc"]
+  - Implementation: [Specific command or process - e.g., "Call: pandoc input.md -o output.pdf"]
+  - Verification: [How to test it works - e.g., "Generate PDF from sample markdown file"]
+
+- **Input Validation:** [What inputs are accepted and how to validate them]
+  - File types: [.md, .txt, etc.]
+  - Validation: [Check file exists, readable, proper format]
+
+- **Error Handling:** [Specific error conditions and responses]
+  - Missing dependencies: [How to detect and guide installation]
+  - Invalid files: [What to do with bad input]
 
 ## CLI Interface Requirements
-- Interactive mode with user prompts for all required inputs
-- Direct mode accepting command-line arguments
-- Preview/dry-run mode to show what would be executed
-- Help text with comprehensive usage examples
-- Version information display
+- **Interactive mode:** Prompt for input file, output location, and options
+- **Direct mode:** Accept file paths and options as command arguments
+- **Preview mode:** Show what would happen without executing (--preview flag)
+- **Help and version:** Standard --help and --version flags
+- **Progress feedback:** Show progress for long-running operations
 
 ## Shell Starter Compliance
 - Follow Shell Starter conventions from docs/conventions.md
-- Use lib/main.sh and provided library functions
-- Include --help and --version flags with proper parsing
-- Use log:: functions (info, warn, error, debug) instead of echo
-- Handle all error conditions gracefully with meaningful messages
-- Include progress indicators for long operations using spinner::
+- Use lib/main.sh and provided library functions (logging, colors, spinner, utils)
+- Include --help and --version flags with proper argument parsing
+- Use log:: functions (info, warn, error, debug) instead of echo for all output
+- Handle all error conditions gracefully with meaningful, actionable messages
+- Include progress indicators for conversion operations using spinner:: functions
 
-## Technical Requirements
-- Input validation for all parameters with helpful error messages
-- Dependency checking with installation guidance
-- Cross-platform compatibility (macOS/Linux)
-- Professional CLI UX patterns and consistent behavior
-- Proper exit codes (0 for success, non-zero for errors)
-- Safe handling of file paths, including spaces and special characters
+## Technical Implementation Details
+**CRITICAL:** Specific technical requirements for implementation
+
+- **Dependencies:** [List all required external tools with version requirements]
+- **File Handling:** [Specific file operations - read input, write output, temp files]
+- **Command Execution:** [Specific commands to run - pandoc, convert, etc.]
+- **Cross-platform:** Support macOS and Linux with proper path handling
+- **Performance:** [Specific performance requirements - file size limits, processing time]
 
 ## Error Handling Scenarios
-- Missing or invalid dependencies with helpful installation instructions
-- Invalid file paths or non-existent input files
-- File permission issues (read input, write output)
-- Invalid input formats or malformed data
-- Insufficient disk space or system resource constraints
-- Network connectivity issues (if applicable)
-- Interrupted operations with proper cleanup
+**CRITICAL:** Specific error conditions that must be handled
 
-## Quality & Performance Requirements
-- Script passes shellcheck with no errors or warnings
-- Script passes shfmt formatting checks
-- Comprehensive test coverage with bats testing framework
-- Performance suitable for typical use cases
-- Memory usage appropriate for target systems
+- **Dependency missing:** [tool] not installed - provide installation instructions for macOS/Linux
+- **File not found:** Clear error message with file path and suggestions
+- **Permission denied:** Specific guidance for read/write permission problems
+- **Invalid format:** Handle malformed input with helpful error messages
+- **Disk full:** Check available space before processing large files
+- **Interrupted operation:** Clean up partial files and provide recovery options
 
-## Success Criteria
-- Script exists at bin/$project_name and is executable
-- All user stories can be completed successfully
-- All error scenarios handled gracefully with helpful messages
-- Manual testing successful across different scenarios and edge cases
-- Documentation complete with usage examples and troubleshooting
-- Ready for distribution via Shell Starter installer
+## Success Criteria & Verification
+**CRITICAL:** How to verify the tool actually works
+
+- **Functional Test:** Tool successfully completes its primary purpose with real test data
+- **Quality:** Passes shellcheck and shfmt with no errors
+- **Integration:** Works with Shell Starter installer system
+- **User Experience:** All user stories can be completed successfully
+- **Error Handling:** All error scenarios produce helpful, actionable messages
+- **Documentation:** Comprehensive help text with examples
+
+**Manual Test Cases:**
+- [ ] Basic functionality works: [specific test case]
+- [ ] Error handling works: [test with invalid input]
+- [ ] Help and version flags work correctly
+- [ ] Progress indicators show during long operations
 EOF
 
 	# Generate progress.log
@@ -384,12 +412,112 @@ analyze_prd_and_generate_tasks() {
 	create_intelligent_tasks "$project_name" "$project_upper" "$prd_content"
 }
 
+# Helper function to detect tool purpose from PRD
+detect_tool_purpose() {
+	local prd_content="$1"
+
+	# Analyze the PRD to determine what the tool actually does
+	if echo "$prd_content" | grep -qi "convert.*markdown.*pdf\|markdown.*to.*pdf"; then
+		echo "markdown to PDF converter"
+	elif echo "$prd_content" | grep -qi "convert.*\|transformation\|format"; then
+		echo "file converter"
+	elif echo "$prd_content" | grep -qi "process.*image\|resize.*image\|image.*manipulation"; then
+		echo "image processor"
+	elif echo "$prd_content" | grep -qi "analyze.*\|analysis\|report"; then
+		echo "analyzer tool"
+	elif echo "$prd_content" | grep -qi "generate.*\|generator\|create.*file"; then
+		echo "file generator"
+	elif echo "$prd_content" | grep -qi "backup\|sync\|copy"; then
+		echo "file management tool"
+	else
+		echo "CLI utility"
+	fi
+}
+
+# Helper function to extract primary dependency from PRD
+extract_primary_dependency() {
+	local prd_content="$1"
+
+	# Look for explicit dependency mentions
+	if echo "$prd_content" | grep -qi "pandoc"; then
+		echo "pandoc"
+	elif echo "$prd_content" | grep -qi "imagemagick\|convert"; then
+		echo "imagemagick"
+	elif echo "$prd_content" | grep -qi "ffmpeg"; then
+		echo "ffmpeg"
+	elif echo "$prd_content" | grep -qi "python"; then
+		echo "python"
+	elif echo "$prd_content" | grep -qi "node\|npm"; then
+		echo "nodejs"
+	else
+		echo ""
+	fi
+}
+
+# Helper function to extract input/output pattern from PRD
+extract_io_pattern() {
+	local prd_content="$1"
+
+	# Look for input/output patterns
+	if echo "$prd_content" | grep -qi "markdown.*pdf\|\.md.*\.pdf"; then
+		echo "markdown_to_pdf"
+	elif echo "$prd_content" | grep -qi "image.*resize\|\.jpg.*\.jpg"; then
+		echo "image_processing"
+	elif echo "$prd_content" | grep -qi "directory.*file\|multiple.*files"; then
+		echo "batch_processing"
+	else
+		echo "single_file"
+	fi
+}
+
+# Helper function to generate primary action based on tool analysis
+generate_primary_action() {
+	local tool_purpose="$1"
+	local primary_dependency="$2"
+	local input_output_pattern="$3"
+
+	case "$tool_purpose" in
+	"markdown to PDF converter")
+		echo "Call pandoc with proper arguments: pandoc \"\$input_file\" -o \"\$output_file\" --pdf-engine=xelatex"
+		;;
+	"file converter")
+		if [[ "$primary_dependency" == "pandoc" ]]; then
+			echo "Execute pandoc conversion command with error handling and progress feedback"
+		elif [[ "$primary_dependency" == "imagemagick" ]]; then
+			echo "Execute ImageMagick convert command with proper error handling"
+		else
+			echo "Execute the primary conversion command for the target format"
+		fi
+		;;
+	"image processor")
+		echo "Execute image processing commands (resize, format, optimize) using appropriate tools"
+		;;
+	"analyzer tool")
+		echo "Run analysis algorithm on input data and generate structured report output"
+		;;
+	"file generator")
+		echo "Generate output files based on input parameters and templates"
+		;;
+	"file management tool")
+		echo "Execute file operations (copy, move, sync) with progress tracking and verification"
+		;;
+	*)
+		echo "Execute the primary functionality that solves the user's core problem"
+		;;
+	esac
+}
+
 create_intelligent_tasks() {
 	local project_name="$1"
 	local project_upper="$2"
 	local prd_content="$3"
 
-	# Analyze PRD content for specific features
+	# Analyze PRD content for tool type and core functionality
+	local tool_purpose=$(detect_tool_purpose "$prd_content")
+	local primary_dependency=$(extract_primary_dependency "$prd_content")
+	local input_output_pattern=$(extract_io_pattern "$prd_content")
+
+	# Feature detection (keeping existing logic)
 	local has_interactive_mode=$(echo "$prd_content" | grep -i "interactive" && echo "true" || echo "false")
 	local has_themes=$(echo "$prd_content" | grep -i "theme" && echo "true" || echo "false")
 	local has_preview=$(echo "$prd_content" | grep -i "preview\|dry-run" && echo "true" || echo "false")
@@ -423,12 +551,12 @@ EOF
 	((task_counter++))
 
 	# Add dependency checking if detected
-	if [[ "$dependencies" != "" ]]; then
+	if [[ "$dependencies" != "" ]] || [[ "$primary_dependency" != "" ]]; then
 		cat >>".ai-workflow/state/tasks.md" <<EOF
 - [ ] **$project_upper-$task_counter:** Implement dependency checking and validation
   **Goal:** Verify all required dependencies and system requirements
   **Actions:**
-  - [ ] **$project_upper-$task_counter.1:** Check for required external dependencies (pandoc, etc.)
+  - [ ] **$project_upper-$task_counter.1:** Check for required external dependencies ($primary_dependency, etc.)
   - [ ] **$project_upper-$task_counter.2:** Validate file system permissions for input/output directories
   - [ ] **$project_upper-$task_counter.3:** Provide helpful installation/setup guidance for missing requirements
   - [ ] **$project_upper-$task_counter.4:** Add dependency version checking if applicable
@@ -437,6 +565,22 @@ EOF
 EOF
 		((task_counter++))
 	fi
+
+	# CRITICAL: Always add core implementation task - this was missing!
+	cat >>".ai-workflow/state/tasks.md" <<EOF
+## Phase 2: Core Implementation
+
+- [ ] **$project_upper-$task_counter:** Implement primary functionality - $tool_purpose
+  **Goal:** Build the core feature that solves the user's primary problem
+  **Actions:**
+  - [ ] **$project_upper-$task_counter.1:** $(generate_primary_action "$tool_purpose" "$primary_dependency" "$input_output_pattern")
+  - [ ] **$project_upper-$task_counter.2:** Handle command execution errors and provide meaningful error messages
+  - [ ] **$project_upper-$task_counter.3:** Validate input/output and ensure successful completion
+  - [ ] **$project_upper-$task_counter.4:** Add progress indicators and user feedback during operation
+  **Verification:** Tool successfully completes its primary purpose with test data - MUST ACTUALLY WORK
+
+EOF
+	((task_counter++))
 
 	# Add interactive mode if detected
 	if [[ "$has_interactive_mode" == "true" ]]; then
@@ -454,19 +598,17 @@ EOF
 		((task_counter++))
 	fi
 
-	# Add file processing if detected
+	# Add file processing if detected (but make it specific, not generic)
 	if [[ "$has_file_processing" == "true" ]]; then
 		cat >>".ai-workflow/state/tasks.md" <<EOF
-## Phase 2: Core Functionality
-
-- [ ] **$project_upper-$task_counter:** Implement core file processing logic
-  **Goal:** Build the main file processing functionality
+- [ ] **$project_upper-$task_counter:** Implement advanced file handling
+  **Goal:** Add robust file processing capabilities beyond basic functionality
   **Actions:**
-  - [ ] **$project_upper-$task_counter.1:** Implement file input validation and format checking
-  - [ ] **$project_upper-$task_counter.2:** Add core processing logic with error handling
-  - [ ] **$project_upper-$task_counter.3:** Implement output file generation and validation
-  - [ ] **$project_upper-$task_counter.4:** Add progress indicators using spinner:: functions
-  **Verification:** Core functionality processes files correctly
+  - [ ] **$project_upper-$task_counter.1:** Add support for multiple file formats and edge cases
+  - [ ] **$project_upper-$task_counter.2:** Implement batch processing if multiple files supported
+  - [ ] **$project_upper-$task_counter.3:** Add file validation, backup, and recovery mechanisms
+  - [ ] **$project_upper-$task_counter.4:** Handle special characters, spaces, and path edge cases
+  **Verification:** Advanced file handling works with various file types and scenarios
 
 EOF
 		((task_counter++))
@@ -587,68 +729,96 @@ EOF
 # $project_name - Product Requirements Document
 
 ## Product Overview
-[Edit this section with your project description and goals]
+**REQUIRED:** Replace this template with specific project details
 
-**Target Users:** [Who will use this tool?]
-**Core Problem:** [What problem does this solve?]
-**Solution Approach:** [How does this tool solve the problem?]
+**Target Users:** [Who will use this tool? Be specific - developers, writers, system admins, etc.]
+**Core Problem:** [What specific problem does this solve? What pain point are you addressing?]
+**Solution Approach:** [How does this tool solve the problem? What approach will it take?]
+
+## Primary Command/Tool Definition
+**CRITICAL:** Define the main command and its primary function - this drives implementation
+
+**Primary Function:** [What does this tool DO? Convert files? Analyze data? Generate reports?]
+**Main Command:** \`$project_name input [output] [options]\`
+**Dependencies:** [What external tools does this require? pandoc? imagemagick? python?]
+**Input/Output:** [What does it take as input and what does it produce?]
+
+**Example Usage:**
+\`\`\`bash
+$project_name document.md                    # Basic usage
+$project_name document.md report.pdf        # With output specification
+$project_name --help                        # Show help
+\`\`\`
 
 ## User Stories
-- **US-1:** As a user, I want [describe user need] so that [benefit/outcome]
-- **US-2:** As a user, I want [describe user need] so that [benefit/outcome]
-- **US-3:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-1:** As a [specific user type], I want to [specific action] so that [specific benefit]
+- **US-2:** As a [specific user type], I want to [specific action] so that [specific benefit]  
+- **US-3:** As a [specific user type], I want to [specific action] so that [specific benefit]
 
-## Core Features
-- [Detailed feature description with acceptance criteria]
-- [Detailed feature description with acceptance criteria]  
-- [Detailed feature description with acceptance criteria]
+## Core Functionality (Implementation Requirements)
+**CRITICAL:** These define what must be implemented - be specific about the actual work
+
+- **Primary Feature:** [The main functionality - e.g., "Convert markdown to PDF using pandoc"]
+  - Implementation: [Specific command or process - e.g., "Call: pandoc input.md -o output.pdf"]
+  - Verification: [How to test it works - e.g., "Generate PDF from sample markdown file"]
+
+- **Input Validation:** [What inputs are accepted and how to validate them]
+  - File types: [.md, .txt, etc.]
+  - Validation: [Check file exists, readable, proper format]
+
+- **Error Handling:** [Specific error conditions and responses]
+  - Missing dependencies: [How to detect and guide installation]
+  - Invalid files: [What to do with bad input]
 
 ## CLI Interface Requirements
-- Interactive mode with user prompts for all required inputs
-- Direct mode accepting command-line arguments
-- Preview/dry-run mode to show what would be executed
-- Help text with comprehensive usage examples
-- Version information display
+- **Interactive mode:** Prompt for input file, output location, and options
+- **Direct mode:** Accept file paths and options as command arguments
+- **Preview mode:** Show what would happen without executing (--preview flag)
+- **Help and version:** Standard --help and --version flags
+- **Progress feedback:** Show progress for long-running operations
 
 ## Shell Starter Compliance
 - Follow Shell Starter conventions from docs/conventions.md
-- Use lib/main.sh and provided library functions
-- Include --help and --version flags with proper parsing
-- Use log:: functions (info, warn, error, debug) instead of echo
-- Handle all error conditions gracefully with meaningful messages
-- Include progress indicators for long operations using spinner::
+- Use lib/main.sh and provided library functions (logging, colors, spinner, utils)
+- Include --help and --version flags with proper argument parsing
+- Use log:: functions (info, warn, error, debug) instead of echo for all output
+- Handle all error conditions gracefully with meaningful, actionable messages
+- Include progress indicators for conversion operations using spinner:: functions
 
-## Technical Requirements
-- Input validation for all parameters with helpful error messages
-- Dependency checking with installation guidance
-- Cross-platform compatibility (macOS/Linux)
-- Professional CLI UX patterns and consistent behavior
-- Proper exit codes (0 for success, non-zero for errors)
-- Safe handling of file paths, including spaces and special characters
+## Technical Implementation Details
+**CRITICAL:** Specific technical requirements for implementation
+
+- **Dependencies:** [List all required external tools with version requirements]
+- **File Handling:** [Specific file operations - read input, write output, temp files]
+- **Command Execution:** [Specific commands to run - pandoc, convert, etc.]
+- **Cross-platform:** Support macOS and Linux with proper path handling
+- **Performance:** [Specific performance requirements - file size limits, processing time]
 
 ## Error Handling Scenarios
-- Missing or invalid dependencies with helpful installation instructions
-- Invalid file paths or non-existent input files
-- File permission issues (read input, write output)
-- Invalid input formats or malformed data
-- Insufficient disk space or system resource constraints
-- Network connectivity issues (if applicable)
-- Interrupted operations with proper cleanup
+**CRITICAL:** Specific error conditions that must be handled
 
-## Quality & Performance Requirements
-- Script passes shellcheck with no errors or warnings
-- Script passes shfmt formatting checks
-- Comprehensive test coverage with bats testing framework
-- Performance suitable for typical use cases
-- Memory usage appropriate for target systems
+- **Dependency missing:** [tool] not installed - provide installation instructions for macOS/Linux
+- **File not found:** Clear error message with file path and suggestions
+- **Permission denied:** Specific guidance for read/write permission problems
+- **Invalid format:** Handle malformed input with helpful error messages
+- **Disk full:** Check available space before processing large files
+- **Interrupted operation:** Clean up partial files and provide recovery options
 
-## Success Criteria
-- Script exists at bin/$project_name and is executable
-- All user stories can be completed successfully
-- All error scenarios handled gracefully with helpful messages
-- Manual testing successful across different scenarios and edge cases
-- Documentation complete with usage examples and troubleshooting
-- Ready for distribution via Shell Starter installer
+## Success Criteria & Verification
+**CRITICAL:** How to verify the tool actually works
+
+- **Functional Test:** Tool successfully completes its primary purpose with real test data
+- **Quality:** Passes shellcheck and shfmt with no errors
+- **Integration:** Works with Shell Starter installer system
+- **User Experience:** All user stories can be completed successfully
+- **Error Handling:** All error scenarios produce helpful, actionable messages
+- **Documentation:** Comprehensive help text with examples
+
+**Manual Test Cases:**
+- [ ] Basic functionality works: [specific test case]
+- [ ] Error handling works: [test with invalid input]
+- [ ] Help and version flags work correctly
+- [ ] Progress indicators show during long operations
 EOF
 
 	# Generate progress.log
