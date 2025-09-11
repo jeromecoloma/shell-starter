@@ -107,13 +107,15 @@ Instead of crafting a single prompt, we'll set up a self-managing AI development
 #### 6A: Generate AI Workflow Structure
 
 ```bash
-# Generate the autonomous development workflow
+# Generate the autonomous development workflow for md-to-pdf project
 ./bin/generate-ai-workflow md-to-pdf
 ```
 
 This creates:
-- `.ai-workflow/state/` - Task tracking and progress files
-- `.ai-workflow/commands/` - Multi-agent command definitions
+- `.ai-workflow/state/` - Task tracking and progress files for your md-to-pdf project
+- `.ai-workflow/commands/` - Project-specific AI commands (separate from Shell Starter's internal commands)
+
+**Important:** This generates a **separate** AI development workflow for your md-to-pdf project. This is different from Shell Starter's internal development commands (like `/do SHS-1`) which are used to develop Shell Starter itself.
 
 #### 6B: Customize Project Requirements
 
@@ -315,13 +317,17 @@ mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/
 mkdir -p .opencode && cp -r .ai-workflow/commands/.opencode/command .opencode/
 ```
 
+**Important:** After copying the commands, restart your AI agent or refresh the command list to ensure the new `/dev` command is available.
+
 ### Step 7: Start Autonomous Development
 
-Now launch the AI development cycle:
+Now launch the AI development cycle using the **generated** `/dev` command (not Shell Starter's internal development commands):
 
 ```
 /dev start
 ```
+
+**Note:** This `/dev` command comes from the generated `.ai-workflow/commands/` directory you just copied, not from Shell Starter's internal development workflow. It will read your project-specific requirements and tasks from `.ai-workflow/state/`.
 
 Your AI coding agent will now:
 
@@ -355,7 +361,7 @@ Simply start a new conversation and run:
 /dev
 ```
 
-The AI will read the saved state and continue exactly where it left off.
+**Note:** This uses the **project-specific** `/dev` command from your generated `.ai-workflow/commands/` directory. Make sure you have copied the commands to your AI agent's directory (Step 6D) before trying to resume development. The AI will read the saved state from `.ai-workflow/state/` and continue exactly where it left off.
 
 ---
 
