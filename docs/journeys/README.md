@@ -7,7 +7,7 @@ Development Journeys are step-by-step guides that show real-world scenarios of b
 ### AI-Assisted Development
 *Building CLI tools with AI coding assistants like Claude, ChatGPT, or Gemini*
 
-- [**Image Resizer CLI**](ai-assisted/image-resizer.md) - Build a batch image resizing tool with ImageMagick integration
+- [**Markdown to PDF Converter CLI**](ai-assisted/md-to-pdf.md) - Build a markdown to PDF conversion tool with pandoc integration and theme support
   - *~40 minutes* • *Beginner-friendly* • *Interactive prompts, progress indicators, error handling*
 
 ### Coming Soon

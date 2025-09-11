@@ -692,7 +692,7 @@ DESCRIPTION:
     - OpenCode (.opencode/command/)
 
 EXAMPLES:
-    $SCRIPT_NAME image-resizer
+    $SCRIPT_NAME md-to-pdf
     $SCRIPT_NAME my-cli-tool
     $SCRIPT_NAME web-scraper
 EOF

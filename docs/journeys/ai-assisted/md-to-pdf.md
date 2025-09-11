@@ -1,15 +1,15 @@
-# Development Journey: AI-Assisted Image Resizer CLI
-**Task Code**: `JOURNEY-IMG-RESIZE`
+# Development Journey: AI-Assisted Markdown to PDF Converter CLI
+**Task Code**: `JOURNEY-MD-PDF`
 
-Build a professional batch image resizing tool using Shell Starter and an AI coding assistant.
+Build a professional markdown to PDF conversion tool using Shell Starter and an AI coding assistant.
 
 ## 📋 Overview
 
-**What You'll Build:** A CLI tool that batch resizes images using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
+**What You'll Build:** A CLI tool that converts markdown files to professional PDFs using pandoc with theme support, interactive prompts, and comprehensive error handling.
 
 **AI Coding Agents:** Claude Code, Cursor, Codex, Gemini CLI, etc.
 
-**Final Result:** Production-ready `image-resize` script with professional UX
+**Final Result:** Production-ready `md-to-pdf` script with professional UX
 
 ## ⏱️ Time Estimate
 **Total:** ~40 minutes
@@ -23,8 +23,8 @@ Build a professional batch image resizing tool using Shell Starter and an AI cod
 
 - Basic command line knowledge
 - Access to an AI coding agent
-- ImageMagick installed (`brew install imagemagick` or `apt-get install imagemagick`)
-- Some sample images for testing
+- Pandoc installed (`brew install pandoc` or `apt-get install pandoc`)
+- Some sample markdown files for testing
 
 ---
 
@@ -70,16 +70,16 @@ ls bin/
 
 ## Phase 2: Requirements Definition (3 minutes)
 
-### Step 4: Define Your Image Resizer Requirements
+### Step 4: Define Your Markdown to PDF Converter Requirements
 
 Our tool should:
 
-- ✅ **Batch process** multiple images in a directory
-- ✅ **Interactive prompts** for input/output paths and dimensions  
-- ✅ **Dependency checking** to ensure ImageMagick is available
-- ✅ **Progress indicators** during processing
-- ✅ **Error handling** for invalid files, permissions, disk space
-- ✅ **Flexible sizing** (width x height, or maintain aspect ratio)
+- ✅ **Single file conversion** from markdown to PDF
+- ✅ **Interactive prompts** for input/output paths and theme selection  
+- ✅ **Dependency checking** to ensure pandoc is available
+- ✅ **Progress indicators** during conversion
+- ✅ **Error handling** for invalid files, permissions, pandoc errors
+- ✅ **Theme support** (GitHub, Academic, Clean, Modern styles)
 - ✅ **Preview mode** to show what would be processed
 - ✅ **Shell Starter compliance** (help, version, logging, etc.)
 
@@ -87,11 +87,13 @@ Our tool should:
 
 ```bash
 # Desired usage patterns:
-image-resize --help                    # Show comprehensive help
-image-resize --version                 # Show version
-image-resize                          # Interactive mode with prompts
-image-resize /path/to/input /path/to/output 800x600    # Direct mode
-image-resize --preview /path/to/input 1920x1080       # Preview only
+md-to-pdf --help                      # Show comprehensive help
+md-to-pdf --version                   # Show version
+md-to-pdf                            # Interactive mode with prompts
+md-to-pdf document.md                 # Convert to document.pdf
+md-to-pdf document.md report.pdf      # Convert with custom output name
+md-to-pdf --theme academic doc.md     # Convert with specific theme
+md-to-pdf --preview document.md       # Preview conversion plan
 ```
 
 ---
@@ -106,7 +108,7 @@ Instead of crafting a single prompt, we'll set up a self-managing AI development
 
 ```bash
 # Generate the autonomous development workflow
-./bin/generate-ai-workflow image-resize
+./bin/generate-ai-workflow md-to-pdf
 ```
 
 This creates:
@@ -119,25 +121,25 @@ Edit the generated requirements file:
 
 ```bash
 # Edit the project requirements
-# Update with image-resizer specific features
+# Update with md-to-pdf specific features
 open .ai-workflow/state/requirements.md
 ```
 
 Update it with:
 
 ```markdown
-# image-resize - Project Requirements
-**Task Code**: `REQ-IMG-RESIZE`
+# md-to-pdf - Project Requirements
+**Task Code**: `REQ-MD-PDF`
 
 ## Overview
-Batch image resizing CLI tool using ImageMagick with interactive prompts, progress indicators, and comprehensive error handling.
+Markdown to PDF conversion CLI tool using pandoc with theme support, interactive prompts, and comprehensive error handling.
 
 ## Core Features
-- [ ] **REQ-1:** Interactive mode: prompts for input directory, output directory, and dimensions
-- [ ] **REQ-2:** Direct mode: accepts input/output paths and dimensions as arguments
-- [ ] **REQ-3:** Batch processing of common image formats (jpg, png, gif, tiff, bmp)
-- [ ] **REQ-4:** Maintain aspect ratio option or exact dimensions
-- [ ] **REQ-5:** Preview mode to show what would be processed without actually resizing
+- [ ] **REQ-1:** Interactive mode: prompts for input file, output file, and theme selection
+- [ ] **REQ-2:** Direct mode: accepts input markdown file and optional output PDF name
+- [ ] **REQ-3:** Support for standard markdown files (.md, .markdown, .txt)
+- [ ] **REQ-4:** Built-in themes: GitHub, Academic, Clean, Modern
+- [ ] **REQ-5:** Preview mode to show conversion plan without actually converting
 
 ## Shell Starter Requirements
 - [ ] **REQ-6:** Follow Shell Starter conventions from docs/conventions.md
@@ -145,35 +147,35 @@ Batch image resizing CLI tool using ImageMagick with interactive prompts, progre
 - [ ] **REQ-8:** Include comprehensive help text with usage examples
 - [ ] **REQ-9:** Use logging functions (log::info, log::error, log::warn) instead of echo
 - [ ] **REQ-10:** Include proper argument parsing with --help and --version
-- [ ] **REQ-11:** Add input validation for all paths and dimensions
+- [ ] **REQ-11:** Add input validation for all file paths and theme names
 - [ ] **REQ-12:** Handle errors gracefully with meaningful messages
 
 ## Technical Requirements
-- [ ] **REQ-13:** Check for ImageMagick dependency (convert command)
-- [ ] **REQ-14:** Validate input directory exists and is readable
+- [ ] **REQ-13:** Check for pandoc dependency availability
+- [ ] **REQ-14:** Validate input markdown file exists and is readable
 - [ ] **REQ-15:** Create output directory if it doesn't exist
 - [ ] **REQ-16:** Show progress with Shell Starter's spinner functions
 - [ ] **REQ-17:** Handle file permission errors, disk space issues
-- [ ] **REQ-18:** Support both "WIDTHxHEIGHT" and "WIDTH" (maintain aspect) formats
-- [ ] **REQ-19:** Skip already processed files or provide overwrite option
+- [ ] **REQ-18:** Support theme selection with built-in CSS/template files
+- [ ] **REQ-19:** Auto-generate output filename if not specified (input.md → input.pdf)
 
 ## Error Handling Scenarios
-- [ ] **REQ-20:** ImageMagick not installed
-- [ ] **REQ-21:** Invalid directory paths
-- [ ] **REQ-22:** No images found in input directory
-- [ ] **REQ-23:** Insufficient disk space
-- [ ] **REQ-24:** File permission issues
-- [ ] **REQ-25:** Invalid dimension formats
+- [ ] **REQ-20:** Pandoc not installed or not in PATH
+- [ ] **REQ-21:** Invalid file paths or non-existent input files
+- [ ] **REQ-22:** Invalid markdown syntax (pandoc conversion errors)
+- [ ] **REQ-23:** Insufficient disk space for PDF output
+- [ ] **REQ-24:** File permission issues (read input, write output)
+- [ ] **REQ-25:** Invalid theme selection
 
 ## Success Criteria
-- [ ] **REQ-26:** Script exists at bin/image-resize and is executable
+- [ ] **REQ-26:** Script exists at bin/md-to-pdf and is executable
 - [ ] **REQ-27:** Passes shellcheck and shfmt quality checks
 - [ ] **REQ-28:** Help text includes comprehensive usage examples
 - [ ] **REQ-29:** All error conditions handled gracefully with log:: functions
 - [ ] **REQ-30:** Interactive mode prompts work correctly
 - [ ] **REQ-31:** Direct mode accepts all argument patterns
-- [ ] **REQ-32:** Preview mode shows processing plan without executing
-- [ ] **REQ-33:** Manual testing successful with real images
+- [ ] **REQ-32:** Preview mode shows conversion plan without executing
+- [ ] **REQ-33:** Manual testing successful with real markdown files
 ```
 
 #### 6C: Install Commands for Your AI Agent
@@ -214,10 +216,10 @@ Your AI coding agent will now:
 **Expected AI Output:**
 ```
 🔄 AUTONOMOUS DEVELOPMENT CYCLE
-Current Task: IMAGE-RESIZE-1: Create project structure and basic executable
-Action: Creating bin/image-resize with Shell Starter template structure
+Current Task: MD-PDF-1: Create project structure and basic executable
+Action: Creating bin/md-to-pdf with Shell Starter template structure
 Progress: Implementing help text and argument parsing
-Next: IMAGE-RESIZE-2: Implement help text and version handling
+Next: MD-PDF-2: Implement pandoc dependency checking and validation
 ```
 
 ### Step 8: Monitor and Resume Development
@@ -251,7 +253,7 @@ The AI workflow includes built-in QA. Run comprehensive checks:
 **Expected QA Output:**
 ```
 🔍 QA REPORT
-Files Checked: bin/image-resize
+Files Checked: bin/md-to-pdf
 Issues Found: 0
 Critical: None
 Warnings: None
@@ -266,28 +268,42 @@ The autonomous development should have created a working script. Test it:
 
 ```bash
 # Test help and version (should work automatically)
-./bin/image-resize --help
-./bin/image-resize --version
+./bin/md-to-pdf --help
+./bin/md-to-pdf --version
 
 # Test dependency checking
-./bin/image-resize --preview /nonexistent/path 800x600
+./bin/md-to-pdf --preview /nonexistent/file.md
 
 # The AI should have implemented proper error handling for all scenarios
 ```
 
-### Step 11: Create Test Images and Directories
+### Step 11: Create Test Markdown Files and Directories
 
 ```bash
 # Create test directory structure
-mkdir -p test-images/input test-images/output
+mkdir -p test-docs/input test-docs/output
 
-# Add some test images to test-images/input/
-# (download or copy some sample images)
+# Create sample markdown files for testing
+echo "# Test Document
+This is a test markdown file with **bold** and *italic* text.
+
+## Code Example
+\`\`\`bash
+echo 'Hello World'
+\`\`\`
+
+## List Example
+- Item 1
+- Item 2
+- Item 3
+" > test-docs/input/sample.md
 
 # Test the modes (AI should have implemented all these)
-./bin/image-resize                                    # Interactive mode
-./bin/image-resize test-images/input test-images/output 800x600  # Direct mode
-./bin/image-resize --preview test-images/input 1920x1080        # Preview mode
+./bin/md-to-pdf                                     # Interactive mode
+./bin/md-to-pdf test-docs/input/sample.md           # Direct mode (auto output)
+./bin/md-to-pdf test-docs/input/sample.md test-docs/output/report.pdf  # Custom output
+./bin/md-to-pdf --theme academic test-docs/input/sample.md             # Themed conversion
+./bin/md-to-pdf --preview test-docs/input/sample.md                    # Preview mode
 ```
 
 ### Step 12: Handle Issues and Iterate
@@ -326,11 +342,11 @@ open .ai-workflow/state/requirements.md
 Add to the requirements:
 ```markdown
 ## Advanced Features
-- [ ] Quality settings: --quality option (1-100) for JPEG compression
-- [ ] Format conversion: --format flag for output format (jpg/png/etc)
-- [ ] Recursive processing: --recursive flag to process subdirectories
-- [ ] Progress indicators: "Processing image X of Y" display
-- [ ] Enhanced preview: Show before/after file sizes
+- [ ] Custom CSS: --css option to use custom stylesheets
+- [ ] Table of contents: --toc flag to generate PDF bookmarks
+- [ ] Page options: --margins, --paper-size (A4, Letter, etc.)
+- [ ] Metadata: --title, --author flags for PDF properties
+- [ ] Enhanced preview: Show markdown parsing results and theme preview
 ```
 
 Then continue development:
@@ -343,19 +359,20 @@ The AI will automatically pick up the new requirements and implement them follow
 ### Step 14: Generate Comprehensive Tests
 
 ```
-Create comprehensive Bats tests for the image-resize script.
+Create comprehensive Bats tests for the md-to-pdf script.
 
 The tests should cover:
 - Help and version output validation
-- Dependency checking (ImageMagick availability)
-- Input validation (directories, dimension formats)
-- Error conditions (invalid paths, permissions)
+- Dependency checking (pandoc availability)
+- Input validation (file paths, theme names)
+- Error conditions (invalid files, permissions, malformed markdown)
 - Interactive mode simulation
 - Direct mode with various argument combinations
 - Preview mode functionality
+- Theme selection and application
 
 Requirements:
-- Save as tests/image-resize.bats
+- Save as tests/md-to-pdf.bats
 - Use proper Bats test structure with setup() and teardown()
 - Test both success and failure scenarios
 - Verify exit codes and output content
@@ -366,15 +383,15 @@ Requirements:
 
 ```bash
 # Run the new tests
-./tests/bats-core/bin/bats tests/image-resize.bats
+./tests/bats-core/bin/bats tests/md-to-pdf.bats
 
 # Add your script to the installer manifest
 # This allows users to install your CLI tool with one command
-# Edit install.sh to include bin/image-resize in the SCRIPTS array
+# Edit install.sh to include bin/md-to-pdf in the SCRIPTS array
 
 # Final quality check
-shellcheck bin/image-resize tests/image-resize.bats
-shfmt -d bin/image-resize
+shellcheck bin/md-to-pdf tests/md-to-pdf.bats
+shfmt -d bin/md-to-pdf
 ```
 
 ### Step 16: Prepare for Distribution
@@ -386,16 +403,16 @@ Now that your tool is complete, you can distribute it like any professional CLI:
 echo "1.0.0" > VERSION
 
 # 2. Update README.md with your tool's description
-# Replace Shell Starter content with your Image Resizer documentation
+# Replace Shell Starter content with your Markdown to PDF converter documentation
 
 # 3. Push to your own GitHub repository
-git remote set-url origin https://github.com/your-username/image-resize-cli.git
+git remote set-url origin https://github.com/your-username/md-to-pdf-cli.git
 git add .
-git commit -m "feat: add image-resize CLI tool with batch processing"
+git commit -m "feat: add md-to-pdf CLI tool with theme support"
 git push -u origin main
 
 # 4. Your users can now install with:
-# curl -fsSL https://raw.githubusercontent.com/your-username/image-resize-cli/main/install.sh | bash
+# curl -fsSL https://raw.githubusercontent.com/your-username/md-to-pdf-cli/main/install.sh | bash
 ```
 
 ---
@@ -405,10 +422,11 @@ git push -u origin main
 ### What You Built
 
 - **Professional CLI tool** with consistent UX
-- **Batch image processing** with ImageMagick integration
+- **Markdown to PDF conversion** with pandoc integration
 - **Interactive and direct modes** for different workflows
+- **Built-in theme support** (GitHub, Academic, Clean, Modern)
 - **Comprehensive error handling** and user feedback
-- **Progress indicators** for long operations
+- **Progress indicators** for conversion operations
 - **Complete test suite** for reliability
 - **Production-ready code** following Shell Starter conventions
 
@@ -416,12 +434,12 @@ git push -u origin main
 
 - [ ] Script has `--help` and `--version` flags
 - [ ] Uses Shell Starter logging functions consistently
-- [ ] Handles missing dependencies gracefully
+- [ ] Handles missing dependencies gracefully (pandoc)
 - [ ] Validates all user inputs with helpful error messages
-- [ ] Shows progress during batch operations
+- [ ] Shows progress during conversion operations
 - [ ] Passes shellcheck and shfmt quality checks
 - [ ] Has comprehensive test coverage
-- [ ] Works with various image formats and dimension specifications
+- [ ] Works with various markdown files and theme selections
 
 ### Key Learning Outcomes
 
@@ -438,22 +456,22 @@ git push -u origin main
 Ready to take it further? Try these enhancements:
 
 ### Advanced Features
-- **Watermarking**: Add text/image watermarks to processed images
-- **Batch effects**: Apply filters, brightness, contrast adjustments
-- **Cloud storage**: Upload/download from S3, Google Cloud, etc.
-- **Parallel processing**: Use GNU parallel for faster batch operations
+- **Custom templates**: Create reusable pandoc templates for different document types
+- **Batch processing**: Convert multiple markdown files in a directory
+- **Live preview**: Watch mode that regenerates PDF when markdown changes
+- **Plugin system**: Support for custom pandoc filters and processors
 
 ### Integration Improvements
-- **Configuration files**: Support for saving/loading common presets
-- **Progress persistence**: Resume interrupted batch operations
-- **Notifications**: Desktop notifications when batch processing completes
-- **Web interface**: Simple web UI for drag-and-drop image processing
+- **Configuration files**: Support for saving/loading conversion presets
+- **Git integration**: Auto-convert README.md files in repositories
+- **Editor plugins**: VS Code/Vim plugins for one-click conversion
+- **Web interface**: Simple web UI for drag-and-drop markdown conversion
 
 ### Professional Features
-- **Logging and audit**: Detailed operation logs for batch processing
-- **Resource monitoring**: Check available disk space before processing
-- **Backup creation**: Automatic backup of original images
-- **Metadata preservation**: Keep EXIF data, creation dates, etc.
+- **Document merging**: Combine multiple markdown files into single PDF
+- **Citation support**: Bibliography and academic citation formatting
+- **Collaboration**: Team templates and shared style configurations
+- **Quality assurance**: Markdown linting and validation before conversion
 
 ---
 
@@ -467,4 +485,4 @@ Ready to take it further? Try these enhancements:
 
 **Total Development Time:** ~40 minutes from Shell Starter template to distributed CLI tool
 
-**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective. The AI has clear patterns to follow, resulting in consistent, professional CLI tools with minimal iteration.
+**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective. The AI has clear patterns to follow, resulting in consistent, professional CLI tools with minimal iteration. The md-to-pdf converter showcases how complex document processing can be made accessible through simple, well-designed command-line interfaces.

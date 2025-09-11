@@ -251,7 +251,7 @@ vim .ai-workflow/state/requirements.md
 | `/qa` | Run comprehensive quality assurance |
 | `/status` | Show current project status |
 
-See the [Image Resizer Journey](docs/journeys/ai-assisted/image-resizer.md) for a complete example.
+See the [Markdown to PDF Converter Journey](docs/journeys/ai-assisted/md-to-pdf.md) for a complete example.
 
 ## 🤖 AI Development
 

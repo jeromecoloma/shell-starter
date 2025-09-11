@@ -13,15 +13,15 @@ AI coding assistants excel at generating Shell Starter-compliant scripts because
 
 ## 📚 Available Journeys
 
-### [Image Resizer CLI](image-resizer.md)
-Build a batch image resizing tool with ImageMagick integration
+### [Markdown to PDF Converter CLI](md-to-pdf.md)
+Build a markdown to PDF conversion tool with pandoc integration and theme support
 
 **What You'll Learn:**
 - Crafting effective AI prompts for Shell Starter
 - Dependency checking and validation patterns
 - Interactive user input handling
 - Progress indicators and error reporting
-- Batch file processing workflows
+- File conversion workflows with theme systems
 
 **Time:** ~40 minutes • **Level:** Beginner
 

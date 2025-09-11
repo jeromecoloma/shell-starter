@@ -37,7 +37,7 @@ The AI will automatically:
 - Resume development across context resets
 - Provide detailed progress reports
 
-See [Image Resizer Journey](journeys/ai-assisted/image-resizer.md) for a complete example.
+See [Markdown to PDF Converter Journey](journeys/ai-assisted/md-to-pdf.md) for a complete example.
 
 ## 🤖 AI Assistant Guidelines
 
