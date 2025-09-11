@@ -248,20 +248,20 @@ EOF
 
 generate_specific_tasks() {
 	local project_name="$1"
-	
+
 	if [[ ! -f ".ai-workflow/state/requirements.md" ]]; then
 		log::error "requirements.md not found. Run '$SCRIPT_NAME $project_name' first."
 		exit 1
 	fi
-	
+
 	log::info "Analyzing requirements.md and generating specific tasks..."
-	
+
 	# Use AI to generate specific tasks directly
 	spinner::start "Generating project-specific tasks from PRD"
-	
+
 	# Create temporary file with AI instructions
 	local ai_prompt=$(mktemp)
-	cat > "$ai_prompt" <<EOF
+	cat >"$ai_prompt" <<EOF
 Analyze the following PRD and generate a specific tasks.md file for the "$project_name" project.
 
 Create detailed, actionable tasks based on the actual features and requirements in the PRD.
@@ -279,14 +279,14 @@ Generate a complete tasks.md file with:
 
 Output the complete markdown content for tasks.md:
 EOF
-	
+
 	# Generate specific tasks using AI (this would call an AI service)
 	# For now, we'll create a more intelligent template based on the PRD
 	analyze_prd_and_generate_tasks "$project_name" "$ai_prompt"
-	
+
 	spinner::stop
 	rm "$ai_prompt"
-	
+
 	log::info "✓ Generated specific tasks based on your PRD"
 	log::info "Review .ai-workflow/state/tasks.md to see project-specific implementation steps"
 }
@@ -295,10 +295,10 @@ analyze_prd_and_generate_tasks() {
 	local project_name="$1"
 	local ai_prompt="$2"
 	local project_upper=$(echo "$project_name" | tr '[:lower:]' '[:upper:]')
-	
+
 	# Read and analyze the PRD content
 	local prd_content=$(cat ".ai-workflow/state/requirements.md")
-	
+
 	# Extract key features and create specific tasks
 	# This is a simplified version - in production this would use actual AI
 	create_intelligent_tasks "$project_name" "$project_upper" "$prd_content"
@@ -308,16 +308,16 @@ create_intelligent_tasks() {
 	local project_name="$1"
 	local project_upper="$2"
 	local prd_content="$3"
-	
+
 	# Analyze PRD content for specific features
 	local has_interactive_mode=$(echo "$prd_content" | grep -i "interactive" && echo "true" || echo "false")
 	local has_themes=$(echo "$prd_content" | grep -i "theme" && echo "true" || echo "false")
 	local has_preview=$(echo "$prd_content" | grep -i "preview\|dry-run" && echo "true" || echo "false")
 	local has_file_processing=$(echo "$prd_content" | grep -i "file\|convert\|process" && echo "true" || echo "false")
 	local dependencies=$(echo "$prd_content" | grep -i "pandoc\|dependency" | head -1)
-	
+
 	# Generate specific tasks based on detected features
-	cat > ".ai-workflow/state/tasks.md" <<EOF
+	cat >".ai-workflow/state/tasks.md" <<EOF
 # $project_name - Development Tasks
 
 This document tracks the implementation progress of the $project_name project using autonomous AI development.
@@ -338,7 +338,7 @@ EOF
 
 	# Add dependency checking if detected
 	if [[ "$dependencies" != "" ]]; then
-		cat >> ".ai-workflow/state/tasks.md" <<EOF
+		cat >>".ai-workflow/state/tasks.md" <<EOF
 - [ ] **$project_upper-2:** Implement dependency checking and validation
   **Goal:** Verify all required dependencies and system requirements
   **Actions:**
@@ -353,7 +353,7 @@ EOF
 
 	# Add interactive mode if detected
 	if [[ "$has_interactive_mode" == "true" ]]; then
-		cat >> ".ai-workflow/state/tasks.md" <<EOF
+		cat >>".ai-workflow/state/tasks.md" <<EOF
 - [ ] **$project_upper-3:** Implement interactive mode functionality
   **Goal:** Create user-friendly interactive prompts for all required inputs
   **Actions:**
@@ -368,7 +368,7 @@ EOF
 
 	# Add file processing if detected
 	if [[ "$has_file_processing" == "true" ]]; then
-		cat >> ".ai-workflow/state/tasks.md" <<EOF
+		cat >>".ai-workflow/state/tasks.md" <<EOF
 ## Phase 2: Core Functionality
 
 - [ ] **$project_upper-4:** Implement core file processing logic
@@ -385,7 +385,7 @@ EOF
 
 	# Add theme system if detected
 	if [[ "$has_themes" == "true" ]]; then
-		cat >> ".ai-workflow/state/tasks.md" <<EOF
+		cat >>".ai-workflow/state/tasks.md" <<EOF
 - [ ] **$project_upper-5:** Implement theme system
   **Goal:** Create theme selection and application functionality
   **Actions:**
@@ -400,7 +400,7 @@ EOF
 
 	# Add preview mode if detected
 	if [[ "$has_preview" == "true" ]]; then
-		cat >> ".ai-workflow/state/tasks.md" <<EOF
+		cat >>".ai-workflow/state/tasks.md" <<EOF
 - [ ] **$project_upper-6:** Implement preview/dry-run mode
   **Goal:** Allow users to see what would happen without executing
   **Actions:**
@@ -414,7 +414,7 @@ EOF
 	fi
 
 	# Add final phases
-	cat >> ".ai-workflow/state/tasks.md" <<EOF
+	cat >>".ai-workflow/state/tasks.md" <<EOF
 ## Phase 3: Quality & Polish
 
 - [ ] **$project_upper-7:** Add comprehensive error handling
@@ -849,10 +849,10 @@ main() {
 			log::info "Run '$SCRIPT_NAME $project_name' first to generate initial templates"
 			exit 1
 		fi
-		
+
 		log::info "Updating tasks for project: $project_name"
 		generate_specific_tasks "$project_name"
-		
+
 		log::info "✓ Updated tasks.md with project-specific implementation steps"
 		log::info "Ready to start development with: /dev start"
 	else
