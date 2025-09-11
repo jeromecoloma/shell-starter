@@ -70,6 +70,10 @@ FILES CREATED:
     .ai-workflow/commands/.gemini/        - Gemini CLI commands
     .ai-workflow/commands/.opencode/      - OpenCode commands
 
+GUIDES:
+    docs/prompting-guide.md               - PRD generation guide for custom requirements
+    docs/journeys/ai-assisted/           - Complete development journey examples
+
 EOF
 }
 
@@ -245,56 +249,56 @@ EOF
 - **US-3:** As a user, I want [describe user need] so that [benefit/outcome]
 
 ## Core Features
-- [ ] **REQ-1:** [Detailed feature description with acceptance criteria]
-- [ ] **REQ-2:** [Detailed feature description with acceptance criteria]
-- [ ] **REQ-3:** [Detailed feature description with acceptance criteria]
+- [Detailed feature description with acceptance criteria]
+- [Detailed feature description with acceptance criteria]  
+- [Detailed feature description with acceptance criteria]
 
 ## CLI Interface Requirements
-- [ ] **REQ-4:** Interactive mode with user prompts for all required inputs
-- [ ] **REQ-5:** Direct mode accepting command-line arguments
-- [ ] **REQ-6:** Preview/dry-run mode to show what would be executed
-- [ ] **REQ-7:** Help text with comprehensive usage examples
-- [ ] **REQ-8:** Version information display
+- Interactive mode with user prompts for all required inputs
+- Direct mode accepting command-line arguments
+- Preview/dry-run mode to show what would be executed
+- Help text with comprehensive usage examples
+- Version information display
 
 ## Shell Starter Compliance
-- [ ] **REQ-9:** Follow Shell Starter conventions from docs/conventions.md
-- [ ] **REQ-10:** Use lib/main.sh and provided library functions
-- [ ] **REQ-11:** Include --help and --version flags with proper parsing
-- [ ] **REQ-12:** Use log:: functions (info, warn, error, debug) instead of echo
-- [ ] **REQ-13:** Handle all error conditions gracefully with meaningful messages
-- [ ] **REQ-14:** Include progress indicators for long operations using spinner::
+- Follow Shell Starter conventions from docs/conventions.md
+- Use lib/main.sh and provided library functions
+- Include --help and --version flags with proper parsing
+- Use log:: functions (info, warn, error, debug) instead of echo
+- Handle all error conditions gracefully with meaningful messages
+- Include progress indicators for long operations using spinner::
 
 ## Technical Requirements
-- [ ] **REQ-15:** Input validation for all parameters with helpful error messages
-- [ ] **REQ-16:** Dependency checking with installation guidance
-- [ ] **REQ-17:** Cross-platform compatibility (macOS/Linux)
-- [ ] **REQ-18:** Professional CLI UX patterns and consistent behavior
-- [ ] **REQ-19:** Proper exit codes (0 for success, non-zero for errors)
-- [ ] **REQ-20:** Safe handling of file paths, including spaces and special characters
+- Input validation for all parameters with helpful error messages
+- Dependency checking with installation guidance
+- Cross-platform compatibility (macOS/Linux)
+- Professional CLI UX patterns and consistent behavior
+- Proper exit codes (0 for success, non-zero for errors)
+- Safe handling of file paths, including spaces and special characters
 
 ## Error Handling Scenarios
-- [ ] **REQ-21:** Missing or invalid dependencies with helpful installation instructions
-- [ ] **REQ-22:** Invalid file paths or non-existent input files
-- [ ] **REQ-23:** File permission issues (read input, write output)
-- [ ] **REQ-24:** Invalid input formats or malformed data
-- [ ] **REQ-25:** Insufficient disk space or system resource constraints
-- [ ] **REQ-26:** Network connectivity issues (if applicable)
-- [ ] **REQ-27:** Interrupted operations with proper cleanup
+- Missing or invalid dependencies with helpful installation instructions
+- Invalid file paths or non-existent input files
+- File permission issues (read input, write output)
+- Invalid input formats or malformed data
+- Insufficient disk space or system resource constraints
+- Network connectivity issues (if applicable)
+- Interrupted operations with proper cleanup
 
 ## Quality & Performance Requirements
-- [ ] **REQ-28:** Script passes shellcheck with no errors or warnings
-- [ ] **REQ-29:** Script passes shfmt formatting checks
-- [ ] **REQ-30:** Comprehensive test coverage with bats testing framework
-- [ ] **REQ-31:** Performance suitable for typical use cases
-- [ ] **REQ-32:** Memory usage appropriate for target systems
+- Script passes shellcheck with no errors or warnings
+- Script passes shfmt formatting checks
+- Comprehensive test coverage with bats testing framework
+- Performance suitable for typical use cases
+- Memory usage appropriate for target systems
 
 ## Success Criteria
-- [ ] **REQ-33:** Script exists at bin/$project_name and is executable
-- [ ] **REQ-34:** All user stories can be completed successfully
-- [ ] **REQ-35:** All error scenarios handled gracefully with helpful messages
-- [ ] **REQ-36:** Manual testing successful across different scenarios and edge cases
-- [ ] **REQ-37:** Documentation complete with usage examples and troubleshooting
-- [ ] **REQ-38:** Ready for distribution via Shell Starter installer
+- Script exists at bin/$project_name and is executable
+- All user stories can be completed successfully
+- All error scenarios handled gracefully with helpful messages
+- Manual testing successful across different scenarios and edge cases
+- Documentation complete with usage examples and troubleshooting
+- Ready for distribution via Shell Starter installer
 EOF
 
 	# Generate progress.log
@@ -609,6 +613,7 @@ main() {
 	echo
 	log::info "Next steps:"
 	log::info "1. Edit .ai-workflow/state/requirements.md with your project details"
+	log::info "   • Use docs/prompting-guide.md for help generating comprehensive PRDs"
 	log::info "2. Copy commands to your AI coding agent:"
 	log::info "   • Claude Code:  mkdir -p .claude && cp -r .ai-workflow/commands/.claude/commands .claude/"
 	log::info "   • Cursor:       mkdir -p .cursor && cp -r .ai-workflow/commands/.cursor/commands .cursor/"

@@ -117,31 +117,168 @@ This creates:
 
 #### 6B: Customize Project Requirements
 
-Edit the generated requirements file to specify the md-to-pdf project details:
+You have three options for creating your project requirements:
+
+**Option 1: Use AI to generate md-to-pdf PRD**  
+Copy this prompt and use it with any AI assistant to generate a custom PRD:
+
+```
+Create a comprehensive Product Requirements Document (PRD) for a markdown to PDF conversion CLI tool called "md-to-pdf".
+
+## Project Context:
+- **Purpose**: Convert markdown files to professional PDF documents with built-in themes and interactive prompts
+- **Target Users**: Developers, writers, documentation teams, content creators
+- **Core Functionality**: Command-line tool using pandoc with theme support, interactive mode, and comprehensive error handling
+
+## Requirements:
+Generate a PRD following this exact structure with NO checkboxes or REQ-X codes:
+
+### Product Overview
+- Clear problem statement and solution approach
+- Target user identification
+
+### User Stories  
+- 3-5 user stories in "As a [user], I want [goal] so that [benefit]" format
+
+### Core Features
+- Interactive mode with file and theme selection prompts
+- Direct command-line mode accepting arguments
+- Built-in themes (GitHub, Academic, Clean, Modern)
+- Preview mode showing conversion plan
+- Smart defaults for output filenames
+
+### CLI Interface Requirements
+- Interactive mode specifications
+- Direct command-line usage: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
+- Help and version requirements
+
+### Shell Starter Compliance
+- Integration with Shell Starter library functions (lib/main.sh)
+- Logging with log:: functions instead of echo
+- Progress indicators using spinner:: functions
+- Standard argument parsing conventions
+
+### Technical Requirements
+- Pandoc dependency checking with installation guidance
+- Input validation for markdown files (.md, .markdown, .txt)
+- Output validation and overwrite protection
+- Theme system with CSS templates
+- Cross-platform compatibility (macOS/Linux)
+- Safe file handling for paths with spaces
+
+### Error Handling Scenarios
+- Pandoc not installed
+- Invalid file paths and permissions
+- Malformed markdown syntax
+- Insufficient disk space
+- Invalid theme selection
+- File overwrite scenarios
+
+### Quality & Performance Requirements
+- Code quality standards (shellcheck, shfmt)
+- Bats testing framework coverage
+- Performance for files up to 50MB
+- Memory usage optimization
+
+### Success Criteria
+- Script executable at bin/md-to-pdf
+- All user stories completed successfully
+- Comprehensive error handling
+- Manual testing across scenarios
+- Shell Starter installer integration
+
+Format as clean markdown with bullet points only. No task codes or checkboxes.
+```
+
+**Option 2: Use the provided specification**  
+Edit the generated requirements file and replace with this ready-to-use specification:
 
 ```bash
 # Edit the product requirements document
 open .ai-workflow/state/requirements.md
 ```
 
-Update the template with md-to-pdf specific information:
+**Option 3: Create custom PRD**  
+Use the comprehensive prompting guide for other project types:
 
-**Product Overview:**
-- Target Users: Developers, writers, documentation teams
-- Core Problem: Need professional PDF output from markdown files
-- Solution Approach: Command-line tool using pandoc with built-in themes
+```bash
+# See the full PRD generation guide
+open docs/prompting-guide.md
+```
 
-**User Stories:**
-- As a developer, I want to convert README.md to PDF for offline reading
-- As a writer, I want to generate styled PDFs from my markdown drafts
-- As a documentation team, I want consistent PDF formatting across all docs
+**Ready-to-use md-to-pdf specification:**
 
-**Core Features:**
-- Interactive mode with prompts for file selection and theme choice
-- Direct mode accepting markdown input and optional PDF output name  
-- Built-in themes (GitHub, Academic, Clean, Modern)
-- Preview mode to show conversion plan
-- Comprehensive error handling and dependency checking
+```markdown
+# md-to-pdf - Product Requirements Document
+
+## Product Overview
+Professional markdown to PDF conversion CLI tool with theme support and interactive prompts.
+
+**Target Users:** Developers, writers, documentation teams, content creators
+**Core Problem:** Need professional, consistently formatted PDF output from markdown files with minimal setup
+**Solution Approach:** Command-line tool using pandoc with built-in themes, interactive prompts, and comprehensive error handling
+
+## User Stories
+- **US-1:** As a developer, I want to convert README.md to PDF for offline reading so that I can review documentation without internet access
+- **US-2:** As a writer, I want to generate styled PDFs from my markdown drafts so that I can share professional documents with clients
+- **US-3:** As a documentation team, I want consistent PDF formatting across all docs so that our brand appears professional and unified
+
+## Core Features
+- Interactive mode: prompts user for input file, output file, and theme selection with validation
+- Direct mode: accepts markdown input file and optional PDF output name via command-line arguments
+- Built-in themes: GitHub, Academic, Clean, Modern styles with preview capability
+- Preview mode: shows conversion plan, theme preview, and file details without executing conversion
+- Smart defaults: auto-generate output filename (input.md → input.pdf) and detect optimal theme
+
+## CLI Interface Requirements
+- Interactive mode with user prompts for all required inputs with input validation
+- Direct mode accepting: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
+- Preview/dry-run mode with `--preview` flag showing conversion plan without executing
+- Help text with comprehensive usage examples and theme descriptions
+- Version information display with dependency versions (pandoc, etc.)
+
+## Shell Starter Compliance  
+- Follow Shell Starter conventions from docs/conventions.md (kebab-case, standard header)
+- Use lib/main.sh and provided library functions (logging, colors, spinner, utils)
+- Include --help and --version flags with proper argument parsing
+- Use log:: functions (info, warn, error, debug) instead of echo for all output
+- Handle all error conditions gracefully with meaningful, actionable messages
+- Include progress indicators for conversion operations using spinner:: functions
+
+## Technical Requirements
+- Pandoc dependency checking with version validation and installation guidance
+- Input validation: markdown file exists, readable, valid extensions (.md, .markdown, .txt)
+- Output validation: directory writable, filename valid, no overwrite without confirmation
+- Theme system: CSS templates for GitHub, Academic, Clean, Modern styles
+- Cross-platform compatibility (macOS/Linux) with proper path handling
+- Safe file handling: spaces in paths, special characters, symbolic links
+
+## Error Handling Scenarios
+- Pandoc not installed: helpful installation instructions for macOS/Linux
+- Invalid file paths: clear error messages with file existence and permission details
+- File permission issues: specific guidance for read/write permission problems
+- Invalid markdown syntax: pandoc error parsing and user-friendly explanations
+- Insufficient disk space: check available space before conversion
+- Invalid theme selection: list available themes and suggest closest match
+- Overwrite protection: confirm before overwriting existing PDF files
+
+## Quality & Performance Requirements
+- Script passes shellcheck with no errors or warnings
+- Script passes shfmt formatting checks
+- Comprehensive bats test coverage for all functions and error scenarios
+- Conversion performance: handle files up to 50MB efficiently
+- Memory usage: appropriate for typical desktop/server environments
+
+## Success Criteria
+- Script exists at bin/md-to-pdf and is executable with proper permissions
+- All user stories completed successfully with intuitive UX
+- All error scenarios handled gracefully with helpful, actionable messages
+- Manual testing successful: various markdown files, all themes, edge cases
+- Integration testing: works with Shell Starter installer system
+- Documentation complete: help text, examples, troubleshooting guide
+```
+
+This specification provides comprehensive requirements that the AI agent will use to guide development.
 
 #### 6C: Install Commands for Your AI Agent
 

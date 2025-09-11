@@ -39,6 +39,14 @@ The AI will automatically:
 
 See [Markdown to PDF Converter Journey](journeys/ai-assisted/md-to-pdf.md) for a complete example.
 
+### PRD Generation
+
+For creating comprehensive Product Requirements Documents, use the [PRD Generation Guide](prompting-guide.md) which provides:
+- Copy-paste ready prompt templates
+- Domain-specific customization guidelines  
+- Quality checklists for AI-ready requirements
+- Examples for different project types
+
 ## 🤖 AI Assistant Guidelines
 
 ### Core Principles
