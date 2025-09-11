@@ -117,66 +117,31 @@ This creates:
 
 #### 6B: Customize Project Requirements
 
-Edit the generated requirements file:
+Edit the generated requirements file to specify the md-to-pdf project details:
 
 ```bash
-# Edit the project requirements
-# Update with md-to-pdf specific features
+# Edit the product requirements document
 open .ai-workflow/state/requirements.md
 ```
 
-Update it with:
+Update the template with md-to-pdf specific information:
 
-```markdown
-# md-to-pdf - Project Requirements
-**Task Code**: `REQ-MD-PDF`
+**Product Overview:**
+- Target Users: Developers, writers, documentation teams
+- Core Problem: Need professional PDF output from markdown files
+- Solution Approach: Command-line tool using pandoc with built-in themes
 
-## Overview
-Markdown to PDF conversion CLI tool using pandoc with theme support, interactive prompts, and comprehensive error handling.
+**User Stories:**
+- As a developer, I want to convert README.md to PDF for offline reading
+- As a writer, I want to generate styled PDFs from my markdown drafts
+- As a documentation team, I want consistent PDF formatting across all docs
 
-## Core Features
-- [ ] **REQ-1:** Interactive mode: prompts for input file, output file, and theme selection
-- [ ] **REQ-2:** Direct mode: accepts input markdown file and optional output PDF name
-- [ ] **REQ-3:** Support for standard markdown files (.md, .markdown, .txt)
-- [ ] **REQ-4:** Built-in themes: GitHub, Academic, Clean, Modern
-- [ ] **REQ-5:** Preview mode to show conversion plan without actually converting
-
-## Shell Starter Requirements
-- [ ] **REQ-6:** Follow Shell Starter conventions from docs/conventions.md
-- [ ] **REQ-7:** Use the standard script template with proper header
-- [ ] **REQ-8:** Include comprehensive help text with usage examples
-- [ ] **REQ-9:** Use logging functions (log::info, log::error, log::warn) instead of echo
-- [ ] **REQ-10:** Include proper argument parsing with --help and --version
-- [ ] **REQ-11:** Add input validation for all file paths and theme names
-- [ ] **REQ-12:** Handle errors gracefully with meaningful messages
-
-## Technical Requirements
-- [ ] **REQ-13:** Check for pandoc dependency availability
-- [ ] **REQ-14:** Validate input markdown file exists and is readable
-- [ ] **REQ-15:** Create output directory if it doesn't exist
-- [ ] **REQ-16:** Show progress with Shell Starter's spinner functions
-- [ ] **REQ-17:** Handle file permission errors, disk space issues
-- [ ] **REQ-18:** Support theme selection with built-in CSS/template files
-- [ ] **REQ-19:** Auto-generate output filename if not specified (input.md → input.pdf)
-
-## Error Handling Scenarios
-- [ ] **REQ-20:** Pandoc not installed or not in PATH
-- [ ] **REQ-21:** Invalid file paths or non-existent input files
-- [ ] **REQ-22:** Invalid markdown syntax (pandoc conversion errors)
-- [ ] **REQ-23:** Insufficient disk space for PDF output
-- [ ] **REQ-24:** File permission issues (read input, write output)
-- [ ] **REQ-25:** Invalid theme selection
-
-## Success Criteria
-- [ ] **REQ-26:** Script exists at bin/md-to-pdf and is executable
-- [ ] **REQ-27:** Passes shellcheck and shfmt quality checks
-- [ ] **REQ-28:** Help text includes comprehensive usage examples
-- [ ] **REQ-29:** All error conditions handled gracefully with log:: functions
-- [ ] **REQ-30:** Interactive mode prompts work correctly
-- [ ] **REQ-31:** Direct mode accepts all argument patterns
-- [ ] **REQ-32:** Preview mode shows conversion plan without executing
-- [ ] **REQ-33:** Manual testing successful with real markdown files
-```
+**Core Features:**
+- Interactive mode with prompts for file selection and theme choice
+- Direct mode accepting markdown input and optional PDF output name  
+- Built-in themes (GitHub, Academic, Clean, Modern)
+- Preview mode to show conversion plan
+- Comprehensive error handling and dependency checking
 
 #### 6C: Install Commands for Your AI Agent
 
@@ -206,11 +171,11 @@ Now launch the AI development cycle:
 
 Your AI coding agent will now:
 
-1. **Read** the current state from `.ai-workflow/state/` files (including your customized requirements.md)
-2. **Analyze** the next incomplete task
-3. **Act** by implementing that specific feature
+1. **Read** the current state from `.ai-workflow/state/` files (requirements.md and tasks.md)
+2. **Analyze** the next incomplete task with detailed Goal/Actions/Verification
+3. **Act** by implementing that specific feature following the task instructions
 4. **Verify** with quality checks (shellcheck, shfmt, manual testing)
-5. **Update** progress in the state files
+5. **Update** progress in the state files and mark tasks complete [x]
 6. **Continue** to the next task automatically
 
 **Expected AI Output:**
@@ -218,8 +183,8 @@ Your AI coding agent will now:
 🔄 AUTONOMOUS DEVELOPMENT CYCLE
 Current Task: MD-PDF-1: Create project structure and basic executable
 Action: Creating bin/md-to-pdf with Shell Starter template structure
-Progress: Implementing help text and argument parsing
-Next: MD-PDF-2: Implement pandoc dependency checking and validation
+Progress: Implementing help text and argument parsing following task specifications
+Next: MD-PDF-2: Implement core argument parsing and validation
 ```
 
 ### Step 8: Monitor and Resume Development

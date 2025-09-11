@@ -2,6 +2,23 @@
 
 This document outlines the coding standards and conventions used in Shell Starter. Following these conventions ensures consistency, maintainability, and compatibility with the project's architecture.
 
+## 📋 Quick Reference: Example Scripts
+
+All conventions are demonstrated in working example scripts in the `bin/` directory:
+
+| Script | Demonstrates |
+|--------|-------------|
+| `bin/hello-world` | Basic structure, standard header, help/version patterns |
+| `bin/greet-user` | Argument parsing, input validation, multiple options |
+| `bin/show-colors` | Color usage, output formatting |
+| `bin/long-task` | Logging functions, spinner usage, progress indicators |
+| `bin/my-cli` | Multi-command structure, subcommand routing |
+| `bin/ai-action` | Dependency checking, external tool integration |
+| `bin/polyglot-example` | Polyglot scripts, `run::script` function |
+| `bin/generate-ai-workflow` | Complex argument parsing, file generation |
+
+**Test Examples**: `tests/hello-world.bats`, `tests/library-functions.bats`
+
 ## 📁 File Organization
 
 ### Directory Structure
@@ -18,21 +35,21 @@ shell-starter/
 ### Naming Conventions
 
 - **Executable Scripts** (`bin/`): Use kebab-case without file extensions
-  - ✅ `hello-world`, `my-cli`, `greet-user`
+  - ✅ `hello-world`, `my-cli`, `greet-user` (see `bin/hello-world`, `bin/my-cli`)
   - ❌ `hello_world.sh`, `myScript`, `greet-user.bash`
 
 - **Library Files** (`lib/`): Use kebab-case with `.sh` extension
-  - ✅ `colors.sh`, `logging.sh`, `spinner.sh`
+  - ✅ `colors.sh`, `logging.sh`, `spinner.sh` (see `lib/colors.sh`, `lib/logging.sh`)
   - ❌ `Colors.sh`, `logging_utils.sh`, `spinner`
 
 - **Test Files** (`tests/`): Use kebab-case with `.bats` extension
-  - ✅ `hello-world.bats`, `library-functions.bats`
+  - ✅ `hello-world.bats`, `library-functions.bats` (see `tests/hello-world.bats`)
   - ❌ `test_hello.bats`, `HelloWorld.bats`
 
 ## 📜 Script Structure
 
 ### Standard Header Template
-Every script should start with this template:
+Every script should start with this template (example: `bin/hello-world`):
 
 ```bash
 #!/bin/bash
@@ -75,6 +92,7 @@ function validate_input() {
 ### Colors and Logging
 - Use the provided logging functions instead of raw `echo`
 - Prefer semantic colors over direct color codes
+- **Examples**: See `bin/long-task` for logging, `bin/show-colors` for color usage
 
 ```bash
 # ✅ Good
@@ -119,7 +137,7 @@ current_date=`date +%Y-%m-%d`
 ## 🔧 Argument Parsing
 
 ### Standard Pattern
-Use this pattern for consistent argument parsing:
+Use this pattern for consistent argument parsing (example: `bin/greet-user`):
 
 ```bash
 show_help() {
@@ -195,6 +213,7 @@ spinner::start "Loading data..."
 # Long running operation
 spinner::stop
 ```
+**Example**: See `bin/long-task` for spinner usage
 
 #### Utility Functions
 ```bash
@@ -204,10 +223,14 @@ version="$(get_version)"
 # Execute scripts in other languages
 run::script "scripts/analyze.py" "$input_file"
 ```
+**Examples**: 
+- Version handling: `bin/hello-world --version`
+- Polyglot scripts: `bin/polyglot-example`
 
 ## 🧪 Testing Conventions
 
 ### Bats Test Structure
+**Example**: See `tests/hello-world.bats` for comprehensive test patterns
 ```bash
 #!/usr/bin/env bats
 
@@ -272,7 +295,7 @@ log::debug "Connecting to API at $API_URL"
 ## 📦 Dependencies
 
 ### Optional Dependencies
-Handle optional dependencies gracefully:
+Handle optional dependencies gracefully (example: `bin/ai-action`):
 
 ```bash
 check_dependencies() {
@@ -294,6 +317,7 @@ check_dependencies() {
 ```
 
 ### Required Dependencies
+**Example**: See `bin/generate-ai-workflow` for dependency checking patterns
 ```bash
 require_dependencies() {
     local deps=("git" "bash")

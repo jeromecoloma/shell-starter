@@ -88,66 +88,213 @@ generate_state_files() {
 This document tracks the implementation progress of the $project_name project using autonomous AI development.
 
 ## Phase 1: Foundation Setup
+
 - [ ] **$project_upper-1:** Create project structure and basic executable
-- [ ] **$project_upper-2:** Implement help text and version handling
-- [ ] **$project_upper-3:** Add dependency checking and validation
+  **Goal:** Create the executable script with Shell Starter template structure
+  **Actions:**
+  - [ ] **$project_upper-1.1:** Create \`bin/$project_name\` with Shell Starter template (see docs/conventions.md)
+  - [ ] **$project_upper-1.2:** Add proper shebang, header comment, and script metadata
+  - [ ] **$project_upper-1.3:** Source lib/main.sh and implement basic argument parsing structure
+  - [ ] **$project_upper-1.4:** Implement show_help() function with comprehensive usage examples
+  - [ ] **$project_upper-1.5:** Add proper main() function with argument handling loop
+  **Verification:** Script exists, is executable, shows help with --help flag
 
-## Phase 2: Core Functionality  
+- [ ] **$project_upper-2:** Implement core argument parsing and validation
+  **Goal:** Handle all command-line arguments and flags according to requirements.md
+  **Actions:**
+  - [ ] **$project_upper-2.1:** Parse all required arguments (input files, options, flags)
+  - [ ] **$project_upper-2.2:** Implement --help, --version, --preview/dry-run modes
+  - [ ] **$project_upper-2.3:** Add input validation for all parameters with helpful error messages
+  - [ ] **$project_upper-2.4:** Use log:: functions for all user feedback instead of echo
+  **Verification:** All argument combinations work, proper error messages for invalid inputs
+
+- [ ] **$project_upper-3:** Add dependency checking and environment validation
+  **Goal:** Verify all required dependencies and system requirements
+  **Actions:**
+  - [ ] **$project_upper-3.1:** Check for required external dependencies (pandoc, python, etc.)
+  - [ ] **$project_upper-3.2:** Validate file system permissions for input/output directories
+  - [ ] **$project_upper-3.3:** Check system resources if needed (disk space, memory)
+  - [ ] **$project_upper-3.4:** Provide helpful installation/setup guidance for missing requirements
+  **Verification:** Graceful handling of missing dependencies with actionable error messages
+
+## Phase 2: Core Functionality
+
 - [ ] **$project_upper-4:** Implement main feature logic
-- [ ] **$project_upper-5:** Add input validation and error handling
-- [ ] **$project_upper-6:** Integrate Shell Starter logging and UI components
+  **Goal:** Build the core functionality that solves the user's problem
+  **Actions:**
+  - [ ] **$project_upper-4.1:** Implement the primary feature according to requirements.md specifications
+  - [ ] **$project_upper-4.2:** Handle both interactive mode (prompts) and direct mode (CLI args)
+  - [ ] **$project_upper-4.3:** Use spinner:: functions for long-running operations
+  - [ ] **$project_upper-4.4:** Implement proper file handling with path validation
+  **Verification:** Core functionality works for typical use cases
 
-## Phase 3: Quality & Polish
-- [ ] **$project_upper-7:** Add comprehensive error handling
-- [ ] **$project_upper-8:** Implement progress indicators and user feedback
-- [ ] **$project_upper-9:** Add advanced features and options
+- [ ] **$project_upper-5:** Add comprehensive error handling
+  **Goal:** Handle all error scenarios gracefully with helpful messages
+  **Actions:**
+  - [ ] **$project_upper-5.1:** Implement error handling for all scenarios listed in requirements.md
+  - [ ] **$project_upper-5.2:** Use appropriate exit codes (0 for success, specific codes for different errors)
+  - [ ] **$project_upper-5.3:** Add cleanup routines for interrupted operations
+  - [ ] **$project_upper-5.4:** Test and handle edge cases (empty files, special characters, etc.)
+  **Verification:** All error scenarios produce helpful messages, no crashes
+
+- [ ] **$project_upper-6:** Integrate Shell Starter UI components
+  **Goal:** Polish the user experience with consistent Shell Starter patterns
+  **Actions:**
+  - [ ] **$project_upper-6.1:** Use color:: variables for consistent output formatting
+  - [ ] **$project_upper-6.2:** Implement progress indicators with spinner:: functions
+  - [ ] **$project_upper-6.3:** Add confirmation prompts for destructive operations
+  - [ ] **$project_upper-6.4:** Ensure all logging uses log:: functions with appropriate levels
+  **Verification:** Professional CLI experience matching Shell Starter conventions
+
+## Phase 3: Advanced Features & Polish
+
+- [ ] **$project_upper-7:** Implement preview/dry-run functionality
+  **Goal:** Allow users to see what would happen without executing
+  **Actions:**
+  - [ ] **$project_upper-7.1:** Add --preview or --dry-run flag support
+  - [ ] **$project_upper-7.2:** Show detailed plan of what would be executed
+  - [ ] **$project_upper-7.3:** Display file paths, transformations, and expected outputs
+  - [ ] **$project_upper-7.4:** Include validation results and potential issues
+  **Verification:** Preview mode shows accurate representation of actual execution
+
+- [ ] **$project_upper-8:** Add advanced configuration options
+  **Goal:** Implement additional features and options from requirements.md
+  **Actions:**
+  - [ ] **$project_upper-8.1:** Add any advanced configuration flags or options
+  - [ ] **$project_upper-8.2:** Implement theme/template/style options if applicable
+  - [ ] **$project_upper-8.3:** Add batch processing or bulk operation capabilities if needed
+  - [ ] **$project_upper-8.4:** Support configuration files or presets if specified
+  **Verification:** All advanced features work correctly and integrate smoothly
+
+- [ ] **$project_upper-9:** Optimize performance and user experience
+  **Goal:** Ensure optimal performance and smooth user experience
+  **Actions:**
+  - [ ] **$project_upper-9.1:** Profile and optimize performance for typical workloads
+  - [ ] **$project_upper-9.2:** Add progress indicators for long operations
+  - [ ] **$project_upper-9.3:** Implement smart defaults and intuitive behavior
+  - [ ] **$project_upper-9.4:** Add helpful suggestions and tips in output
+  **Verification:** Good performance, intuitive usage patterns
 
 ## Phase 4: Testing & Documentation
+
 - [ ] **$project_upper-10:** Create comprehensive test suite
-- [ ] **$project_upper-11:** Add usage examples and documentation
-- [ ] **$project_upper-12:** Final QA and release preparation
+  **Goal:** Build complete test coverage using bats testing framework
+  **Actions:**
+  - [ ] **$project_upper-10.1:** Create tests/$project_name.bats with comprehensive test coverage
+  - [ ] **$project_upper-10.2:** Test all argument combinations and edge cases
+  - [ ] **$project_upper-10.3:** Test error conditions and validation scenarios
+  - [ ] **$project_upper-10.4:** Include integration tests with real data/files
+  **Verification:** All tests pass, good coverage of functionality and edge cases
+
+- [ ] **$project_upper-11:** Final quality assurance and polish
+  **Goal:** Ensure production-ready quality and consistency
+  **Actions:**
+  - [ ] **$project_upper-11.1:** Run shellcheck and shfmt, fix any issues
+  - [ ] **$project_upper-11.2:** Test on different platforms (macOS/Linux) if possible
+  - [ ] **$project_upper-11.3:** Verify all requirements.md items are satisfied
+  - [ ] **$project_upper-11.4:** Polish help text, error messages, and user feedback
+  **Verification:** Passes all quality checks, ready for distribution
+
+- [ ] **$project_upper-12:** Integration and distribution preparation
+  **Goal:** Prepare for integration with Shell Starter installer system
+  **Actions:**
+  - [ ] **$project_upper-12.1:** Update install.sh SCRIPTS array to include bin/$project_name
+  - [ ] **$project_upper-12.2:** Test installation and uninstallation process
+  - [ ] **$project_upper-12.3:** Verify script works when installed to different prefixes
+  - [ ] **$project_upper-12.4:** Final end-to-end testing of complete workflow
+  **Verification:** Can be installed/uninstalled correctly, works in installed environment
+
+## Development Guidelines for AI Agents
+
+### Context Management
+- Work on ONE task at a time, mark as [x] when complete
+- Save progress to progress.log after each task with timestamp
+- Read requirements.md for product context before starting each task
+- If approaching context limits, save state and request continuation
+
+### Quality Standards
+- Follow Shell Starter conventions (see docs/conventions.md)
+- Use lib/main.sh functions consistently
+- All scripts must pass shellcheck and shfmt
+- Include comprehensive error handling for all scenarios
+- Test thoroughly before marking tasks complete
 
 ### Verification Steps
-After each phase, run:
-- \`shellcheck bin/$project_name\`
-- \`shfmt -d bin/$project_name\` 
-- Manual functionality testing
-- Update progress.log with results
+After each task completion:
+- Run \`shellcheck bin/$project_name\`
+- Run \`shfmt -d bin/$project_name\`
+- Test the implemented functionality manually
+- Update progress.log with results and any issues found
+- Mark task as [x] only when verification passes
 EOF
 
-	# Generate requirements.md
+	# Generate requirements.md (Product Requirements Document)
 	cat >.ai-workflow/state/requirements.md <<EOF
-# $project_name - Project Requirements
-**Task Code**: \`REQ-$project_upper\`
+# $project_name - Product Requirements Document
 
-## Overview
-[Edit this section with your project description]
+## Product Overview
+[Edit this section with your project description and goals]
+
+**Target Users:** [Who will use this tool?]
+**Core Problem:** [What problem does this solve?]
+**Solution Approach:** [How does this tool solve the problem?]
+
+## User Stories
+- **US-1:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-2:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-3:** As a user, I want [describe user need] so that [benefit/outcome]
 
 ## Core Features
-- [ ] **REQ-1:** [Describe main functionality]
-- [ ] **REQ-2:** [Describe secondary functionality] 
-- [ ] **REQ-3:** [Describe additional functionality]
+- [ ] **REQ-1:** [Detailed feature description with acceptance criteria]
+- [ ] **REQ-2:** [Detailed feature description with acceptance criteria]
+- [ ] **REQ-3:** [Detailed feature description with acceptance criteria]
 
-## Shell Starter Requirements
-- [ ] **REQ-4:** Follow Shell Starter conventions
-- [ ] **REQ-5:** Use lib/main.sh and provided functions
-- [ ] **REQ-6:** Include --help and --version flags
-- [ ] **REQ-7:** Use log:: functions instead of echo
-- [ ] **REQ-8:** Handle all error conditions gracefully
-- [ ] **REQ-9:** Include progress indicators for long operations
+## CLI Interface Requirements
+- [ ] **REQ-4:** Interactive mode with user prompts for all required inputs
+- [ ] **REQ-5:** Direct mode accepting command-line arguments
+- [ ] **REQ-6:** Preview/dry-run mode to show what would be executed
+- [ ] **REQ-7:** Help text with comprehensive usage examples
+- [ ] **REQ-8:** Version information display
 
-## Technical Requirements  
-- [ ] **REQ-10:** Input validation for all parameters
-- [ ] **REQ-11:** Dependency checking with helpful error messages
-- [ ] **REQ-12:** Cross-platform compatibility (macOS/Linux)
-- [ ] **REQ-13:** Professional CLI UX patterns
+## Shell Starter Compliance
+- [ ] **REQ-9:** Follow Shell Starter conventions from docs/conventions.md
+- [ ] **REQ-10:** Use lib/main.sh and provided library functions
+- [ ] **REQ-11:** Include --help and --version flags with proper parsing
+- [ ] **REQ-12:** Use log:: functions (info, warn, error, debug) instead of echo
+- [ ] **REQ-13:** Handle all error conditions gracefully with meaningful messages
+- [ ] **REQ-14:** Include progress indicators for long operations using spinner::
+
+## Technical Requirements
+- [ ] **REQ-15:** Input validation for all parameters with helpful error messages
+- [ ] **REQ-16:** Dependency checking with installation guidance
+- [ ] **REQ-17:** Cross-platform compatibility (macOS/Linux)
+- [ ] **REQ-18:** Professional CLI UX patterns and consistent behavior
+- [ ] **REQ-19:** Proper exit codes (0 for success, non-zero for errors)
+- [ ] **REQ-20:** Safe handling of file paths, including spaces and special characters
+
+## Error Handling Scenarios
+- [ ] **REQ-21:** Missing or invalid dependencies with helpful installation instructions
+- [ ] **REQ-22:** Invalid file paths or non-existent input files
+- [ ] **REQ-23:** File permission issues (read input, write output)
+- [ ] **REQ-24:** Invalid input formats or malformed data
+- [ ] **REQ-25:** Insufficient disk space or system resource constraints
+- [ ] **REQ-26:** Network connectivity issues (if applicable)
+- [ ] **REQ-27:** Interrupted operations with proper cleanup
+
+## Quality & Performance Requirements
+- [ ] **REQ-28:** Script passes shellcheck with no errors or warnings
+- [ ] **REQ-29:** Script passes shfmt formatting checks
+- [ ] **REQ-30:** Comprehensive test coverage with bats testing framework
+- [ ] **REQ-31:** Performance suitable for typical use cases
+- [ ] **REQ-32:** Memory usage appropriate for target systems
 
 ## Success Criteria
-- [ ] **REQ-14:** Script executable and follows naming conventions
-- [ ] **REQ-15:** Passes shellcheck and shfmt quality checks
-- [ ] **REQ-16:** Comprehensive help text with usage examples
-- [ ] **REQ-17:** All error scenarios handled with meaningful messages
-- [ ] **REQ-18:** Manual testing successful across different scenarios
+- [ ] **REQ-33:** Script exists at bin/$project_name and is executable
+- [ ] **REQ-34:** All user stories can be completed successfully
+- [ ] **REQ-35:** All error scenarios handled gracefully with helpful messages
+- [ ] **REQ-36:** Manual testing successful across different scenarios and edge cases
+- [ ] **REQ-37:** Documentation complete with usage examples and troubleshooting
+- [ ] **REQ-38:** Ready for distribution via Shell Starter installer
 EOF
 
 	# Generate progress.log
