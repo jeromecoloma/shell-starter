@@ -280,9 +280,24 @@ open docs/prompting-guide.md
 
 ---
 
-Either approach provides comprehensive requirements that the AI agent will use to guide development.
+#### 6C: Generate Specific Tasks from PRD
 
-#### 6C: Install Commands for Your AI Agent
+After customizing your requirements.md, generate project-specific tasks:
+
+```bash
+# Generate specific implementation tasks based on your PRD
+./bin/generate-ai-workflow --update-tasks md-to-pdf
+```
+
+This analyzes your requirements.md and creates specific tasks like:
+- **MD-TO-PDF-2:** Implement dependency checking (because PRD mentions pandoc)
+- **MD-TO-PDF-3:** Implement interactive mode (because PRD mentions interactive prompts)  
+- **MD-TO-PDF-5:** Implement theme system (because PRD mentions GitHub, Academic, Clean, Modern themes)
+- **MD-TO-PDF-6:** Implement preview mode (because PRD mentions --preview flag)
+
+**vs generic tasks** that would force unnecessary work for every project.
+
+#### 6D: Install Commands for Your AI Agent
 
 Copy the appropriate commands to your coding agent:
 
