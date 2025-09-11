@@ -98,26 +98,6 @@ md-to-pdf --preview document.md       # Preview conversion plan
 
 ---
 
-## 🔧 Recent Workflow Improvements
-
-**IMPORTANT:** The Shell Starter AI workflow has been enhanced to prevent a critical issue where autonomous development would create perfectly compliant Shell Starter scripts that didn't actually perform their primary function.
-
-### What Was Fixed
-- **Problem:** AI would focus on Shell Starter compliance (error handling, logging, argument parsing) but skip the core business logic
-- **Example:** An "md-to-pdf" script that had perfect error handling but contained `TODO: Implement actual conversion logic here`
-- **Root Cause:** Task generation jumped from "Foundation Setup" directly to "Quality & Polish", missing "Core Implementation"
-
-### Improvements Made
-- **Mandatory Core Implementation Phase:** Every project now gets **Phase 2: Core Implementation** with specific action items
-- **Better PRD Analysis:** Detects tool purpose (converter, processor, analyzer) and generates appropriate tasks
-- **Specific Implementation Instructions:** Instead of "implement core functionality", generates "Call pandoc with proper arguments: pandoc '$input_file' -o '$output_file'"
-- **Functional Verification:** Tasks now require the tool to actually work with test data, not just pass linting
-
-### Result
-The workflow now prioritizes **building working tools** over perfect Shell Starter compliance, ensuring you get functional software that solves real problems.
-
----
-
 ## Phase 3: AI-Assisted Development (15 minutes)
 
 ### Step 6: Setup Autonomous AI Development Workflow
@@ -170,11 +150,10 @@ Professional markdown to PDF conversion CLI tool with theme support and interact
 **Input/Output:** Takes markdown files (.md, .markdown) as input and produces PDF files as output
 
 **Example Usage:**
-```bash
-md-to-pdf document.md                    # Basic usage
-md-to-pdf document.md report.pdf        # With output specification
-md-to-pdf --help                        # Show help
-```
+
+    md-to-pdf document.md                    # Basic usage
+    md-to-pdf document.md report.pdf        # With output specification
+    md-to-pdf --help                        # Show help
 
 ## User Stories
 - **US-1:** As a developer, I want to convert README.md to PDF for offline reading so that I can review documentation without internet access
@@ -353,7 +332,7 @@ This analyzes your requirements.md and creates specific tasks like:
 - **MD-TO-PDF-5:** Implement theme system (because PRD mentions GitHub, Academic, Clean, Modern themes)
 - **MD-TO-PDF-6:** Implement preview mode (because PRD mentions --preview flag)
 
-**CRITICAL:** The improved workflow now ensures **Phase 2: Core Implementation** is always included, preventing the creation of "wrapper scripts" that don't actually do their primary function.
+The workflow ensures comprehensive task coverage for complete implementation.
 
 #### 6D: Install Commands for Your AI Agent
 
@@ -676,6 +655,4 @@ Ready to take it further? Try these enhancements:
 
 **Total Development Time:** ~40 minutes from Shell Starter template to distributed CLI tool
 
-**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective, but only when the workflow prioritizes functional implementation over compliance theater. The enhanced AI workflow now ensures that autonomous development builds **working tools that solve real problems** rather than perfectly formatted scripts that contain placeholder TODOs.
-
-**Critical Learning:** Process-heavy development workflows can create the illusion of progress while missing fundamental deliverables. The improved workflow balances Shell Starter compliance with functional implementation, ensuring every generated script actually performs its intended purpose.
+**Key Insight:** Shell Starter's standardized structure and comprehensive documentation makes AI-assisted development incredibly effective when the workflow focuses on building functional tools that solve real problems.
