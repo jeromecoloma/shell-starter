@@ -244,6 +244,86 @@ After each task completion:
 - Update progress.log with results and any issues found
 - Mark task as [x] only when verification passes
 EOF
+
+	# Generate requirements.md (Product Requirements Document)
+	cat >.ai-workflow/state/requirements.md <<EOF
+# $project_name - Product Requirements Document
+
+## Product Overview
+[Edit this section with your project description and goals]
+
+**Target Users:** [Who will use this tool?]
+**Core Problem:** [What problem does this solve?]
+**Solution Approach:** [How does this tool solve the problem?]
+
+## User Stories
+- **US-1:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-2:** As a user, I want [describe user need] so that [benefit/outcome]
+- **US-3:** As a user, I want [describe user need] so that [benefit/outcome]
+
+## Core Features
+- [Detailed feature description with acceptance criteria]
+- [Detailed feature description with acceptance criteria]  
+- [Detailed feature description with acceptance criteria]
+
+## CLI Interface Requirements
+- Interactive mode with user prompts for all required inputs
+- Direct mode accepting command-line arguments
+- Preview/dry-run mode to show what would be executed
+- Help text with comprehensive usage examples
+- Version information display
+
+## Shell Starter Compliance
+- Follow Shell Starter conventions from docs/conventions.md
+- Use lib/main.sh and provided library functions
+- Include --help and --version flags with proper parsing
+- Use log:: functions (info, warn, error, debug) instead of echo
+- Handle all error conditions gracefully with meaningful messages
+- Include progress indicators for long operations using spinner::
+
+## Technical Requirements
+- Input validation for all parameters with helpful error messages
+- Dependency checking with installation guidance
+- Cross-platform compatibility (macOS/Linux)
+- Professional CLI UX patterns and consistent behavior
+- Proper exit codes (0 for success, non-zero for errors)
+- Safe handling of file paths, including spaces and special characters
+
+## Error Handling Scenarios
+- Missing or invalid dependencies with helpful installation instructions
+- Invalid file paths or non-existent input files
+- File permission issues (read input, write output)
+- Invalid input formats or malformed data
+- Insufficient disk space or system resource constraints
+- Network connectivity issues (if applicable)
+- Interrupted operations with proper cleanup
+
+## Quality & Performance Requirements
+- Script passes shellcheck with no errors or warnings
+- Script passes shfmt formatting checks
+- Comprehensive test coverage with bats testing framework
+- Performance suitable for typical use cases
+- Memory usage appropriate for target systems
+
+## Success Criteria
+- Script exists at bin/$project_name and is executable
+- All user stories can be completed successfully
+- All error scenarios handled gracefully with helpful messages
+- Manual testing successful across different scenarios and edge cases
+- Documentation complete with usage examples and troubleshooting
+- Ready for distribution via Shell Starter installer
+EOF
+
+	# Generate progress.log
+	cat >.ai-workflow/state/progress.log <<EOF
+# $project_name - Development Progress Log
+
+## $(date '+%Y-%m-%d %H:%M:%S') - Workflow Generated
+- Created AI workflow structure
+- Generated initial task breakdown  
+- Ready to start development with /dev start
+
+EOF
 }
 
 generate_specific_tasks() {
@@ -567,11 +647,18 @@ generate_claude_commands() {
 
 	# /dev command
 	cat >.ai-workflow/commands/.claude/commands/dev.md <<'EOF'
+---
+description: Autonomous development cycle for current project
+argument-hint: [start|status]
+---
+
 You are managing autonomous development for the current project. Follow this protocol exactly.
 
 **Arguments:**
 - No args or "start": Initialize/resume development cycle
 - "status": Show current development state only
+
+Handle argument: $ARGUMENTS
 
 **AUTONOMOUS DEVELOPMENT PROTOCOL:**
 
@@ -621,6 +708,10 @@ EOF
 
 	# /qa command
 	cat >.ai-workflow/commands/.claude/commands/qa.md <<'EOF'
+---
+description: Quality assurance for AI-developed project
+---
+
 You are a Quality Assurance engineer for the current AI-developed project.
 
 **Protocol:**
@@ -655,6 +746,10 @@ EOF
 
 	# /status command
 	cat >.ai-workflow/commands/.claude/commands/status.md <<'EOF'
+---
+description: Show current project development status
+---
+
 You are a project manager. Show the current development status.
 
 **Protocol:**
@@ -682,11 +777,129 @@ generate_other_agent_commands() {
 	cp .ai-workflow/commands/.claude/commands/qa.md .ai-workflow/commands/.cursor/commands/
 	cp .ai-workflow/commands/.claude/commands/status.md .ai-workflow/commands/.cursor/commands/
 
-	# OpenCode commands (markdown format)
+	# OpenCode commands (markdown format with frontmatter)
 	mkdir -p .ai-workflow/commands/.opencode/command
-	cp .ai-workflow/commands/.claude/commands/dev.md .ai-workflow/commands/.opencode/command/
-	cp .ai-workflow/commands/.claude/commands/qa.md .ai-workflow/commands/.opencode/command/
-	cp .ai-workflow/commands/.claude/commands/status.md .ai-workflow/commands/.opencode/command/
+
+	cat >.ai-workflow/commands/.opencode/command/dev.md <<'EOF'
+---
+description: Autonomous development cycle for current project
+agent: build
+---
+
+You are managing autonomous development for the current project. Follow this protocol exactly.
+
+**Arguments:**
+- No args or "start": Initialize/resume development cycle
+- "status": Show current development state only
+
+Handle argument: $ARGUMENTS
+
+**AUTONOMOUS DEVELOPMENT PROTOCOL:**
+
+1. **READ STATE** (always check current state first):
+   - Read `.ai-workflow/state/tasks.md` - Find next incomplete task `[ ]`
+   - Read `.ai-workflow/state/requirements.md` - Understand project goals
+   - Read `.ai-workflow/state/progress.log` - Check recent progress
+
+2. **ANALYZE** (determine what to do):
+   - Identify the next incomplete task from tasks.md
+   - Understand what this task requires
+   - Check if any previous work needs to be continued
+
+3. **ACT** (execute development work):
+   - Work on ONLY the current incomplete task
+   - Follow Shell Starter conventions and patterns
+   - Create/modify files as needed for this specific task
+   - Use proper logging, error handling, and Shell Starter functions
+
+4. **VERIFY** (quality assurance):
+   - Run `shellcheck` on any shell scripts created/modified
+   - Run `shfmt -d` to check formatting
+   - Test the functionality manually if applicable
+   - Ensure the task is actually complete
+
+5. **UPDATE STATE** (record progress):
+   - Mark completed tasks with `[x]` in tasks.md
+   - Add detailed progress entry to progress.log with timestamp
+   - Identify next task or mark project complete
+
+**CONTEXT MANAGEMENT:**
+- When approaching context limits, save all progress to state files
+- End with: "Continue development with: /dev"
+- Never leave work in incomplete state
+
+**OUTPUT FORMAT:**
+```
+🔄 AUTONOMOUS DEVELOPMENT CYCLE
+Current Task: [task code and description]
+Action: [what you're implementing]
+Progress: [current progress status]
+Next: [next task or completion status]
+```
+
+Begin autonomous development now.
+EOF
+
+	cat >.ai-workflow/commands/.opencode/command/qa.md <<'EOF'
+---
+description: Quality assurance for AI-developed project
+agent: build
+---
+
+You are a Quality Assurance engineer for the current AI-developed project.
+
+**Protocol:**
+1. Read `.ai-workflow/state/tasks.md` to understand what's been built
+2. Read `.ai-workflow/state/progress.log` to see recent changes
+3. Run comprehensive QA checks on all developed components
+4. Log results to progress.log
+5. Provide actionable feedback
+
+**QA Checklist:**
+- [ ] Shellcheck passes on all shell scripts
+- [ ] Shfmt formatting is correct  
+- [ ] Help text is comprehensive and accurate
+- [ ] Version flag works correctly
+- [ ] All error conditions handled gracefully
+- [ ] Manual functionality testing successful
+- [ ] Shell Starter conventions followed
+- [ ] Code quality and maintainability
+
+**Output Format:**
+```
+🔍 QA REPORT
+Files Checked: [list of files]
+Issues Found: [number]
+Critical: [blocking issues]
+Warnings: [non-blocking issues] 
+Status: [PASS/FAIL with next steps]
+```
+
+Begin QA analysis now.
+EOF
+
+	cat >.ai-workflow/commands/.opencode/command/status.md <<'EOF'
+---
+description: Show current project development status
+agent: plan
+---
+
+You are a project manager. Show the current development status.
+
+**Protocol:**
+1. Read `.ai-workflow/state/tasks.md` and parse the checklist
+2. Read `.ai-workflow/state/progress.log` for recent activity  
+3. Provide a concise status summary
+
+**Output Format:**
+```
+📊 PROJECT STATUS
+Next Task: [first incomplete task]
+Progress: [X/Y tasks completed]
+Recent Activity: [latest progress.log entry]
+Ready for: [/dev, /qa, or completion]
+```
+EOF
 
 	# Gemini commands (TOML format)
 	mkdir -p .ai-workflow/commands/.gemini/commands
@@ -699,6 +912,8 @@ You are managing autonomous development for the current project. Follow this pro
 **Arguments:**
 - No args or "start": Initialize/resume development cycle
 - "status": Show current development state only
+
+Handle argument: {{args}}
 
 **AUTONOMOUS DEVELOPMENT PROTOCOL:**
 
