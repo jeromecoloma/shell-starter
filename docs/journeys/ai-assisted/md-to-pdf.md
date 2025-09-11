@@ -119,94 +119,15 @@ This creates:
 
 You have three options for creating your project requirements:
 
-**Option 1: Use AI to generate md-to-pdf PRD**  
-Copy this prompt and use it with any AI assistant to generate a custom PRD:
-
-```
-Create a comprehensive Product Requirements Document (PRD) for a markdown to PDF conversion CLI tool called "md-to-pdf".
-
-## Project Context:
-- **Purpose**: Convert markdown files to professional PDF documents with built-in themes and interactive prompts
-- **Target Users**: Developers, writers, documentation teams, content creators
-- **Core Functionality**: Command-line tool using pandoc with theme support, interactive mode, and comprehensive error handling
-
-## Requirements:
-Generate a PRD following this exact structure with NO checkboxes or REQ-X codes:
-
-### Product Overview
-- Clear problem statement and solution approach
-- Target user identification
-
-### User Stories  
-- 3-5 user stories in "As a [user], I want [goal] so that [benefit]" format
-
-### Core Features
-- Interactive mode with file and theme selection prompts
-- Direct command-line mode accepting arguments
-- Built-in themes (GitHub, Academic, Clean, Modern)
-- Preview mode showing conversion plan
-- Smart defaults for output filenames
-
-### CLI Interface Requirements
-- Interactive mode specifications
-- Direct command-line usage: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
-- Help and version requirements
-
-### Shell Starter Compliance
-- Integration with Shell Starter library functions (lib/main.sh)
-- Logging with log:: functions instead of echo
-- Progress indicators using spinner:: functions
-- Standard argument parsing conventions
-
-### Technical Requirements
-- Pandoc dependency checking with installation guidance
-- Input validation for markdown files (.md, .markdown, .txt)
-- Output validation and overwrite protection
-- Theme system with CSS templates
-- Cross-platform compatibility (macOS/Linux)
-- Safe file handling for paths with spaces
-
-### Error Handling Scenarios
-- Pandoc not installed
-- Invalid file paths and permissions
-- Malformed markdown syntax
-- Insufficient disk space
-- Invalid theme selection
-- File overwrite scenarios
-
-### Quality & Performance Requirements
-- Code quality standards (shellcheck, shfmt)
-- Bats testing framework coverage
-- Performance for files up to 50MB
-- Memory usage optimization
-
-### Success Criteria
-- Script executable at bin/md-to-pdf
-- All user stories completed successfully
-- Comprehensive error handling
-- Manual testing across scenarios
-- Shell Starter installer integration
-
-Format as clean markdown with bullet points only. No task codes or checkboxes.
-```
-
-**Option 2: Use the provided specification**  
-Edit the generated requirements file and replace with this ready-to-use specification:
+**Option 1: Use the provided md-to-pdf specification (Fastest)**  
+Copy-paste this ready-to-use specification directly:
 
 ```bash
 # Edit the product requirements document
 open .ai-workflow/state/requirements.md
 ```
 
-**Option 3: Create custom PRD**  
-Use the comprehensive prompting guide for other project types:
-
-```bash
-# See the full PRD generation guide
-open docs/prompting-guide.md
-```
-
-**Ready-to-use md-to-pdf specification:**
+Replace the template content with this complete md-to-pdf specification:
 
 ```markdown
 # md-to-pdf - Product Requirements Document
@@ -278,7 +199,88 @@ Professional markdown to PDF conversion CLI tool with theme support and interact
 - Documentation complete: help text, examples, troubleshooting guide
 ```
 
-This specification provides comprehensive requirements that the AI agent will use to guide development.
+**Option 2: Generate with AI assistance (Educational)**  
+Use this prompt with any AI assistant to generate a custom PRD:
+
+```
+Create a comprehensive Product Requirements Document (PRD) for a markdown to PDF conversion CLI tool called "md-to-pdf".
+
+## Project Context:
+- **Purpose**: Convert markdown files to professional PDF documents with built-in themes and interactive prompts
+- **Target Users**: Developers, writers, documentation teams, content creators
+- **Core Functionality**: Command-line tool using pandoc with theme support, interactive mode, and comprehensive error handling
+
+## Requirements:
+Generate a PRD following this exact structure with NO checkboxes or REQ-X codes:
+
+### Product Overview
+- Clear problem statement and solution approach
+- Target user identification
+
+### User Stories  
+- 3-5 user stories in "As a [user], I want [goal] so that [benefit]" format
+
+### Core Features
+- Interactive mode with file and theme selection prompts
+- Direct command-line mode accepting arguments
+- Built-in themes (GitHub, Academic, Clean, Modern)
+- Preview mode showing conversion plan
+- Smart defaults for output filenames
+
+### CLI Interface Requirements
+- Interactive mode specifications
+- Direct command-line usage: `md-to-pdf file.md [output.pdf] [--theme name] [--preview]`
+- Help and version requirements
+
+### Shell Starter Compliance
+- Integration with Shell Starter library functions (lib/main.sh)
+- Logging with log:: functions instead of echo
+- Progress indicators using spinner:: functions
+- Standard argument parsing conventions
+
+### Technical Requirements
+- Pandoc dependency checking with installation guidance
+- Input validation for markdown files (.md, .markdown, .txt)
+- Output validation and overwrite protection
+- Theme system with CSS templates
+- Cross-platform compatibility (macOS/Linux)
+- Safe file handling for paths with spaces
+
+### Error Handling Scenarios
+- Pandoc not installed
+- Invalid file paths and permissions
+- Malformed markdown syntax
+- Insufficient disk space
+- Invalid theme selection
+- File overwrite scenarios
+
+### Quality & Performance Requirements
+- Code quality standards (shellcheck, shfmt)
+- Bats testing framework coverage
+- Performance for files up to 50MB
+- Memory usage optimization
+
+### Success Criteria
+- Script executable at bin/md-to-pdf
+- All user stories completed successfully
+- Comprehensive error handling
+- Manual testing across scenarios
+- Shell Starter installer integration
+
+Format as clean markdown with bullet points only. No task codes or checkboxes.
+```
+
+**Option 3: Create custom PRD for other projects**  
+Use the comprehensive prompting guide for different project types:
+
+```bash
+# See the full PRD generation guide with templates
+open docs/prompting-guide.md
+```
+
+---
+
+Either approach provides comprehensive requirements that the AI agent will use to guide development.
 
 #### 6C: Install Commands for Your AI Agent
 
