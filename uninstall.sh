@@ -172,11 +172,12 @@ read_manifest() {
 	log_info "Reading installation manifest: $MANIFEST_FILE"
 
 	# Extract install prefix from manifest
-	INSTALL_PREFIX=$(grep '^# Install prefix:' "$MANIFEST_FILE" | sed 's/^# Install prefix: //')
+	INSTALL_PREFIX=$(grep '^# Install prefix:' "$MANIFEST_FILE" | sed 's/^# Install prefix: //' || true)
 
 	# Count non-comment, non-empty lines
 	local file_count
-	file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l)
+	file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l || echo "0")
+	file_count=$(echo "$file_count" | tr -d ' \n\r\t')
 
 	if [[ $file_count -eq 0 ]]; then
 		log_warn "No files listed in manifest. Nothing to uninstall."

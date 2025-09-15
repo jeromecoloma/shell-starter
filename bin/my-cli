@@ -479,6 +479,9 @@ main() {
 	local quiet=false
 	local command=""
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	# Parse global options first
 	while [[ $# -gt 0 ]]; do
 		case $1 in

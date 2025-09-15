@@ -30,6 +30,7 @@ OPTIONS:
     -v, --version   Show version information and exit
     --update        Check for available updates
     --check-version Show detailed version status and check for updates
+    --notify-config Configure update notification settings
     --verbose       Enable verbose output
     --no-python     Skip Python operations (Bash only)
     --output-dir    Directory for output files [default: /tmp/polyglot-output]
@@ -712,6 +713,9 @@ main() {
 	local output_dir="/tmp/polyglot-output"
 	local command=""
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	# Parse global options first
 	while [[ $# -gt 0 ]]; do
 		case $1 in
@@ -727,7 +731,7 @@ main() {
 			output_dir="$2"
 			shift 2
 			;;
-		--help | -h | --version | -v | --update | --check-version)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

@@ -21,6 +21,7 @@ OPTIONS:
     -v, --version     Show version information and exit
     --update          Check for available updates
     --check-version   Show detailed version status and check for updates
+    --notify-config   Configure update notification settings
     --no-demo         Skip the color demonstration examples
     --plain           Display colors without fancy formatting
 
@@ -124,6 +125,9 @@ main() {
 	local show_demo_flag=true
 	local plain_mode=false
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		--no-demo)
@@ -134,7 +138,7 @@ main() {
 			plain_mode=true
 			shift
 			;;
-		--help | -h | --version | -v | --update | --check-version)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

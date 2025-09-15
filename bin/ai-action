@@ -30,6 +30,7 @@ OPTIONS:
     -v, --version   Show version information and exit
     --update        Check for available updates
     --check-version Show detailed version status and check for updates
+    --notify-config Configure update notification settings
     --model         AI model to use (gpt-4|gpt-3.5|claude|local) [default: gpt-3.5]
     --api-key       API key for AI service (or set AI_API_KEY env var)
     --max-tokens    Maximum tokens for AI response [default: 1000]
@@ -1044,6 +1045,9 @@ main() {
 	local verbose=false
 	local command=""
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	# Parse global options first
 	while [[ $# -gt 0 ]]; do
 		case $1 in
@@ -1067,7 +1071,7 @@ main() {
 			verbose=true
 			shift
 			;;
-		--help | -h | --version | -v | --update | --check-version)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

@@ -50,6 +50,7 @@ OPTIONS:
     --version       Show version information and exit
     --update        Check for available updates
     --check-version Show detailed version status and check for updates
+    --notify-config Configure update notification settings
 
 DESCRIPTION:
     Generates a complete AI development workflow including:
@@ -1221,9 +1222,12 @@ main() {
 	local project_name=""
 	local update_tasks=false
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	while [[ $# -gt 0 ]]; do
 		case $1 in
-		--help | -h | --version | -v | --update | --check-version)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$SCRIPT_NAME" "$@"
 			;;
 		--update-tasks)
