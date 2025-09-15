@@ -70,19 +70,21 @@ OPTIONS:
     --lib-prefix PATH     Install libraries location (default: $DEFAULT_LIB_PREFIX)
     --from-github         Download from GitHub releases (latest)
     --version VERSION     Install specific version (enables --from-github)
+    --uninstall           Remove Shell Starter installation
     --help, -h            Show this help
 
 EXAMPLES:
     $0                    # Install from current directory
     $0 --from-github      # Install latest from GitHub
     $0 --version v1.2.3   # Install specific version
+    $0 --uninstall        # Remove installation
 
 EOF
 }
 
 # Parse arguments
 parse_args() {
-	PREFIX="$DEFAULT_PREFIX" LIB_PREFIX="$DEFAULT_LIB_PREFIX" FROM_GITHUB=false VERSION=""
+	PREFIX="$DEFAULT_PREFIX" LIB_PREFIX="$DEFAULT_LIB_PREFIX" FROM_GITHUB=false VERSION="" UNINSTALL=false
 
 	while [[ $# -gt 0 ]]; do
 		case $1 in
@@ -104,6 +106,10 @@ parse_args() {
 			VERSION="$2"
 			FROM_GITHUB=true
 			shift 2
+			;;
+		--uninstall)
+			UNINSTALL=true
+			shift
 			;;
 		--help | -h)
 			show_help
@@ -286,9 +292,164 @@ install_scripts() {
 	fi
 }
 
+# Remove PATH entry from shell configuration
+remove_from_path() {
+	local config_file="$1" path_to_remove="$2"
+
+	[[ ! -f "$config_file" ]] && {
+		log info "Shell config file not found: $config_file"
+		return 0
+	}
+
+	grep -q "export PATH.*$path_to_remove" "$config_file" 2>/dev/null || {
+		log info "PATH entry not found in $config_file"
+		return 0
+	}
+
+	log info "Removing PATH entry from $config_file"
+
+	local temp_file
+	temp_file=$(mktemp)
+
+	awk -v target_path="$path_to_remove" '
+	/^# Added by shell-starter installer$/ {
+		getline nextline
+		if (index(nextline, target_path) == 0 || nextline !~ /^export PATH=/) {
+			print $0
+			print nextline
+		}
+		next
+	}
+	{ print }
+	' "$config_file" >"$temp_file"
+
+	if mv "$temp_file" "$config_file"; then
+		log success "Removed PATH entry from $config_file"
+	else
+		log error "Failed to update $config_file"
+		rm -f "$temp_file"
+	fi
+}
+
+# Show files that will be removed
+show_uninstall_files() {
+	echo
+	log info "The following files will be removed:"
+	echo
+
+	grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | while read -r file_path; do
+		if [[ -f "$file_path" ]]; then
+			echo "  🗑️  $file_path"
+		else
+			echo "  ❌ $file_path (not found)"
+		fi
+	done
+	echo
+}
+
+# Get user confirmation for uninstall
+get_uninstall_confirmation() {
+	echo -e "${YELLOW}Are you sure you want to remove these files? [y/N]${NC} "
+	read -r response
+
+	case "$response" in
+	[yY] | [yY][eE][sS])
+		return 0
+		;;
+	*)
+		log info "Uninstallation cancelled by user"
+		exit 0
+		;;
+	esac
+}
+
+# Remove files listed in manifest
+remove_files() {
+	local removed_count=0 not_found_count=0
+
+	log info "Starting file removal..."
+
+	while IFS= read -r file_path; do
+		[[ "$file_path" =~ ^#.*$ ]] || [[ -z "$file_path" ]] || [[ "$file_path" =~ ^[[:space:]]*$ ]] && continue
+
+		if [[ -f "$file_path" ]]; then
+			log info "Removing: $file_path"
+			if rm "$file_path"; then
+				((removed_count++))
+			else
+				log error "Failed to remove: $file_path"
+			fi
+		else
+			log warn "File not found (already removed?): $file_path"
+			((not_found_count++))
+		fi
+	done <"$MANIFEST_FILE"
+
+	log success "Removed $removed_count file(s)"
+	[[ $not_found_count -gt 0 ]] && log warn "$not_found_count file(s) were already missing"
+}
+
+# Clean up manifest file and directory
+cleanup_manifest() {
+	log info "Cleaning up installation manifest..."
+
+	if rm "$MANIFEST_FILE"; then
+		log info "Removed manifest file: $MANIFEST_FILE"
+	else
+		log warn "Failed to remove manifest file: $MANIFEST_FILE"
+	fi
+
+	if [[ -d "$MANIFEST_DIR" ]] && [[ -z "$(ls -A "$MANIFEST_DIR" 2>/dev/null)" ]]; then
+		if rmdir "$MANIFEST_DIR"; then
+			log info "Removed empty manifest directory: $MANIFEST_DIR"
+		else
+			log warn "Failed to remove manifest directory: $MANIFEST_DIR"
+		fi
+	fi
+}
+
+# Uninstall functionality
+run_uninstaller() {
+	log info "Starting Shell Starter uninstallation..."
+
+	[[ ! -f "$MANIFEST_FILE" ]] && {
+		log error "No installation manifest found at: $MANIFEST_FILE"
+		log error "Either Shell Starter was never installed, or the manifest was deleted."
+		exit 1
+	}
+
+	local file_count
+	file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' \n\r\t')
+
+	[[ $file_count -eq 0 ]] && {
+		log warn "No files listed in manifest. Nothing to uninstall."
+		exit 0
+	}
+
+	log info "Found $file_count file(s) to remove"
+	show_uninstall_files
+	get_uninstall_confirmation
+	remove_files
+
+	local shell_config
+	shell_config=$(detect_shell_config)
+	remove_from_path "$shell_config" "$PREFIX"
+
+	cleanup_manifest
+	log success "Uninstallation complete!"
+	log info "All Shell Starter files and PATH entries have been removed from your system."
+	log info "Please run 'source $shell_config' or restart your shell to update PATH"
+}
+
 # Main installation
 main() {
 	parse_args "$@"
+
+	# Handle uninstall option
+	if [[ "$UNINSTALL" == true ]]; then
+		run_uninstaller
+		return 0
+	fi
 
 	if [[ "$FROM_GITHUB" == true ]]; then
 		log info "Installing from GitHub (${VERSION:-latest})"
