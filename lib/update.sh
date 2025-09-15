@@ -195,3 +195,226 @@ update::info() {
 		return 1
 	fi
 }
+
+# Configuration directory and files for optional notifications
+UPDATE_CONFIG_DIR="${HOME}/.config/shell-starter"
+UPDATE_CONFIG_FILE="${UPDATE_CONFIG_DIR}/update-notifications.conf"
+UPDATE_LAST_CHECK_FILE="${UPDATE_CONFIG_DIR}/last-update-check"
+
+# Default configuration values
+DEFAULT_NOTIFICATIONS_ENABLED=false
+DEFAULT_CHECK_INTERVAL_HOURS=24
+DEFAULT_SHOW_QUIET_NOTIFICATIONS=true
+
+# Function to ensure config directory exists
+ensure_config_dir() {
+	if [[ ! -d "$UPDATE_CONFIG_DIR" ]]; then
+		mkdir -p "$UPDATE_CONFIG_DIR"
+	fi
+}
+
+# Function to get configuration value
+get_config_value() {
+	local key="$1"
+	local default_value="$2"
+
+	if [[ -f "$UPDATE_CONFIG_FILE" ]]; then
+		local value
+		value=$(grep "^${key}=" "$UPDATE_CONFIG_FILE" 2>/dev/null | cut -d'=' -f2-)
+		if [[ -n "$value" ]]; then
+			echo "$value"
+			return 0
+		fi
+	fi
+
+	echo "$default_value"
+}
+
+# Function to set configuration value
+set_config_value() {
+	local key="$1"
+	local value="$2"
+
+	ensure_config_dir
+
+	# Remove existing key if present
+	if [[ -f "$UPDATE_CONFIG_FILE" ]]; then
+		grep -v "^${key}=" "$UPDATE_CONFIG_FILE" >"${UPDATE_CONFIG_FILE}.tmp" 2>/dev/null || true
+		mv "${UPDATE_CONFIG_FILE}.tmp" "$UPDATE_CONFIG_FILE"
+	fi
+
+	# Add new key-value pair
+	echo "${key}=${value}" >>"$UPDATE_CONFIG_FILE"
+}
+
+# Function to check if enough time has passed since last check
+should_check_for_update() {
+	local check_interval_hours
+	check_interval_hours=$(get_config_value "CHECK_INTERVAL_HOURS" "$DEFAULT_CHECK_INTERVAL_HOURS")
+
+	if [[ ! -f "$UPDATE_LAST_CHECK_FILE" ]]; then
+		return 0 # Never checked before
+	fi
+
+	local last_check_time
+	last_check_time=$(cat "$UPDATE_LAST_CHECK_FILE" 2>/dev/null || echo "0")
+
+	local current_time
+	current_time=$(date +%s)
+
+	local time_diff
+	time_diff=$((current_time - last_check_time))
+
+	local interval_seconds
+	interval_seconds=$((check_interval_hours * 3600))
+
+	if [[ $time_diff -ge $interval_seconds ]]; then
+		return 0 # Enough time has passed
+	else
+		return 1 # Too soon to check again
+	fi
+}
+
+# Function to record current time as last check time
+record_check_time() {
+	ensure_config_dir
+	date +%s >"$UPDATE_LAST_CHECK_FILE"
+}
+
+# Function to show optional update notification
+notify_update_available() {
+	local current_version="$1"
+	local latest_version="$2"
+	local show_quiet="$3"
+
+	if [[ "$show_quiet" == "true" ]]; then
+		log::info "💡 Update available: $current_version → $latest_version (use --update for details)"
+	else
+		echo "Update available: $current_version → $latest_version"
+	fi
+}
+
+# Function to perform optional background update check
+optional_update_check() {
+	local repo="${1:-$GITHUB_REPO}"
+	local script_name="${2:-$(basename "$0")}"
+
+	# Check if notifications are enabled
+	local notifications_enabled
+	notifications_enabled=$(get_config_value "NOTIFICATIONS_ENABLED" "$DEFAULT_NOTIFICATIONS_ENABLED")
+
+	if [[ "$notifications_enabled" != "true" ]]; then
+		return 0 # Notifications disabled
+	fi
+
+	# Check if enough time has passed
+	if ! should_check_for_update; then
+		return 0 # Too soon to check
+	fi
+
+	# Perform the check quietly
+	local current_version
+	current_version=$(get_version)
+
+	local latest_version
+	latest_version=$(get_latest_release "$repo" 2>/dev/null)
+	local fetch_exit_code=$?
+
+	# Record that we checked (even if failed)
+	record_check_time
+
+	if [[ $fetch_exit_code -ne 0 ]]; then
+		return 1 # Failed to check
+	fi
+
+	# Compare versions
+	version_compare "$current_version" "$latest_version"
+	local comparison_result=$?
+
+	if [[ $comparison_result -eq 2 ]]; then
+		# Update available
+		local show_quiet
+		show_quiet=$(get_config_value "SHOW_QUIET_NOTIFICATIONS" "$DEFAULT_SHOW_QUIET_NOTIFICATIONS")
+		notify_update_available "$current_version" "$latest_version" "$show_quiet"
+		return 0
+	fi
+
+	return 1 # No update available
+}
+
+# Function to enable/disable update notifications
+update::config() {
+	local action="${1:-}"
+
+	case "$action" in
+	enable)
+		set_config_value "NOTIFICATIONS_ENABLED" "true"
+		log::info "Update notifications enabled"
+		;;
+	disable)
+		set_config_value "NOTIFICATIONS_ENABLED" "false"
+		log::info "Update notifications disabled"
+		;;
+	interval)
+		local hours="$2"
+		if [[ -z "$hours" || ! "$hours" =~ ^[0-9]+$ ]]; then
+			log::error "Invalid interval. Please specify hours as a positive integer."
+			return 1
+		fi
+		set_config_value "CHECK_INTERVAL_HOURS" "$hours"
+		log::info "Update check interval set to $hours hours"
+		;;
+	status)
+		local enabled
+		enabled=$(get_config_value "NOTIFICATIONS_ENABLED" "$DEFAULT_NOTIFICATIONS_ENABLED")
+		local interval
+		interval=$(get_config_value "CHECK_INTERVAL_HOURS" "$DEFAULT_CHECK_INTERVAL_HOURS")
+		local quiet
+		quiet=$(get_config_value "SHOW_QUIET_NOTIFICATIONS" "$DEFAULT_SHOW_QUIET_NOTIFICATIONS")
+
+		echo "Update Notification Configuration:"
+		echo "  Enabled: $enabled"
+		echo "  Check interval: $interval hours"
+		echo "  Quiet notifications: $quiet"
+
+		if [[ -f "$UPDATE_LAST_CHECK_FILE" ]]; then
+			local last_check
+			last_check=$(date -r "$(cat "$UPDATE_LAST_CHECK_FILE")" 2>/dev/null || echo "Unknown")
+			echo "  Last check: $last_check"
+		else
+			echo "  Last check: Never"
+		fi
+		;;
+	quiet)
+		local mode="$2"
+		if [[ "$mode" == "on" ]]; then
+			set_config_value "SHOW_QUIET_NOTIFICATIONS" "true"
+			log::info "Quiet notifications enabled"
+		elif [[ "$mode" == "off" ]]; then
+			set_config_value "SHOW_QUIET_NOTIFICATIONS" "false"
+			log::info "Quiet notifications disabled"
+		else
+			log::error "Invalid mode. Use 'on' or 'off'."
+			return 1
+		fi
+		;;
+	*)
+		cat <<EOF
+Usage: update::config <action> [args]
+
+ACTIONS:
+    enable              Enable update notifications
+    disable             Disable update notifications
+    interval <hours>    Set check interval in hours
+    quiet <on|off>      Enable/disable quiet notifications
+    status              Show current configuration
+
+EXAMPLES:
+    update::config enable
+    update::config interval 48
+    update::config quiet off
+    update::config status
+EOF
+		;;
+	esac
+}

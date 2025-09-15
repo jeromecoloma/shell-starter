@@ -43,6 +43,15 @@ parse_common_args() {
 			update::info
 			exit $?
 			;;
+		--check-version)
+			"${SHELL_STARTER_ROOT_DIR}/scripts/check-version.sh" status
+			exit $?
+			;;
+		--notify-config)
+			shift
+			update::config "$@"
+			exit $?
+			;;
 		*)
 			# Unknown option, return to caller for handling
 			return 1
@@ -60,11 +69,21 @@ show_help() {
 Usage: $script_name [OPTIONS]
 
 OPTIONS:
-    -h, --help     Show this help message and exit
-    -v, --version  Show version information and exit
-    --update       Check for available updates
+    -h, --help        Show this help message and exit
+    -v, --version     Show version information and exit
+    --update          Check for available updates
+    --check-version   Show detailed version status and check for updates
+    --notify-config   Configure update notification settings
 
 This is a Shell Starter script. Override the show_help function
 in your script to provide specific usage information.
 EOF
+}
+
+# Function to enable optional background update notifications
+# Call this function in your script's main() function to enable automatic update checking
+enable_background_updates() {
+	# This function performs a background check and shows notifications if updates are available
+	# It respects user configuration and rate limiting
+	optional_update_check "$GITHUB_REPO" "$(basename "$0")" &>/dev/null || true
 }

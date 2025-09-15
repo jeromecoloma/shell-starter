@@ -20,6 +20,7 @@ OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
     --update          Check for available updates
+    --check-version   Show detailed version status and check for updates
     --no-demo         Skip the color demonstration examples
     --plain           Display colors without fancy formatting
 
@@ -133,7 +134,7 @@ main() {
 			plain_mode=true
 			shift
 			;;
-		--help | -h | --version | -v | --update)
+		--help | -h | --version | -v | --update | --check-version)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

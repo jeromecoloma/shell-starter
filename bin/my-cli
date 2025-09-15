@@ -27,6 +27,8 @@ OPTIONS:
     -h, --help      Show this help message and exit
     -v, --version   Show version information and exit
     --update        Check for available updates
+    --check-version Show detailed version status and check for updates
+    --notify-config Configure update notification settings
     --verbose       Enable verbose output
     --quiet         Suppress non-essential output
 
@@ -488,7 +490,7 @@ main() {
 			quiet=true
 			shift
 			;;
-		--help | -h | --version | -v | --update)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

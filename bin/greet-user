@@ -23,6 +23,8 @@ OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
     --update          Check for available updates
+    --check-version   Show detailed version status and check for updates
+    --notify-config   Configure update notification settings
     -i, --interactive Force interactive mode even if name is provided
     -f, --formal      Use formal greeting style
     -c, --casual      Use casual greeting style
@@ -203,7 +205,7 @@ main() {
 			time_based=true
 			shift
 			;;
-		--help | -h | --version | -v | --update)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

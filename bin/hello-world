@@ -23,6 +23,8 @@ OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
     --update          Check for available updates
+    --check-version   Show detailed version status and check for updates
+    --notify-config   Configure update notification settings
     -q, --quiet       Suppress colorful output
 
 EXAMPLES:
@@ -36,13 +38,16 @@ main() {
 	local quiet=false
 	local name="World"
 
+	# Enable optional background update notifications
+	enable_background_updates
+
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		--quiet | -q)
 			quiet=true
 			shift
 			;;
-		--help | -h | --version | -v | --update)
+		--help | -h | --version | -v | --update | --check-version | --notify-config)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)
