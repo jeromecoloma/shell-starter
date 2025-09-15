@@ -391,7 +391,7 @@ The project includes a `.shellcheckrc` file that configures shellcheck for shell
 
 ```bash
 # Check if shellcheck passes
-shellcheck lib/*.sh bin/* install.sh uninstall.sh
+shellcheck lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
 ```
 
 The configuration suppresses warnings that are expected in a shell library project:
@@ -405,10 +405,10 @@ Use `shfmt` to ensure consistent formatting:
 
 ```bash
 # Check formatting
-shfmt -d lib/*.sh bin/* install.sh uninstall.sh
+shfmt -d lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
 
 # Apply formatting fixes
-shfmt -w lib/*.sh bin/* install.sh uninstall.sh
+shfmt -w lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
 ```
 
 ### Continuous Integration

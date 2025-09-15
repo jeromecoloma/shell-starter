@@ -20,12 +20,33 @@ RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[1;33m' BLUE='\033[0;34m' NC='\0
 log() {
 	local level="$1" && shift
 	case "$level" in
-	error) echo -e "${RED}[ERROR]${NC} $*" ;;
-	warn) echo -e "${YELLOW}[WARN]${NC} $*" ;;
+	error) echo -e "${RED}[ERROR]${NC} $*" >&2 ;;
+	warn) echo -e "${YELLOW}[WARN]${NC} $*" >&2 ;;
 	success) echo -e "${GREEN}[SUCCESS]${NC} $*" ;;
 	*) echo -e "${BLUE}[INFO]${NC} $*" ;;
 	esac
 }
+
+# Enhanced error handling with exit codes
+fatal_error() {
+	log error "$1"
+	[[ -n "${2:-}" ]] && log error "Error code: $2"
+	log error "Installation failed. See above for details."
+	exit "${2:-1}"
+}
+
+# Cleanup function for emergency exits
+cleanup_on_exit() {
+	local exit_code=$?
+	if [[ $exit_code -ne 0 && -n "${TEMP_DIR:-}" && -d "$TEMP_DIR" ]]; then
+		log warn "Cleaning up temporary files due to error..."
+		rm -rf "$TEMP_DIR" 2>/dev/null || true
+	fi
+	exit $exit_code
+}
+
+# Set up cleanup trap
+trap cleanup_on_exit EXIT
 
 # Detect shell config file
 detect_shell_config() {
@@ -41,17 +62,43 @@ detect_shell_config() {
 add_to_path() {
 	local config_file="$1" path_to_add="$2"
 
+	# Validate inputs
+	if [[ -z "$config_file" || -z "$path_to_add" ]]; then
+		log error "add_to_path requires both config_file and path_to_add parameters"
+		return 1
+	fi
+
 	if grep -q "export PATH.*$path_to_add" "$config_file" 2>/dev/null; then
 		log info "PATH entry already exists in $config_file"
 		return 0
 	fi
 
-	[[ ! -f "$config_file" ]] && touch "$config_file"
-	{
+	# Create config file if it doesn't exist
+	if [[ ! -f "$config_file" ]]; then
+		if ! touch "$config_file"; then
+			log error "Failed to create shell config file: $config_file"
+			log error "You may need to manually add '$path_to_add' to your PATH"
+			return 1
+		fi
+	fi
+
+	# Check write permissions
+	if [[ ! -w "$config_file" ]]; then
+		log error "No write permission for shell config: $config_file"
+		log error "Please manually add 'export PATH=\"$path_to_add:\$PATH\"' to your shell configuration"
+		return 1
+	fi
+
+	# Add PATH entry with error handling
+	if ! {
 		echo ""
 		echo "# Added by shell-starter installer"
 		echo "export PATH=\"$path_to_add:\$PATH\""
-	} >>"$config_file"
+	} >>"$config_file"; then
+		log error "Failed to write to shell config: $config_file"
+		log error "Please manually add 'export PATH=\"$path_to_add:\$PATH\"' to your shell configuration"
+		return 1
+	fi
 
 	log success "Added PATH entry to $config_file"
 }
@@ -82,6 +129,44 @@ EXAMPLES:
 EOF
 }
 
+# Validate argument values
+validate_args() {
+	# Validate prefix paths
+	if [[ -z "$PREFIX" ]]; then
+		fatal_error "PREFIX cannot be empty"
+	fi
+
+	if [[ -z "$LIB_PREFIX" ]]; then
+		fatal_error "LIB_PREFIX cannot be empty"
+	fi
+
+	# Validate version format if provided
+	if [[ -n "$VERSION" && ! "$VERSION" =~ ^(v?[0-9]+\.[0-9]+\.[0-9]+|latest|main|master)$ ]]; then
+		log warn "Version format '$VERSION' may not be recognized by GitHub API"
+	fi
+
+	# Ensure paths are absolute or relative to HOME
+	case "$PREFIX" in
+	/*) ;; # Absolute path - OK
+	~/*) PREFIX="${PREFIX/#~/$HOME}" ;;
+	*) log warn "Relative prefix path '$PREFIX' - this may cause issues" ;;
+	esac
+
+	case "$LIB_PREFIX" in
+	/*) ;; # Absolute path - OK
+	~/*) LIB_PREFIX="${LIB_PREFIX/#~/$HOME}" ;;
+	*) log warn "Relative lib prefix path '$LIB_PREFIX' - this may cause issues" ;;
+	esac
+
+	# Prevent installing to system directories without explicit confirmation
+	case "$PREFIX" in
+	/usr/bin | /usr/local/bin | /bin | /sbin)
+		log warn "Installing to system directory: $PREFIX"
+		log warn "This requires elevated privileges and may affect system stability"
+		;;
+	esac
+}
+
 # Parse arguments
 parse_args() {
 	PREFIX="$DEFAULT_PREFIX" LIB_PREFIX="$DEFAULT_LIB_PREFIX" FROM_GITHUB=false VERSION="" UNINSTALL=false
@@ -89,12 +174,18 @@ parse_args() {
 	while [[ $# -gt 0 ]]; do
 		case $1 in
 		--prefix)
+			if [[ -z "${2:-}" ]]; then
+				fatal_error "--prefix requires a directory path argument"
+			fi
 			PREFIX="$2"
 			# Set lib prefix relative to bin prefix if not explicitly set
 			[[ "$LIB_PREFIX" == "$DEFAULT_LIB_PREFIX" ]] && LIB_PREFIX="$(dirname "$PREFIX")/lib"
 			shift 2
 			;;
 		--lib-prefix)
+			if [[ -z "${2:-}" ]]; then
+				fatal_error "--lib-prefix requires a directory path argument"
+			fi
 			LIB_PREFIX="$2"
 			shift 2
 			;;
@@ -103,6 +194,9 @@ parse_args() {
 			shift
 			;;
 		--version)
+			if [[ -z "${2:-}" ]]; then
+				fatal_error "--version requires a version string argument"
+			fi
 			VERSION="$2"
 			FROM_GITHUB=true
 			shift 2
@@ -116,59 +210,73 @@ parse_args() {
 			exit 0
 			;;
 		*)
-			log error "Unknown option: $1"
-			show_help
-			exit 1
+			fatal_error "Unknown option: $1. Use --help to see available options."
 			;;
 		esac
 	done
 
-	[[ -n "$VERSION" && ! "$VERSION" =~ ^(v?[0-9]+\.[0-9]+\.[0-9]+|latest|main|master)$ ]] &&
-		log warn "Version format '$VERSION' may not be recognized"
+	validate_args
+}
+
+# Check system prerequisites
+check_prerequisites() {
+	local missing_tools=()
+
+	command -v curl >/dev/null || missing_tools+=("curl")
+	command -v tar >/dev/null || missing_tools+=("tar")
+
+	if [[ ${#missing_tools[@]} -gt 0 ]]; then
+		fatal_error "Missing required tools: ${missing_tools[*]}. Please install them first."
+	fi
 }
 
 # HTTP request with retry
 http_request() {
 	local url="$1" output_file="${2:-}" attempt=1
 
-	command -v curl >/dev/null || {
-		log error "curl is required"
-		return 1
-	}
-
 	while [[ $attempt -le $CURL_RETRY_COUNT ]]; do
 		local curl_cmd="curl -fsSL --connect-timeout $CURL_TIMEOUT --max-time $((CURL_TIMEOUT * 2)) -A 'shell-starter-installer/1.0'"
 		[[ -n "$output_file" ]] && curl_cmd="$curl_cmd -o '$output_file'"
 		curl_cmd="$curl_cmd '$url'"
 
+		local error_output
 		if [[ -n "$output_file" ]]; then
-			eval "$curl_cmd" 2>/dev/null && return 0
+			if error_output=$(eval "$curl_cmd" 2>&1); then
+				return 0
+			fi
 		else
-			local response && response=$(eval "$curl_cmd" 2>/dev/null) && {
+			local response
+			if response=$(eval "$curl_cmd" 2>&1); then
 				echo "$response"
 				return 0
-			}
+			fi
+			error_output="$response"
 		fi
 
-		log warn "Request failed (attempt $attempt/$CURL_RETRY_COUNT)"
+		log warn "Request failed (attempt $attempt/$CURL_RETRY_COUNT): $error_output"
 		[[ $attempt -lt $CURL_RETRY_COUNT ]] && sleep $((attempt * 2))
 		((attempt++))
 	done
 
-	log error "All HTTP requests failed"
+	log error "All HTTP requests failed for URL: $url"
 	return 1
 }
 
 # Create manifest
 init_manifest() {
-	mkdir -p "$MANIFEST_DIR"
-	{
+	if ! mkdir -p "$MANIFEST_DIR"; then
+		fatal_error "Failed to create manifest directory: $MANIFEST_DIR"
+	fi
+
+	if ! {
 		echo "# Shell Starter Install Manifest"
 		echo "# Generated on $(date)"
 		echo "# Scripts prefix: $PREFIX"
 		echo "# Libraries prefix: $LIB_PREFIX"
 		echo ""
-	} >"$MANIFEST_FILE"
+	} >"$MANIFEST_FILE"; then
+		fatal_error "Failed to create manifest file: $MANIFEST_FILE"
+	fi
 }
 
 # Get GitHub release download URL
@@ -201,31 +309,46 @@ get_download_url() {
 download_release() {
 	local version="${1:-latest}" temp_dir="$TEMP_DIR"
 
-	mkdir -p "$temp_dir" || {
-		log error "Failed to create temp dir"
-		return 1
-	}
-
-	local download_url tarball="$temp_dir/release.tar.gz"
-	download_url=$(get_download_url "$GITHUB_REPO" "$version") || {
-		rm -rf "$temp_dir"
-		return 1
-	}
-
-	if ! http_request "$download_url" "$tarball"; then
-		log error "Download failed"
-		rm -rf "$temp_dir"
-		return 1
+	log info "Preparing download directory..."
+	if ! mkdir -p "$temp_dir"; then
+		fatal_error "Failed to create temporary directory: $temp_dir"
 	fi
 
-	tar -xzf "$tarball" -C "$temp_dir" --strip-components=1 || {
-		log error "Extract failed"
-		rm -rf "$temp_dir"
-		return 1
-	}
+	log info "Getting download URL for version: $version"
+	local download_url
+	if ! download_url=$(get_download_url "$GITHUB_REPO" "$version"); then
+		fatal_error "Failed to get download URL for version: $version"
+	fi
+
+	local tarball="$temp_dir/release.tar.gz"
+	log info "Downloading from: $download_url"
+	if ! http_request "$download_url" "$tarball"; then
+		fatal_error "Download failed from: $download_url"
+	fi
+
+	log info "Extracting archive..."
+	if ! tar -xzf "$tarball" -C "$temp_dir" --strip-components=1; then
+		fatal_error "Failed to extract archive: $tarball"
+	fi
 
 	rm -f "$tarball"
+	log info "Download and extraction complete"
 	echo "$temp_dir"
+}
+
+# Validate directory permissions
+validate_directory_permissions() {
+	local dir="$1" purpose="$2"
+
+	if [[ ! -d "$dir" ]]; then
+		if ! mkdir -p "$dir"; then
+			fatal_error "Failed to create $purpose directory: $dir"
+		fi
+	fi
+
+	if [[ ! -w "$dir" ]]; then
+		fatal_error "No write permission for $purpose directory: $dir"
+	fi
 }
 
 # Install scripts and libraries
@@ -234,22 +357,21 @@ install_scripts() {
 
 	# Download if from GitHub
 	if [[ "$FROM_GITHUB" == true ]]; then
-		working_dir=$(download_release "${VERSION:-latest}") || {
-			log error "GitHub download failed"
-			exit 1
-		}
-		trap 'rm -rf "$TEMP_DIR"' EXIT
+		if ! working_dir=$(download_release "${VERSION:-latest}"); then
+			fatal_error "GitHub download failed"
+		fi
 	fi
 
-	# Verify directories exist
-	[[ -d "$working_dir/bin" ]] || {
-		log error "No 'bin' directory found"
-		exit 1
-	}
+	# Verify source directories exist
+	if [[ ! -d "$working_dir/bin" ]]; then
+		fatal_error "Source 'bin' directory not found in: $working_dir"
+	fi
 
-	# Create install directories
-	mkdir -p "$PREFIX" "$LIB_PREFIX"
+	log info "Validating installation directories..."
+	validate_directory_permissions "$PREFIX" "scripts"
+	validate_directory_permissions "$LIB_PREFIX" "libraries"
 
+	log info "Installing scripts from: $working_dir/bin/"
 	# Install scripts from bin/
 	for script in "$working_dir"/bin/*; do
 		if [[ -f "$script" && -x "$script" ]]; then
@@ -257,38 +379,59 @@ install_scripts() {
 			name=$(basename "$script")
 			dest_path="$PREFIX/$name"
 
-			cp "$script" "$dest_path"
-			chmod +x "$dest_path"
-			echo "$dest_path" >>"$MANIFEST_FILE"
+			if ! cp "$script" "$dest_path"; then
+				fatal_error "Failed to copy script: $script -> $dest_path"
+			fi
+
+			if ! chmod +x "$dest_path"; then
+				log warn "Failed to set executable permission on: $dest_path"
+			fi
+
+			echo "$dest_path" >>"$MANIFEST_FILE" || {
+				log warn "Failed to add to manifest: $dest_path"
+			}
 			((script_count++))
+			log info "Installed script: $name"
 		fi
 	done
 
 	# Install libraries from lib/ if directory exists
 	if [[ -d "$working_dir/lib" ]]; then
+		log info "Installing libraries from: $working_dir/lib/"
 		for lib_file in "$working_dir"/lib/*; do
 			if [[ -f "$lib_file" ]]; then
 				local name dest_path
 				name=$(basename "$lib_file")
 				dest_path="$LIB_PREFIX/$name"
 
-				cp "$lib_file" "$dest_path"
-				chmod 644 "$dest_path"
-				echo "$dest_path" >>"$MANIFEST_FILE"
+				if ! cp "$lib_file" "$dest_path"; then
+					fatal_error "Failed to copy library: $lib_file -> $dest_path"
+				fi
+
+				if ! chmod 644 "$dest_path"; then
+					log warn "Failed to set permissions on library: $dest_path"
+				fi
+
+				echo "$dest_path" >>"$MANIFEST_FILE" || {
+					log warn "Failed to add to manifest: $dest_path"
+				}
 				((lib_count++))
+				log info "Installed library: $name"
 			fi
 		done
+	else
+		log warn "No 'lib' directory found, skipping library installation"
 	fi
 
 	# Report installation results
 	if [[ $script_count -eq 0 ]]; then
-		log warn "No executable scripts found"
+		fatal_error "No executable scripts found in source directory"
 	else
-		log success "Installed $script_count script(s)"
+		log success "Successfully installed $script_count script(s) to: $PREFIX"
 	fi
 
 	if [[ $lib_count -gt 0 ]]; then
-		log success "Installed $lib_count library file(s)"
+		log success "Successfully installed $lib_count library file(s) to: $LIB_PREFIX"
 	fi
 }
 
@@ -412,19 +555,31 @@ cleanup_manifest() {
 run_uninstaller() {
 	log info "Starting Shell Starter uninstallation..."
 
-	[[ ! -f "$MANIFEST_FILE" ]] && {
+	if [[ ! -f "$MANIFEST_FILE" ]]; then
 		log error "No installation manifest found at: $MANIFEST_FILE"
 		log error "Either Shell Starter was never installed, or the manifest was deleted."
+		log info "If you installed Shell Starter manually, you'll need to remove files manually:"
+		log info "  - Check $PREFIX for scripts"
+		log info "  - Check $LIB_PREFIX for libraries"
+		log info "  - Check shell config files for PATH entries"
 		exit 1
-	}
+	fi
+
+	# Validate manifest file is readable
+	if [[ ! -r "$MANIFEST_FILE" ]]; then
+		fatal_error "Cannot read manifest file: $MANIFEST_FILE (permission denied)"
+	fi
 
 	local file_count
-	file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' \n\r\t')
+	if ! file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l | tr -d ' \n\r\t'); then
+		fatal_error "Failed to count files in manifest"
+	fi
 
-	[[ $file_count -eq 0 ]] && {
+	if [[ $file_count -eq 0 ]]; then
 		log warn "No files listed in manifest. Nothing to uninstall."
+		cleanup_manifest
 		exit 0
-	}
+	fi
 
 	log info "Found $file_count file(s) to remove"
 	show_uninstall_files
@@ -432,17 +587,23 @@ run_uninstaller() {
 	remove_files
 
 	local shell_config
-	shell_config=$(detect_shell_config)
-	remove_from_path "$shell_config" "$PREFIX"
+	if shell_config=$(detect_shell_config); then
+		if ! remove_from_path "$shell_config" "$PREFIX"; then
+			log warn "Failed to remove PATH entry - you may need to do this manually"
+		fi
+	else
+		log warn "Could not detect shell config - PATH cleanup skipped"
+	fi
 
 	cleanup_manifest
 	log success "Uninstallation complete!"
 	log info "All Shell Starter files and PATH entries have been removed from your system."
-	log info "Please run 'source $shell_config' or restart your shell to update PATH"
+	[[ -n "${shell_config:-}" ]] && log info "Please run 'source $shell_config' or restart your shell to update PATH"
 }
 
 # Main installation
 main() {
+	# Parse and validate arguments first
 	parse_args "$@"
 
 	# Handle uninstall option
@@ -451,24 +612,43 @@ main() {
 		return 0
 	fi
 
+	# Check system prerequisites for installation
 	if [[ "$FROM_GITHUB" == true ]]; then
-		log info "Installing from GitHub (${VERSION:-latest})"
+		check_prerequisites
+		log info "Installing Shell Starter from GitHub (${VERSION:-latest})"
 	else
-		log info "Installing from local directory"
+		log info "Installing Shell Starter from local directory"
 	fi
 
+	# Initialize installation
 	init_manifest
+
+	# Perform main installation
 	install_scripts
 
+	# Configure shell PATH
 	local shell_config
-	shell_config=$(detect_shell_config)
-	add_to_path "$shell_config" "$PREFIX"
+	if shell_config=$(detect_shell_config); then
+		if add_to_path "$shell_config" "$PREFIX"; then
+			log success "PATH configuration updated successfully"
+		else
+			log warn "PATH configuration failed - you may need to add manually"
+		fi
+	else
+		log warn "Could not detect shell configuration - PATH not updated"
+		log info "Please manually add 'export PATH=\"$PREFIX:\$PATH\"' to your shell configuration"
+	fi
 
+	# Installation complete
 	log success "Installation complete!"
 	log info "Scripts installed to: $PREFIX"
 	log info "Libraries installed to: $LIB_PREFIX"
-	log info "Manifest: $MANIFEST_FILE"
-	log info "Restart shell or run: source $shell_config"
+	log info "Installation manifest: $MANIFEST_FILE"
+
+	if [[ -n "${shell_config:-}" ]]; then
+		log info "To use the installed scripts immediately, run: source $shell_config"
+		log info "Or restart your shell to automatically load the new PATH"
+	fi
 }
 
 # Run main function if script is executed directly

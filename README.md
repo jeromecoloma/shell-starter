@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/your-username/your-cli-tool/main/in
 
 **Custom Installation Path**: The installer supports `--prefix /custom/path` (default: `~/.config/your-project/bin`)
 
-**Uninstallation**: Built-in uninstaller with confirmation: `./uninstall.sh` or `./uninstall.sh -y`
+**Uninstallation**: Built-in uninstaller via `./install.sh --uninstall` or standalone `./uninstall.sh` script
 
 ## 📋 Features
 
