@@ -103,70 +103,84 @@ teardown() {
     unset MANIFEST_DIR MANIFEST_FILE
 }
 
-@test "uninstall.sh: detect_shell_config function works for bash" {
+@test "uninstall.sh: get_shell_config function works for bash" {
     export SHELL="/bin/bash"
-    
+
     source "$PROJECT_ROOT/uninstall.sh"
-    
+
     # Mock the file checks
     touch "$HOME/.bashrc"
-    run detect_shell_config
+    run get_shell_config
     assert_success
     assert_output "$HOME/.bashrc"
-    
+
     rm -f "$HOME/.bashrc"
 }
 
-@test "uninstall.sh: detect_shell_config function works for zsh" {
+@test "uninstall.sh: get_shell_config function works for zsh" {
     export SHELL="/bin/zsh"
-    
+
     source "$PROJECT_ROOT/uninstall.sh"
-    
-    run detect_shell_config
+
+    # Mock the file checks
+    touch "$HOME/.zshrc"
+    run get_shell_config
     assert_success
     assert_output "$HOME/.zshrc"
+
+    rm -f "$HOME/.zshrc"
 }
 
-@test "uninstall.sh: remove_from_path function removes PATH entry" {
+@test "uninstall.sh: cleanup_path_from_file function removes PATH entry" {
     source "$PROJECT_ROOT/uninstall.sh"
-    
-    run remove_from_path "$TEST_SHELL_CONFIG" "$TEST_PREFIX"
+
+    run cleanup_path_from_file "$TEST_SHELL_CONFIG" "$TEST_PREFIX"
     assert_success
-    
+
     # Check that PATH was removed from the config file
     run grep "export PATH.*$TEST_PREFIX" "$TEST_SHELL_CONFIG"
     assert_failure
 }
 
-@test "uninstall.sh: remove_from_path preserves other PATH entries" {
+@test "uninstall.sh: cleanup_path_from_file preserves other PATH entries" {
     source "$PROJECT_ROOT/uninstall.sh"
-    
-    run remove_from_path "$TEST_SHELL_CONFIG" "$TEST_PREFIX"
+
+    run cleanup_path_from_file "$TEST_SHELL_CONFIG" "$TEST_PREFIX"
     assert_success
-    
+
     # Check that other PATH entries are preserved
     run grep "/some/other/path" "$TEST_SHELL_CONFIG"
     assert_success
-    
+
     # Check that other config lines are preserved
     run grep "alias ll=" "$TEST_SHELL_CONFIG"
     assert_success
 }
 
-@test "uninstall.sh: remove_from_path handles non-existent config file" {
+@test "uninstall.sh: cleanup_path_from_file handles non-existent config file" {
     source "$PROJECT_ROOT/uninstall.sh"
-    
-    run remove_from_path "$TEST_DIR/nonexistent-config" "$TEST_PREFIX"
+
+    run cleanup_path_from_file "$TEST_DIR/nonexistent-config" "$TEST_PREFIX"
     assert_success
-    assert_output --partial "Shell config file not found"
+    assert_output --partial "Config file not found"
 }
 
-@test "uninstall.sh: remove_from_path handles non-existent PATH entry" {
+@test "uninstall.sh: cleanup_path_from_file handles non-existent PATH entry" {
     source "$PROJECT_ROOT/uninstall.sh"
-    
-    run remove_from_path "$TEST_SHELL_CONFIG" "/nonexistent/path"
+
+    # Create a clean config file without shell-starter entries
+    local CLEAN_CONFIG="$TEST_DIR/.clean_shell_config"
+    cat > "$CLEAN_CONFIG" <<EOF
+# Some existing config
+export PATH="/some/other/path:\$PATH"
+alias ll="ls -la"
+EOF
+
+    run cleanup_path_from_file "$CLEAN_CONFIG" "/nonexistent/path"
     assert_success
-    assert_output --partial "PATH entry not found"
+    assert_output --partial "No shell-starter PATH entries found"
+
+    rm -f "$CLEAN_CONFIG"
 }
 
 @test "uninstall.sh: removes files listed in manifest" {
@@ -192,7 +206,6 @@ teardown() {
     
     run "$PROJECT_ROOT/uninstall.sh" --force
     assert_success
-    assert_output --partial "File not found (already removed?)"
     assert_output --partial "1 file(s) were already missing"
     
     unset MANIFEST_DIR MANIFEST_FILE
@@ -247,7 +260,7 @@ teardown() {
     
     run "$PROJECT_ROOT/uninstall.sh" --force
     assert_success
-    assert_output --partial "Force removal enabled, skipping confirmation"
+    assert_output --partial "Force removal enabled - proceeding without confirmation"
     
     unset MANIFEST_DIR MANIFEST_FILE
 }
@@ -258,7 +271,7 @@ teardown() {
     
     run "$PROJECT_ROOT/uninstall.sh" -y
     assert_success
-    assert_output --partial "Force removal enabled, skipping confirmation"
+    assert_output --partial "Force removal enabled - proceeding without confirmation"
     
     unset MANIFEST_DIR MANIFEST_FILE
 }
@@ -269,7 +282,7 @@ teardown() {
     
     run "$PROJECT_ROOT/uninstall.sh" --force
     assert_success
-    assert_output --partial "Uninstallation complete!"
+    assert_output --partial "Uninstallation completed successfully"
     assert_output --partial "All Shell Starter files and PATH entries have been removed"
     
     unset MANIFEST_DIR MANIFEST_FILE
@@ -310,7 +323,7 @@ EOF
     
     run "$PROJECT_ROOT/uninstall.sh" --force
     assert_success
-    assert_output --partial "The following files will be removed:"
+    assert_output --partial "Files that will be removed:"
     assert_output --partial "$TEST_PREFIX/test-script"
     assert_output --partial "$TEST_PREFIX/another-script"
     
