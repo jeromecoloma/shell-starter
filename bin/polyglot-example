@@ -28,6 +28,7 @@ COMMANDS:
 OPTIONS:
     -h, --help      Show this help message and exit
     -v, --version   Show version information and exit
+    --update        Check for available updates
     --verbose       Enable verbose output
     --no-python     Skip Python operations (Bash only)
     --output-dir    Directory for output files [default: /tmp/polyglot-output]
@@ -725,7 +726,7 @@ main() {
 			output_dir="$2"
 			shift 2
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

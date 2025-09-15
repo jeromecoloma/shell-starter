@@ -12,6 +12,7 @@ source "${SHELL_STARTER_LIB_DIR}/colors.sh"
 source "${SHELL_STARTER_LIB_DIR}/logging.sh"
 source "${SHELL_STARTER_LIB_DIR}/spinner.sh"
 source "${SHELL_STARTER_LIB_DIR}/utils.sh"
+source "${SHELL_STARTER_LIB_DIR}/update.sh"
 
 # Function to get the current version from VERSION file
 get_version() {
@@ -38,6 +39,10 @@ parse_common_args() {
 			show_help "$script_name"
 			exit 0
 			;;
+		--update)
+			update::info
+			exit $?
+			;;
 		*)
 			# Unknown option, return to caller for handling
 			return 1
@@ -57,6 +62,7 @@ Usage: $script_name [OPTIONS]
 OPTIONS:
     -h, --help     Show this help message and exit
     -v, --version  Show version information and exit
+    --update       Check for available updates
 
 This is a Shell Starter script. Override the show_help function
 in your script to provide specific usage information.

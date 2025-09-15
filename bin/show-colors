@@ -19,6 +19,7 @@ Displays all available colors and text formatting options from Shell Starter.
 OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
+    --update          Check for available updates
     --no-demo         Skip the color demonstration examples
     --plain           Display colors without fancy formatting
 
@@ -132,7 +133,7 @@ main() {
 			plain_mode=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

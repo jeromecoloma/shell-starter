@@ -46,6 +46,9 @@ ARGUMENTS:
 
 OPTIONS:
     --update-tasks  Generate specific tasks based on existing requirements.md
+    --help          Show this help message and exit
+    --version       Show version information and exit
+    --update        Check for available updates
 
 DESCRIPTION:
     Generates a complete AI development workflow including:
@@ -1219,7 +1222,7 @@ main() {
 
 	while [[ $# -gt 0 ]]; do
 		case $1 in
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$SCRIPT_NAME" "$@"
 			;;
 		--update-tasks)

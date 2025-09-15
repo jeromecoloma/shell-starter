@@ -22,6 +22,7 @@ ARGUMENTS:
 OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
+    --update          Check for available updates
     -q, --quiet       Suppress spinner output
     --no-color        Disable colored output
     --steps N         Number of progress steps (default: 5)
@@ -124,7 +125,7 @@ main() {
 			fast_spinner=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

@@ -22,6 +22,7 @@ ARGUMENTS:
 OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
+    --update          Check for available updates
     -i, --interactive Force interactive mode even if name is provided
     -f, --formal      Use formal greeting style
     -c, --casual      Use casual greeting style
@@ -202,7 +203,7 @@ main() {
 			time_based=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

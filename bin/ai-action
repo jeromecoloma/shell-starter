@@ -28,6 +28,7 @@ COMMANDS:
 OPTIONS:
     -h, --help      Show this help message and exit
     -v, --version   Show version information and exit
+    --update        Check for available updates
     --model         AI model to use (gpt-4|gpt-3.5|claude|local) [default: gpt-3.5]
     --api-key       API key for AI service (or set AI_API_KEY env var)
     --max-tokens    Maximum tokens for AI response [default: 1000]
@@ -1065,7 +1066,7 @@ main() {
 			verbose=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

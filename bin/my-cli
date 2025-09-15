@@ -26,6 +26,7 @@ COMMANDS:
 OPTIONS:
     -h, --help      Show this help message and exit
     -v, --version   Show version information and exit
+    --update        Check for available updates
     --verbose       Enable verbose output
     --quiet         Suppress non-essential output
 
@@ -487,7 +488,7 @@ main() {
 			quiet=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

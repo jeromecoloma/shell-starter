@@ -6,8 +6,8 @@ set -euo pipefail
 # This script removes installed CLI scripts based on the installation manifest
 
 # Configuration
-MANIFEST_DIR="$HOME/.config/shell-starter"
-MANIFEST_FILE="$MANIFEST_DIR/install-manifest.txt"
+MANIFEST_DIR="${MANIFEST_DIR:-$HOME/.config/shell-starter}"
+MANIFEST_FILE="${MANIFEST_FILE:-$MANIFEST_DIR/install-manifest.txt}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,6 +33,81 @@ log_error() {
 	echo -e "${RED}[ERROR]${NC} $1"
 }
 
+# Detect user's shell configuration file
+detect_shell_config() {
+	local shell_name
+	shell_name=$(basename "$SHELL")
+
+	case "$shell_name" in
+	zsh)
+		echo "$HOME/.zshrc"
+		;;
+	bash)
+		# Check for .bashrc first, then .bash_profile
+		if [[ -f "$HOME/.bashrc" ]]; then
+			echo "$HOME/.bashrc"
+		else
+			echo "$HOME/.bash_profile"
+		fi
+		;;
+	fish)
+		echo "$HOME/.config/fish/config.fish"
+		;;
+	*)
+		# Default to .bashrc for unknown shells
+		echo "$HOME/.bashrc"
+		;;
+	esac
+}
+
+# Remove PATH entry from shell configuration
+remove_from_path() {
+	local config_file="$1"
+	local path_to_remove="$2"
+
+	if [[ ! -f "$config_file" ]]; then
+		log_info "Shell config file not found: $config_file"
+		return 0
+	fi
+
+	# Check if PATH entry exists
+	if ! grep -q "export PATH.*$path_to_remove" "$config_file" 2>/dev/null; then
+		log_info "PATH entry not found in $config_file"
+		return 0
+	fi
+
+	log_info "Removing PATH entry from $config_file"
+
+	# Create a temporary file
+	local temp_file
+	temp_file=$(mktemp)
+
+	# Remove the PATH line and the comment line before it using a simpler approach
+	awk -v target_path="$path_to_remove" '
+	/^# Added by shell-starter installer$/ {
+		# Check if next line contains the PATH entry
+		getline nextline
+		if (index(nextline, target_path) == 0 || nextline !~ /^export PATH=/) {
+			# If not our PATH entry, keep both lines
+			print $0
+			print nextline
+		}
+		# If it is our PATH entry, skip both lines (dont print anything)
+		next
+	}
+	# Print all other lines
+	{ print }
+	' "$config_file" >"$temp_file"
+
+	# Replace original file with cleaned version
+	if mv "$temp_file" "$config_file"; then
+		log_success "Removed PATH entry from $config_file"
+	else
+		log_error "Failed to update $config_file"
+		rm -f "$temp_file"
+	fi
+}
+
 # Show usage information
 show_help() {
 	cat <<EOF
@@ -47,7 +122,8 @@ OPTIONS:
 DESCRIPTION:
     This script removes all Shell Starter CLI scripts that were previously 
     installed using install.sh. It reads the installation manifest to determine
-    which files to remove.
+    which files to remove and automatically cleans up PATH entries from your
+    shell configuration.
     
     The manifest file is located at: $MANIFEST_FILE
     
@@ -95,6 +171,9 @@ check_manifest() {
 read_manifest() {
 	log_info "Reading installation manifest: $MANIFEST_FILE"
 
+	# Extract install prefix from manifest
+	INSTALL_PREFIX=$(grep '^# Install prefix:' "$MANIFEST_FILE" | sed 's/^# Install prefix: //')
+
 	# Count non-comment, non-empty lines
 	local file_count
 	file_count=$(grep -v '^#' "$MANIFEST_FILE" | grep -v '^[[:space:]]*$' | wc -l)
@@ -105,6 +184,9 @@ read_manifest() {
 	fi
 
 	log_info "Found $file_count file(s) to remove"
+	if [[ -n "$INSTALL_PREFIX" ]]; then
+		log_info "Install prefix: $INSTALL_PREFIX"
+	fi
 }
 
 # Show files that will be removed
@@ -178,6 +260,17 @@ remove_files() {
 	fi
 }
 
+# Clean up PATH entries
+cleanup_path() {
+	if [[ -n "$INSTALL_PREFIX" ]]; then
+		log_info "Cleaning up PATH entries..."
+		local shell_config
+		shell_config=$(detect_shell_config)
+		remove_from_path "$shell_config" "$INSTALL_PREFIX"
+		log_info "Please run 'source $shell_config' or restart your shell to update PATH"
+	fi
+}
+
 # Clean up manifest file and directory
 cleanup_manifest() {
 	log_info "Cleaning up installation manifest..."
@@ -209,13 +302,14 @@ main() {
 	show_files
 	get_confirmation
 	remove_files
+	cleanup_path
 	cleanup_manifest
 
 	log_success "Uninstallation complete!"
-	log_info "All Shell Starter files have been removed from your system."
+	log_info "All Shell Starter files and PATH entries have been removed from your system."
 }
 
 # Run main function if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+if [[ "${BASH_SOURCE[0]:-}" == "${0:-}" ]]; then
 	main "$@"
 fi

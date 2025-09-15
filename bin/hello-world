@@ -22,6 +22,7 @@ ARGUMENTS:
 OPTIONS:
     -h, --help        Show this help message and exit
     -v, --version     Show version information and exit
+    --update          Check for available updates
     -q, --quiet       Suppress colorful output
 
 EXAMPLES:
@@ -41,7 +42,7 @@ main() {
 			quiet=true
 			shift
 			;;
-		--help | -h | --version | -v)
+		--help | -h | --version | -v | --update)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)
