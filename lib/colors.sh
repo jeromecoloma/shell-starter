@@ -115,7 +115,7 @@ colors::gradient_horizontal() {
 		output+="$(colors::rgb "$r" "$g" "$b")${text:$i:1}"
 	done
 
-	printf '%s%s' "$output" "${COLOR_RESET}"
+	printf '%b%b' "$output" "${COLOR_RESET}"
 }
 
 # Banner functions
@@ -177,21 +177,13 @@ banner::ascii_style() {
 }
 
 banner::minimal_style() {
+	echo
 	if colors::has_color && (colors::has_truecolor || colors::has_256color); then
-		echo
-		colors::gradient_horizontal "• Shell Starter •" 100 150 255 255 150 100
-		echo
-	elif colors::has_color; then
-		# Use basic colors if available
-		echo
-		printf '%s• Shell Starter •%s\n' "${COLOR_CYAN}" "${COLOR_RESET}"
-		echo
+		colors::gradient_horizontal "• Shell Starter •" 0 150 255 255 150 0
 	else
-		# Plain text fallback for truly no-color terminals
-		echo
 		echo "• Shell Starter •"
-		echo
 	fi
+	echo
 }
 
 # Fallback banners for terminals without color support
