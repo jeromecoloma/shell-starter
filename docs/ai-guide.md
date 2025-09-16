@@ -40,6 +40,30 @@ The AI will automatically:
 
 See [Markdown to PDF Converter Journey](journeys/ai-assisted/md-to-pdf.md) for a complete example.
 
+### Dependency Management
+
+For projects using Shell Starter as a library foundation, use the `update-shell-starter` tool to manage dependencies:
+
+```bash
+# Check for updates to shell-starter libraries
+./bin/update-shell-starter --check
+
+# Update to latest version with breaking change detection
+./bin/update-shell-starter
+
+# Preview changes before applying
+./bin/update-shell-starter --dry-run
+
+# Update to specific version
+./bin/update-shell-starter --target-version 0.2.0
+```
+
+**Key Features:**
+- **Selective Updates**: Only updates core shell-starter library files, preserves custom code
+- **Version Tracking**: Maintains `.shell-starter-version` file for dependency tracking
+- **Breaking Change Detection**: Warns about API changes with migration guidance
+- **Backup Support**: Creates automatic backups before updates
+
 ### PRD Generation
 
 For creating comprehensive Product Requirements Documents, use the [PRD Generation Guide](prompting-guide.md) which provides:
@@ -57,6 +81,7 @@ For creating comprehensive Product Requirements Documents, use the [PRD Generati
 - Include proper error handling and input validation
 - Provide comprehensive help text and examples
 - Follow the standard script structure template
+- **Keep shell-starter dependencies updated** - use `update-shell-starter` for library management
 
 ### Development Workflow
 1. **Define and implement core functionality first** - what does this tool actually do?

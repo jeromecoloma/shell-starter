@@ -16,6 +16,7 @@ All conventions are demonstrated in working example scripts in the `bin/` direct
 | `bin/ai-action` | Dependency checking, external tool integration |
 | `bin/polyglot-example` | Polyglot scripts, `run::script` function |
 | `bin/generate-ai-workflow` | Complex argument parsing, file generation |
+| `bin/update-shell-starter` | Dependency management, version tracking, breaking change detection |
 
 **Test Examples**: `tests/hello-world.bats`, `tests/library-functions.bats`
 
@@ -335,6 +336,117 @@ require_dependencies() {
         exit 1
     fi
 }
+```
+
+## 📦 Version Tracking and Dependency Management
+
+### Shell Starter Version Tracking
+
+Projects using Shell Starter as a library foundation should maintain version tracking:
+
+#### Version File
+- **`.shell-starter-version`**: Tracks the version of shell-starter libraries in use
+- This file is automatically maintained by the `update-shell-starter` tool
+- Should be committed to version control for team synchronization
+
+```bash
+# Check current shell-starter version
+cat .shell-starter-version
+
+# Example content
+0.1.0
+```
+
+#### Project Structure for Derived Projects
+```
+my-cli-project/
+├── bin/                     # Your custom CLI scripts
+├── lib/                     # Shell Starter libraries + your custom libs
+│   ├── colors.sh           # Shell Starter library (managed)
+│   ├── logging.sh          # Shell Starter library (managed)
+│   ├── main.sh             # Shell Starter library (managed)
+│   ├── spinner.sh          # Shell Starter library (managed)
+│   ├── utils.sh            # Shell Starter library (managed)
+│   ├── update.sh           # Shell Starter library (managed)
+│   └── my-custom.sh        # Your custom library (preserved)
+├── .shell-starter-version  # Version tracking file
+└── VERSION                 # Your project's version
+```
+
+### Dependency Management Practices
+
+#### Updating Shell Starter Dependencies
+
+Use the built-in dependency management system to keep libraries current:
+
+```bash
+# Regular maintenance - check for updates
+./bin/update-shell-starter --check
+
+# Update to latest with safety checks
+./bin/update-shell-starter
+
+# Preview changes before applying
+./bin/update-shell-starter --dry-run
+
+# Update to specific version
+./bin/update-shell-starter --target-version 0.2.0
+```
+
+#### Breaking Change Management
+
+Follow these practices when shell-starter releases breaking changes:
+
+1. **Review Migration Guide**: Check `docs/MIGRATION.md` for version-specific guidance
+2. **Test Updates**: Use `--dry-run` to preview changes
+3. **Backup Strategy**: Updates automatically create backups, but consider additional backups for critical projects
+4. **Staged Rollout**: Update development environments before production
+
+```bash
+# Example workflow for breaking changes
+./bin/update-shell-starter --dry-run  # Preview changes
+./bin/update-shell-starter            # Apply with prompts
+# Review warnings and migration guide
+# Test your scripts with updated libraries
+```
+
+#### Custom Library Preservation
+
+The dependency management system preserves your customizations:
+
+- **Standard Files**: Automatically updated (`colors.sh`, `logging.sh`, `main.sh`, `spinner.sh`, `utils.sh`, `update.sh`)
+- **Custom Files**: Preserved and warned about (`my-custom.sh`, `project-specific.sh`)
+- **Backup Creation**: Automatic backups before updates (configurable)
+
+### Version Management Best Practices
+
+#### For Project Maintainers
+
+```bash
+# Version consistency checks
+check_version_consistency() {
+    local project_version
+    local shell_starter_version
+
+    project_version="$(cat VERSION)"
+    shell_starter_version="$(cat .shell-starter-version 2>/dev/null || echo 'unknown')"
+
+    log::info "Project version: $project_version"
+    log::info "Shell Starter version: $shell_starter_version"
+}
+```
+
+#### For Teams
+
+- **Commit Version Files**: Include both `VERSION` and `.shell-starter-version` in version control
+- **Update Documentation**: Document shell-starter version requirements in README
+- **CI Integration**: Consider adding dependency checks to CI pipelines
+
+```bash
+# Example CI check
+if [[ ! -f .shell-starter-version ]]; then
+    log::warn "Shell Starter version not tracked - consider running update-shell-starter"
+fi
 ```
 
 ## 📖 Documentation

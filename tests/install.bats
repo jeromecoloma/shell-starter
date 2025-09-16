@@ -61,7 +61,7 @@ teardown() {
     rm -rf "$TEST_DIR/bin"
     run "$PROJECT_ROOT/install.sh" --prefix "$TEST_PREFIX"
     assert_failure
-    assert_output --partial "No 'bin' directory found"
+    assert_output --partial "Source 'bin' directory not found"
 }
 
 @test "install.sh: creates install directory if it doesn't exist" {
@@ -189,10 +189,10 @@ teardown() {
 @test "install.sh: handles empty bin directory gracefully" {
     # Remove all scripts from bin directory
     rm -f "$TEST_DIR/bin"/*
-    
+
     run "$PROJECT_ROOT/install.sh" --prefix "$TEST_PREFIX"
-    assert_success
-    assert_output --partial "No executable scripts found in bin/ directory"
+    assert_failure
+    assert_output --partial "No executable scripts found in source directory"
 }
 
 @test "install.sh: only installs executable files" {

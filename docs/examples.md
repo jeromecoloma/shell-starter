@@ -875,9 +875,220 @@ main "$@"
 # Start autonomous development with /dev start
 ```
 
+### 7. Dependency Management Script
+
+The `update-shell-starter` script demonstrates advanced dependency management patterns:
+
+```bash
+#!/bin/bash
+
+# update-shell-starter - Update Shell Starter library dependencies
+# Updates the shell-starter lib/ directory while preserving project customizations
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_NAME="$(basename "${BASH_SOURCE[0]}")"
+
+# Try to source lib/main.sh from various locations
+for lib_path in \
+	"${SCRIPT_DIR}/../lib/main.sh" \
+	"${SCRIPT_DIR}/lib/main.sh" \
+	"$(dirname "${SCRIPT_DIR}")/lib/main.sh"; do
+	if [[ -f "$lib_path" ]]; then
+		source "$lib_path"
+		break
+	fi
+done
+
+# Configuration
+SHELL_STARTER_REPO="jeromecoloma/shell-starter"
+SHELL_STARTER_VERSION_FILE=".shell-starter-version"
+BACKUP_SUFFIX=".backup-$(date +%Y%m%d-%H%M%S)"
+DEFAULT_LIB_DIR="lib"
+
+show_help() {
+    cat << EOF
+${SCRIPT_NAME} - Update Shell Starter library dependencies
+
+USAGE:
+    ${SCRIPT_NAME} [OPTIONS]
+
+OPTIONS:
+    --version               Show version information
+    --help                  Show this help message
+    --check                 Check for available updates without installing
+    --target-version <ver>  Update to specific version (default: latest)
+    --lib-dir <path>        Library directory path (default: lib)
+    --backup                Create backup before updating (default: enabled)
+    --no-backup             Skip backup creation
+    --force                 Force update even if versions match
+    --dry-run               Show what would be updated without making changes
+
+EXAMPLES:
+    ${SCRIPT_NAME}                           # Update to latest version
+    ${SCRIPT_NAME} --check                   # Check for updates
+    ${SCRIPT_NAME} --target-version 0.2.0   # Update to specific version
+    ${SCRIPT_NAME} --lib-dir custom_lib      # Update custom lib directory
+    ${SCRIPT_NAME} --dry-run                 # Preview changes
+
+This tool updates shell-starter library files while preserving your project's
+customizations. It maintains a version file for tracking dependencies.
+EOF
+}
+
+# Update library files while preserving customizations
+update_library_files() {
+	local source_lib="$1"
+	local target_lib="$2"
+
+	# List of standard shell-starter library files
+	local standard_files=(
+		"colors.sh"
+		"logging.sh"
+		"main.sh"
+		"spinner.sh"
+		"update.sh"
+		"utils.sh"
+	)
+
+	log::info "Updating library files in ${target_lib}..."
+
+	for file in "${standard_files[@]}"; do
+		local source_file="${source_lib}/${file}"
+		local target_file="${target_lib}/${file}"
+
+		if [[ -f "$source_file" ]]; then
+			if [[ "$DRY_RUN" == "true" ]]; then
+				if [[ -f "$target_file" ]]; then
+					log::info "[DRY-RUN] Would update: ${target_file}"
+				else
+					log::info "[DRY-RUN] Would create: ${target_file}"
+				fi
+			else
+				log::info "Updating: ${target_file}"
+				cp "$source_file" "$target_file"
+			fi
+		fi
+	done
+
+	# Warn about custom files that won't be updated
+	if [[ -d "$target_lib" ]]; then
+		while IFS= read -r -d '' custom_file; do
+			local basename_file
+			basename_file=$(basename "$custom_file")
+			if [[ ! " ${standard_files[*]} " =~ \ ${basename_file}\  ]]; then
+				log::warn "Custom file preserved: ${custom_file}"
+			fi
+		done < <(find "$target_lib" -name "*.sh" -type f -print0)
+	fi
+}
+
+# Breaking change detection and migration guidance
+check_breaking_changes() {
+	local current_version="$1"
+	local target_version="$2"
+	local warnings=()
+
+	# Define known breaking changes by version
+	local breaking_changes=(
+		"0.2.0:Function names in logging.sh changed from log_* to log::*"
+		"0.3.0:Color variable names standardized with COLOR_ prefix"
+		"0.4.0:Spinner API changed to use spinner::* namespace"
+		"1.0.0:Major API restructure - see migration guide"
+	)
+
+	# Check if we're crossing any breaking change versions
+	for change in "${breaking_changes[@]}"; do
+		local break_version="${change%%:*}"
+		local description="${change#*:}"
+
+		# Check if we're upgrading across this breaking change
+		if version_is_greater "$break_version" "$current_version" &&
+			version_is_less_or_equal "$break_version" "$target_version"; then
+			warnings+=("v${break_version}: ${description}")
+		fi
+	done
+
+	# Display warnings if any breaking changes detected
+	if [[ ${#warnings[@]} -gt 0 ]]; then
+		log::warn "BREAKING CHANGES DETECTED:"
+		for warning in "${warnings[@]}"; do
+			log::warn "  • $warning"
+		done
+		log::warn ""
+		log::warn "Please review the migration guide at:"
+		log::warn "https://github.com/${SHELL_STARTER_REPO}/blob/main/docs/MIGRATION.md"
+		log::warn ""
+
+		if [[ "$FORCE_UPDATE" == "false" ]]; then
+			echo -n "Continue with update? [y/N]: "
+			read -r response
+			if [[ ! "$response" =~ ^[Yy]$ ]]; then
+				log::info "Update cancelled by user"
+				exit 0
+			fi
+		fi
+	fi
+}
+
+main() {
+    # Parse command line arguments and execute update logic
+    # ... (full implementation in bin/update-shell-starter)
+}
+
+main "$@"
+```
+
+**Key Features Demonstrated:**
+
+- **Selective File Management**: Updates only standard library files, preserves custom additions
+- **Version Tracking**: Maintains `.shell-starter-version` for dependency tracking
+- **Breaking Change Detection**: Warns users about API changes with specific guidance
+- **Backup Management**: Automatic backup creation with timestamps
+- **Dry Run Capability**: Preview changes before applying them
+- **Flexible Library Discovery**: Finds Shell Starter libraries in multiple locations
+- **User Confirmation**: Interactive prompts for breaking changes
+- **GitHub API Integration**: Downloads releases from GitHub API
+
+**Usage Examples:**
+
+```bash
+# Check for available updates
+./bin/update-shell-starter --check
+
+# Update to latest version with safety checks
+./bin/update-shell-starter
+
+# Preview what would be updated without applying changes
+./bin/update-shell-starter --dry-run
+
+# Update to specific version
+./bin/update-shell-starter --target-version 0.2.0
+
+# Force update even if versions match
+./bin/update-shell-starter --force
+
+# Update custom lib directory location
+./bin/update-shell-starter --lib-dir custom_lib
+```
+
+**Version Tracking File:**
+
+The script maintains a `.shell-starter-version` file in your project root:
+
+```bash
+# Check current shell-starter version
+cat .shell-starter-version
+# Output: 0.1.0
+
+# This file is automatically updated by the script
+# and should be committed to version control
+```
+
 ## 🔗 Polyglot Integration Examples
 
-### 6. Bash + Python Integration
+### 8. Bash + Python Integration
 
 Demonstrates calling Python scripts from Bash:
 
@@ -927,7 +1138,7 @@ main() {
 main "$@"
 ```
 
-### 7. API Integration Script
+### 9. API Integration Script
 
 Example of calling external APIs with error handling:
 
@@ -1065,7 +1276,7 @@ main "$@"
 
 ## 🧪 Testing Examples
 
-### 8. Bats Test File
+### 10. Bats Test File
 
 Example test file structure:
 

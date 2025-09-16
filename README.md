@@ -42,6 +42,8 @@ curl -fsSL https://raw.githubusercontent.com/your-username/your-cli-tool/main/in
 - **🔗 Polyglot Support**: Helper functions to call Python, Node.js, and other language scripts
 - **🧪 Testing Framework**: Bats-core integration for reliable script testing
 - **🤖 CI/CD Ready**: GitHub Actions with ShellCheck, shfmt, and Bats test automation
+- **📦 Dependency Management**: Built-in system for updating shell-starter library dependencies
+- **🔄 Breaking Change Detection**: Automatic detection and migration guidance for API changes
 - **🤖 AI-Friendly**: Comprehensive documentation for AI-assisted development
 - **🗺️ Development Journeys**: Step-by-step guides for real-world CLI tool creation
 
@@ -56,6 +58,7 @@ shell-starter/
 ├── docs/               # Documentation for humans and AI assistants
 ├── .github/workflows/  # CI/CD configuration
 ├── VERSION             # Centralized version file (SemVer)
+├── .shell-starter-version  # Shell Starter dependency version tracking
 ├── install.sh          # Installer with curl support
 └── uninstall.sh        # Manifest-based uninstaller
 ```
@@ -74,6 +77,7 @@ Shell Starter includes several example scripts to demonstrate features:
 | `ai-action` | Template for AI API integration with secure key handling |
 | `polyglot-example` | Bash + Python integration example |
 | `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
+| `update-shell-starter` | Updates shell-starter library dependencies in derived projects |
 
 ### Try the examples:
 
@@ -164,6 +168,62 @@ bats tests/
 - Integration tests for Shell Starter framework
 
 Tests automatically run in CI on every push and pull request.
+
+### Library Dependency Management
+
+Shell Starter includes a built-in dependency management system for projects that use it as a library foundation:
+
+#### Updating Shell Starter Dependencies
+
+If you've built a project using Shell Starter as a foundation, keep your library dependencies updated:
+
+```bash
+# Check for updates
+./bin/update-shell-starter --check
+
+# Update to latest version
+./bin/update-shell-starter
+
+# Update to specific version
+./bin/update-shell-starter --target-version 0.2.0
+
+# Preview changes without applying
+./bin/update-shell-starter --dry-run
+```
+
+#### Features
+
+- **Selective Updates**: Only updates standard shell-starter library files (`lib/*.sh`)
+- **Preservation**: Keeps your custom library files and project code intact
+- **Version Tracking**: Maintains `.shell-starter-version` file for dependency tracking
+- **Breaking Change Detection**: Warns about potential breaking changes with migration guidance
+- **Backup Support**: Automatically creates backups before updates (configurable)
+- **Dry Run Mode**: Preview changes before applying
+
+#### Version Tracking
+
+Your project automatically tracks the shell-starter version in `.shell-starter-version`:
+
+```bash
+# Check current shell-starter version
+cat .shell-starter-version
+
+# This file is automatically updated by the update tool
+```
+
+#### Breaking Changes
+
+The update tool detects breaking changes and provides migration guidance:
+
+```bash
+# Example warning for breaking changes
+./bin/update-shell-starter
+# Warning: Breaking changes detected in v0.2.0
+# - Function names changed from log_* to log::*
+# See migration guide for details...
+```
+
+For detailed migration instructions, see [docs/MIGRATION.md](docs/MIGRATION.md).
 
 ### Development Tool Setup
 
