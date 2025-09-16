@@ -52,6 +52,10 @@ parse_common_args() {
 			update::config "$@"
 			exit $?
 			;;
+		--uninstall)
+			"${SHELL_STARTER_ROOT_DIR}/install.sh" --uninstall
+			exit $?
+			;;
 		*)
 			# Unknown option, return to caller for handling
 			return 1
@@ -74,6 +78,7 @@ OPTIONS:
     --update          Check for available updates
     --check-version   Show detailed version status and check for updates
     --notify-config   Configure update notification settings
+    --uninstall       Remove Shell Starter installation
 
 This is a Shell Starter script. Override the show_help function
 in your script to provide specific usage information.

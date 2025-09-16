@@ -25,6 +25,7 @@ OPTIONS:
     --update          Check for available updates
     --check-version   Show detailed version status and check for updates
     --notify-config   Configure update notification settings
+    --uninstall       Remove Shell Starter installation
     -i, --interactive Force interactive mode even if name is provided
     -f, --formal      Use formal greeting style
     -c, --casual      Use casual greeting style
@@ -208,7 +209,7 @@ main() {
 			time_based=true
 			shift
 			;;
-		--help | -h | --version | -v | --update | --check-version | --notify-config)
+		--help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

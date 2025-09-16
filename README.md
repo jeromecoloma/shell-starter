@@ -79,6 +79,8 @@ Shell Starter includes several example scripts to demonstrate features:
 | `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
 | `update-shell-starter` | Updates shell-starter library dependencies in derived projects |
 
+**Built-in Features**: All example scripts support standard flags including `--help`, `--version`, `--update`, `--check-version`, `--notify-config`, and `--uninstall` (for removing Shell Starter installation).
+
 ### Try the examples:
 
 ```bash
@@ -310,6 +312,7 @@ vim .ai-workflow/state/requirements.md
 | `/dev start` | Begin/resume autonomous development |
 | `/qa` | Run comprehensive quality assurance |
 | `/status` | Show current project status |
+| `/deps` | Manage Shell Starter library dependencies |
 
 See the [Markdown to PDF Converter Journey](docs/journeys/ai-assisted/md-to-pdf.md) for a complete example.
 

@@ -31,6 +31,7 @@ OPTIONS:
     --update        Check for available updates
     --check-version Show detailed version status and check for updates
     --notify-config Configure update notification settings
+    --uninstall     Remove Shell Starter installation
     --verbose       Enable verbose output
     --no-python     Skip Python operations (Bash only)
     --output-dir    Directory for output files [default: /tmp/polyglot-output]
@@ -731,7 +732,7 @@ main() {
 			output_dir="$2"
 			shift 2
 			;;
-		--help | -h | --version | -v | --update | --check-version | --notify-config)
+		--help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)

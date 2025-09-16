@@ -51,6 +51,7 @@ OPTIONS:
     --update        Check for available updates
     --check-version Show detailed version status and check for updates
     --notify-config Configure update notification settings
+    --uninstall     Remove Shell Starter installation
 
 DESCRIPTION:
     Generates a complete AI development workflow including:
@@ -83,10 +84,10 @@ FILES CREATED:
     .ai-workflow/state/tasks.md           - Project task breakdown (generic or specific)
     .ai-workflow/state/requirements.md    - Feature requirements
     .ai-workflow/state/progress.log       - Development log
-    .ai-workflow/commands/.claude/        - Claude Code commands
-    .ai-workflow/commands/.cursor/        - Cursor commands
-    .ai-workflow/commands/.gemini/        - Gemini CLI commands
-    .ai-workflow/commands/.opencode/      - OpenCode commands
+    .ai-workflow/commands/.claude/        - Claude Code commands (dev, qa, status, deps)
+    .ai-workflow/commands/.cursor/        - Cursor commands (dev, qa, status, deps)
+    .ai-workflow/commands/.gemini/        - Gemini CLI commands (dev, qa, status, deps)
+    .ai-workflow/commands/.opencode/      - OpenCode commands (dev, qa, status, deps)
 
 GUIDES:
     docs/prompting-guide.md               - PRD generation guide for custom requirements
@@ -964,6 +965,80 @@ Recent Activity: [latest progress.log entry]
 Ready for: [/dev, /qa, or completion]
 ```
 EOF
+
+	# /deps command
+	cat >.ai-workflow/commands/.claude/commands/deps.md <<'EOF'
+---
+description: Manage Shell Starter library dependencies for current project
+argument-hint: [check|update|status]
+---
+
+You are managing Shell Starter library dependencies for the current project.
+
+**Arguments:**
+- No args or "check": Check for Shell Starter library updates
+- "update": Update Shell Starter libraries to latest version
+- "status": Show current dependency status
+
+Handle argument: $ARGUMENTS
+
+**DEPENDENCY MANAGEMENT PROTOCOL:**
+
+1. **READ STATE** (check current dependency status):
+   - Check if `.shell-starter-version` file exists
+   - Read current Shell Starter version if available
+   - Check for `bin/update-shell-starter` script availability
+
+2. **ANALYZE** (determine dependency needs):
+   - If `bin/update-shell-starter` exists, use it for dependency management
+   - If not available, provide guidance for manual Shell Starter library management
+   - Check project structure for Shell Starter dependencies (`lib/` directory)
+
+3. **ACT** (execute dependency operations):
+   - For "check": Run `bin/update-shell-starter --check` if available
+   - For "update": Run `bin/update-shell-starter` to update libraries
+   - For "status": Show current `.shell-starter-version` and library status
+   - If no update script, guide user to Shell Starter installation process
+
+4. **VERIFY** (validate dependency state):
+   - Ensure library updates don't break existing functionality
+   - Check that all required Shell Starter libraries are present
+   - Verify version tracking files are properly updated
+
+5. **UPDATE STATE** (record dependency changes):
+   - Log dependency operations to `.ai-workflow/state/progress.log`
+   - Note any breaking changes or migration requirements
+   - Update project documentation if needed
+
+**DEPENDENCY COMMANDS:**
+```bash
+# Check for updates
+bin/update-shell-starter --check
+
+# Update libraries
+bin/update-shell-starter
+
+# Show version status
+cat .shell-starter-version 2>/dev/null || echo "No version tracking file"
+```
+
+**OUTPUT FORMAT:**
+```
+📦 DEPENDENCY MANAGEMENT
+Current Version: [version from .shell-starter-version]
+Libraries Status: [up-to-date/update available/missing]
+Action Taken: [what was executed]
+Next Steps: [any follow-up actions needed]
+```
+
+**ERROR HANDLING:**
+- If `bin/update-shell-starter` doesn't exist, provide installation guidance
+- Handle network connectivity issues gracefully
+- Backup libraries before major updates
+- Detect and warn about potential breaking changes
+
+Begin dependency management now.
+EOF
 }
 
 generate_other_agent_commands() {
@@ -974,6 +1049,7 @@ generate_other_agent_commands() {
 	cp .ai-workflow/commands/.claude/commands/dev.md .ai-workflow/commands/.cursor/commands/
 	cp .ai-workflow/commands/.claude/commands/qa.md .ai-workflow/commands/.cursor/commands/
 	cp .ai-workflow/commands/.claude/commands/status.md .ai-workflow/commands/.cursor/commands/
+	cp .ai-workflow/commands/.claude/commands/deps.md .ai-workflow/commands/.cursor/commands/
 
 	# OpenCode commands (markdown format with frontmatter)
 	mkdir -p .ai-workflow/commands/.opencode/command
@@ -1099,6 +1175,79 @@ Ready for: [/dev, /qa, or completion]
 ```
 EOF
 
+	cat >.ai-workflow/commands/.opencode/command/deps.md <<'EOF'
+---
+description: Manage Shell Starter library dependencies for current project
+agent: build
+---
+
+You are managing Shell Starter library dependencies for the current project.
+
+**Arguments:**
+- No args or "check": Check for Shell Starter library updates
+- "update": Update Shell Starter libraries to latest version
+- "status": Show current dependency status
+
+Handle argument: $ARGUMENTS
+
+**DEPENDENCY MANAGEMENT PROTOCOL:**
+
+1. **READ STATE** (check current dependency status):
+   - Check if `.shell-starter-version` file exists
+   - Read current Shell Starter version if available
+   - Check for `bin/update-shell-starter` script availability
+
+2. **ANALYZE** (determine dependency needs):
+   - If `bin/update-shell-starter` exists, use it for dependency management
+   - If not available, provide guidance for manual Shell Starter library management
+   - Check project structure for Shell Starter dependencies (`lib/` directory)
+
+3. **ACT** (execute dependency operations):
+   - For "check": Run `bin/update-shell-starter --check` if available
+   - For "update": Run `bin/update-shell-starter` to update libraries
+   - For "status": Show current `.shell-starter-version` and library status
+   - If no update script, guide user to Shell Starter installation process
+
+4. **VERIFY** (validate dependency state):
+   - Ensure library updates don't break existing functionality
+   - Check that all required Shell Starter libraries are present
+   - Verify version tracking files are properly updated
+
+5. **UPDATE STATE** (record dependency changes):
+   - Log dependency operations to `.ai-workflow/state/progress.log`
+   - Note any breaking changes or migration requirements
+   - Update project documentation if needed
+
+**DEPENDENCY COMMANDS:**
+```bash
+# Check for updates
+bin/update-shell-starter --check
+
+# Update libraries
+bin/update-shell-starter
+
+# Show version status
+cat .shell-starter-version 2>/dev/null || echo "No version tracking file"
+```
+
+**OUTPUT FORMAT:**
+```
+📦 DEPENDENCY MANAGEMENT
+Current Version: [version from .shell-starter-version]
+Libraries Status: [up-to-date/update available/missing]
+Action Taken: [what was executed]
+Next Steps: [any follow-up actions needed]
+```
+
+**ERROR HANDLING:**
+- If `bin/update-shell-starter` doesn't exist, provide installation guidance
+- Handle network connectivity issues gracefully
+- Backup libraries before major updates
+- Detect and warn about potential breaking changes
+
+Begin dependency management now.
+EOF
+
 	# Gemini commands (TOML format)
 	mkdir -p .ai-workflow/commands/.gemini/commands
 
@@ -1216,6 +1365,77 @@ Ready for: [/dev, /qa, or completion]
 ```
 """
 EOF
+
+	cat >.ai-workflow/commands/.gemini/commands/deps.toml <<'EOF'
+description = "Manage Shell Starter library dependencies for current project"
+prompt = """
+You are managing Shell Starter library dependencies for the current project.
+
+**Arguments:**
+- No args or "check": Check for Shell Starter library updates
+- "update": Update Shell Starter libraries to latest version
+- "status": Show current dependency status
+
+Handle argument: {{args}}
+
+**DEPENDENCY MANAGEMENT PROTOCOL:**
+
+1. **READ STATE** (check current dependency status):
+   - Check if `.shell-starter-version` file exists
+   - Read current Shell Starter version if available
+   - Check for `bin/update-shell-starter` script availability
+
+2. **ANALYZE** (determine dependency needs):
+   - If `bin/update-shell-starter` exists, use it for dependency management
+   - If not available, provide guidance for manual Shell Starter library management
+   - Check project structure for Shell Starter dependencies (`lib/` directory)
+
+3. **ACT** (execute dependency operations):
+   - For "check": Run `bin/update-shell-starter --check` if available
+   - For "update": Run `bin/update-shell-starter` to update libraries
+   - For "status": Show current `.shell-starter-version` and library status
+   - If no update script, guide user to Shell Starter installation process
+
+4. **VERIFY** (validate dependency state):
+   - Ensure library updates don't break existing functionality
+   - Check that all required Shell Starter libraries are present
+   - Verify version tracking files are properly updated
+
+5. **UPDATE STATE** (record dependency changes):
+   - Log dependency operations to `.ai-workflow/state/progress.log`
+   - Note any breaking changes or migration requirements
+   - Update project documentation if needed
+
+**DEPENDENCY COMMANDS:**
+```bash
+# Check for updates
+bin/update-shell-starter --check
+
+# Update libraries
+bin/update-shell-starter
+
+# Show version status
+cat .shell-starter-version 2>/dev/null || echo "No version tracking file"
+```
+
+**OUTPUT FORMAT:**
+```
+📦 DEPENDENCY MANAGEMENT
+Current Version: [version from .shell-starter-version]
+Libraries Status: [up-to-date/update available/missing]
+Action Taken: [what was executed]
+Next Steps: [any follow-up actions needed]
+```
+
+**ERROR HANDLING:**
+- If `bin/update-shell-starter` doesn't exist, provide installation guidance
+- Handle network connectivity issues gracefully
+- Backup libraries before major updates
+- Detect and warn about potential breaking changes
+
+Begin dependency management now.
+"""
+EOF
 }
 
 main() {
@@ -1227,7 +1447,7 @@ main() {
 
 	while [[ $# -gt 0 ]]; do
 		case $1 in
-		--help | -h | --version | -v | --update | --check-version | --notify-config)
+		--help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
 			parse_common_args "$SCRIPT_NAME" "$@"
 			;;
 		--update-tasks)
@@ -1304,6 +1524,7 @@ main() {
 		log::info "   • Gemini CLI:   mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/"
 		log::info "   • OpenCode:     mkdir -p .opencode && cp -r .ai-workflow/commands/.opencode/command .opencode/"
 		log::info "4. Start development with: /dev start"
+		log::info "5. Manage Shell Starter dependencies with: /deps"
 	fi
 }
 

@@ -22,6 +22,7 @@ OPTIONS:
     --update          Check for available updates
     --check-version   Show detailed version status and check for updates
     --notify-config   Configure update notification settings
+    --uninstall       Remove Shell Starter installation
     --no-demo         Skip the color demonstration examples
     --plain           Display colors without fancy formatting
 
@@ -138,7 +139,7 @@ main() {
 			plain_mode=true
 			shift
 			;;
-		--help | -h | --version | -v | --update | --check-version | --notify-config)
+		--help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
 			parse_common_args "$(basename "$0")" "$@"
 			;;
 		-*)
