@@ -145,17 +145,17 @@ download_shell_starter() {
 	local temp_dir
 	temp_dir=$(mktemp -d)
 
-	log::info "Downloading shell-starter v${version}..."
+	log::info "Downloading shell-starter v${version}..." >&2
 
 	local download_url="https://github.com/${SHELL_STARTER_REPO}/archive/v${version}.tar.gz"
 	if command -v curl >/dev/null 2>&1; then
-		if ! curl -sL "$download_url" | tar -xz -C "$temp_dir" --strip-components=1; then
-			log::error "Failed to download shell-starter v${version}"
+		if ! curl -sL "$download_url" | tar -xz -C "$temp_dir" --strip-components=1 >/dev/null 2>&1; then
+			log::error "Failed to download shell-starter v${version}" >&2
 			rm -rf "$temp_dir"
 			return 1
 		fi
 	else
-		log::error "curl is required but not installed"
+		log::error "curl is required but not installed" >&2
 		return 1
 	fi
 
@@ -387,7 +387,8 @@ perform_update() {
 
 	# Download shell-starter
 	local temp_dir
-	if ! temp_dir=$(download_shell_starter "$target_version"); then
+	if ! temp_dir=$(download_shell_starter "$target_version") || [[ -z "$temp_dir" ]]; then
+		log::error "Failed to download shell-starter"
 		return 1
 	fi
 
