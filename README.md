@@ -78,6 +78,7 @@ Shell Starter includes several example scripts to demonstrate features:
 | `polyglot-example` | Bash + Python integration example |
 | `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
 | `update-shell-starter` | Updates shell-starter library dependencies in derived projects |
+| `bump-version` | Intelligent version bumping for shell-starter and cloned projects |
 
 **Built-in Features**: All example scripts support standard flags including `--help`, `--version`, `--update`, `--check-version`, `--notify-config`, and `--uninstall` (for removing Shell Starter installation).
 
@@ -226,6 +227,35 @@ The update tool detects breaking changes and provides migration guidance:
 ```
 
 For detailed migration instructions, see [docs/MIGRATION.md](docs/MIGRATION.md).
+
+### Version Management
+
+Shell Starter includes intelligent version bumping that works differently for the main repository vs. cloned projects:
+
+```bash
+# Bump version types
+./bin/bump-version patch    # 1.2.3 -> 1.2.4
+./bin/bump-version minor    # 1.2.3 -> 1.3.0
+./bin/bump-version major    # 1.2.3 -> 2.0.0
+
+# Set exact version
+./bin/bump-version 1.5.0
+
+# Check current version and repository type
+./bin/bump-version --current
+./bin/bump-version --check-repo
+
+# Preview changes without applying
+./bin/bump-version --dry-run patch
+```
+
+#### Smart Repository Detection
+
+- **Shell-starter repository**: Updates both `VERSION` and `.shell-starter-version`
+- **Cloned projects**: Updates only `VERSION` file (preserves dependency tracking)
+- **Auto-detection**: Uses repository markers to identify shell-starter vs. cloned project context
+
+This ensures that when you clone Shell Starter for your project, version bumps only affect your project version, not the Shell Starter dependency version.
 
 ### Development Tool Setup
 

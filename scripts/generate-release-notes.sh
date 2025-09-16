@@ -127,14 +127,14 @@ EOF
 		# Initialize temporary files for categorization
 		local temp_dir
 		temp_dir=$(mktemp -d)
-		trap "rm -rf $temp_dir" EXIT
+		trap 'rm -rf "$temp_dir"' EXIT
 
-		>"$temp_dir/features.tmp"
-		>"$temp_dir/fixes.tmp"
-		>"$temp_dir/docs.tmp"
-		>"$temp_dir/chores.tmp"
-		>"$temp_dir/breaking.tmp"
-		>"$temp_dir/other.tmp"
+		true >"$temp_dir/features.tmp"
+		true >"$temp_dir/fixes.tmp"
+		true >"$temp_dir/docs.tmp"
+		true >"$temp_dir/chores.tmp"
+		true >"$temp_dir/breaking.tmp"
+		true >"$temp_dir/other.tmp"
 
 		# Parse commits using conventional commit format
 		while IFS='|' read -r hash subject author email; do

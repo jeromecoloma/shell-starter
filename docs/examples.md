@@ -875,7 +875,158 @@ main "$@"
 # Start autonomous development with /dev start
 ```
 
-### 7. Dependency Management Script
+### 7. Version Management Script
+
+The `bump-version` script provides intelligent version bumping with automatic repository detection:
+
+```bash
+#!/bin/bash
+
+# bump-version - Intelligent version bumping for shell-starter and cloned projects
+# Automatically detects context and updates appropriate version files
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+source "${SHELL_STARTER_ROOT}/lib/main.sh"
+
+# Detect if this is the shell-starter repository or a cloned project
+detect_repository_type() {
+    local repo_indicators=(
+        "bin/generate-ai-workflow"
+        "scripts/generate-release-notes.sh"
+        "tests/framework.bats"
+        "install.sh"
+    )
+
+    local found_indicators=0
+    for indicator in "${repo_indicators[@]}"; do
+        if [[ -f "${PROJECT_ROOT}/${indicator}" ]]; then
+            ((found_indicators++))
+        fi
+    done
+
+    # If we find most indicators, this is likely the shell-starter repo
+    if [[ $found_indicators -ge 3 ]]; then
+        echo "shell-starter"
+    else
+        echo "cloned-project"
+    fi
+}
+
+# Increment version based on bump type
+increment_version() {
+    local current_version="$1"
+    local bump_type="$2"
+    local major minor patch
+
+    read -r major minor patch <<< "$(parse_version "$current_version")"
+
+    case "$bump_type" in
+    major)
+        echo "$((major + 1)).0.0"
+        ;;
+    minor)
+        echo "${major}.$((minor + 1)).0"
+        ;;
+    patch)
+        echo "${major}.${minor}.$((patch + 1))"
+        ;;
+    *)
+        log::error "Invalid bump type: $bump_type (expected: major, minor, patch)"
+        return 1
+        ;;
+    esac
+}
+
+# Main version bumping function
+perform_bump() {
+    local version_arg="$1"
+    local current_version
+    local new_version
+    local repo_type
+
+    repo_type=$(detect_repository_type)
+    current_version=$(get_current_version)
+
+    log::info "Repository type: ${repo_type}"
+    log::info "Current version: ${current_version}"
+
+    # Determine new version
+    case "$version_arg" in
+    major|minor|patch)
+        if ! new_version=$(increment_version "$current_version" "$version_arg"); then
+            exit 1
+        fi
+        log::info "Bumping ${version_arg} version: ${current_version} -> ${new_version}"
+        ;;
+    *)
+        new_version="$version_arg"
+        if ! validate_version "$new_version"; then
+            exit 1
+        fi
+        log::info "Setting version: ${current_version} -> ${new_version}"
+        ;;
+    esac
+
+    # Update VERSION file (always)
+    update_version_file "$VERSION_FILE" "$new_version" "project version"
+
+    # Update .shell-starter-version only for shell-starter repository
+    if [[ "$repo_type" == "shell-starter" ]]; then
+        update_version_file "$SHELL_STARTER_VERSION_FILE" "$new_version" "shell-starter version"
+    else
+        log::info "Skipping ${SHELL_STARTER_VERSION_FILE} update (cloned project)"
+    fi
+
+    if [[ "$DRY_RUN" == "false" ]]; then
+        log::success "Version bump completed successfully!"
+    else
+        log::info "Dry run completed. Use without --dry-run to apply changes."
+    fi
+}
+
+main "$@"
+```
+
+**Key Features Demonstrated:**
+
+- **Intelligent Repository Detection**: Automatically identifies shell-starter repo vs. cloned projects
+- **Selective File Updates**: Updates different files based on repository type
+- **Semantic Version Support**: Handles `major`, `minor`, `patch` bumps plus exact versions
+- **Dry Run Capability**: Preview changes before applying
+- **Comprehensive Validation**: Input validation and error handling
+- **User-Friendly Output**: Clear progress reporting and next steps
+
+**Usage Examples:**
+
+```bash
+# Bump version types
+./bin/bump-version patch    # 1.2.3 -> 1.2.4
+./bin/bump-version minor    # 1.2.3 -> 1.3.0
+./bin/bump-version major    # 1.2.3 -> 2.0.0
+
+# Set exact version
+./bin/bump-version 1.5.0
+
+# Check status and repository detection
+./bin/bump-version --current      # Show current versions
+./bin/bump-version --check-repo   # Show detection details
+
+# Preview changes
+./bin/bump-version --dry-run patch
+```
+
+**Repository-Aware Behavior:**
+
+- **Shell-starter repository**: Updates both `VERSION` and `.shell-starter-version` files
+- **Cloned projects**: Updates only `VERSION` file, preserving dependency tracking
+- **Automatic detection**: Uses project markers to determine repository type
+- **Smart defaults**: Appropriate behavior for each context without user intervention
+
+### 8. Dependency Management Script
 
 The `update-shell-starter` script demonstrates advanced dependency management patterns:
 

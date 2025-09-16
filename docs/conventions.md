@@ -29,8 +29,7 @@ shell-starter/
 ├── lib/                # Shared library functions (.sh extension)
 ├── scripts/            # Helper scripts in other languages
 ├── tests/              # Bats test files (.bats extension)
-├── docs/               # Documentation files (.md extension)
-└── .development/       # Internal development files
+└── docs/               # Documentation files (.md extension)
 ```
 
 ### Naming Conventions
