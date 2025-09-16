@@ -272,7 +272,7 @@ jobs:
             echo "" >> release_notes.md
           fi
 
-          # Contributors section
+          # Contributors section - map git author names to GitHub usernames
           CONTRIBUTORS=$(git log --pretty=format:"%an" $PREV_TAG..HEAD | sort | uniq)
           CONTRIBUTOR_COUNT=$(echo "$CONTRIBUTORS" | wc -l)
 
@@ -283,7 +283,17 @@ jobs:
             echo ""
           } >> release_notes.md
           echo "$CONTRIBUTORS" | while read -r contributor; do
-            echo "- @$contributor" >> release_notes.md
+            # Map git author names to GitHub usernames
+            case "$contributor" in
+              "Jerome Coloma")
+                github_username="jeromecoloma"
+                ;;
+              *)
+                # For unknown contributors, use the name as-is (fallback)
+                github_username="$contributor"
+                ;;
+            esac
+            echo "- @$github_username" >> release_notes.md
           done
           echo "" >> release_notes.md
 
