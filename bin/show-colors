@@ -11,6 +11,8 @@ SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SHELL_STARTER_ROOT}/lib/main.sh"
 
 show_help() {
+	# Show banner header for help
+	banner::shell_starter minimal
 	cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
@@ -155,8 +157,10 @@ main() {
 		esac
 	done
 
-	echo -e "${COLOR_BOLD}${COLOR_CYAN}Shell Starter - Color Library Showcase${COLOR_RESET}"
-	echo "=========================================="
+	# Welcome banner for the script
+	banner::shell_starter minimal
+	echo -e "${COLOR_BOLD}${COLOR_CYAN}Color Library Showcase${COLOR_RESET}"
+	echo "========================="
 
 	if [[ "$plain_mode" == "true" ]]; then
 		show_plain_colors

@@ -39,3 +39,215 @@ readonly COLOR_SUCCESS="${COLOR_GREEN}"
 readonly COLOR_WARNING="${COLOR_YELLOW}"
 readonly COLOR_ERROR="${COLOR_RED}"
 readonly COLOR_DEBUG="${COLOR_MAGENTA}"
+
+# 256-color support for gradients
+colors::rgb() {
+	local r=$1 g=$2 b=$3
+	printf '\033[38;2;%d;%d;%dm' "$r" "$g" "$b"
+}
+
+colors::bg_rgb() {
+	local r=$1 g=$2 b=$3
+	printf '\033[48;2;%d;%d;%dm' "$r" "$g" "$b"
+}
+
+# Terminal capability detection
+colors::has_truecolor() {
+	# Check for explicit truecolor support
+	[[ "${COLORTERM:-}" == "truecolor" ]] || [[ "${COLORTERM:-}" == "24bit" ]] || {
+		# Check for terminals that typically support truecolor
+		[[ "${TERM_PROGRAM:-}" == "iTerm.app" ]] ||
+			[[ "${TERM_PROGRAM:-}" == "vscode" ]] ||
+			[[ "${TERM:-}" == "xterm-kitty" ]] ||
+			[[ "${TERM:-}" == "alacritty" ]] ||
+			[[ "${TERM:-}" == "wezterm" ]]
+	}
+}
+
+colors::has_256color() {
+	# Check for 256 color support
+	[[ "${TERM:-}" =~ 256color ]] ||
+		[[ "${COLORTERM:-}" == "gnome-terminal" ]] ||
+		[[ "${TERM:-}" == "screen" ]] ||
+		[[ "${TERM:-}" == "tmux" ]] ||
+		[[ "${TERM:-}" == "xterm" ]] ||
+		[[ "${TERM:-}" == "rxvt-unicode" ]]
+}
+
+# Enhanced terminal capability detection
+colors::has_color() {
+	# Check for NO_COLOR environment variable first (respects user preference)
+	[[ "${NO_COLOR:-}" == "" ]] && {
+		# Basic color support detection - most terminals support at least 8/16 colors
+		colors::has_truecolor || colors::has_256color || {
+			# Check for basic color support (even when not directly connected to terminal)
+			[[ "${TERM:-}" != "dumb" ]] &&
+				[[ "${TERM:-}" != "" ]]
+		}
+	}
+}
+
+colors::is_terminal() {
+	# Check if output is going to a terminal
+	[[ -t 1 ]]
+}
+
+# Gradient generation functions
+colors::gradient_horizontal() {
+	local text="$1"
+	local start_r=$2 start_g=$3 start_b=$4
+	local end_r=$5 end_g=$6 end_b=$7
+	local length=${#text}
+
+	if [[ $length -eq 0 ]]; then
+		return
+	fi
+
+	local output=""
+	local i
+
+	for ((i = 0; i < length; i++)); do
+		local ratio=$((i * 100 / (length - 1)))
+		local r=$((start_r + (end_r - start_r) * ratio / 100))
+		local g=$((start_g + (end_g - start_g) * ratio / 100))
+		local b=$((start_b + (end_b - start_b) * ratio / 100))
+
+		output+="$(colors::rgb "$r" "$g" "$b")${text:$i:1}"
+	done
+
+	printf '%s%s' "$output" "${COLOR_RESET}"
+}
+
+# Banner functions
+banner::shell_starter() {
+	local style="${1:-block}"
+
+	case "$style" in
+	"block" | "pixel")
+		banner::block_style
+		;;
+	"ascii")
+		banner::ascii_style
+		;;
+	"minimal")
+		banner::minimal_style
+		;;
+	*)
+		banner::block_style
+		;;
+	esac
+}
+
+banner::block_style() {
+	if colors::has_color && (colors::has_truecolor || colors::has_256color); then
+		echo
+		colors::gradient_horizontal "███████╗██╗  ██╗███████╗██╗     ██╗         ███████╗████████╗ █████╗ ██████╗ ████████╗███████╗██████╗ " 0 100 255 255 100 0
+		echo
+		colors::gradient_horizontal "██╔════╝██║  ██║██╔════╝██║     ██║         ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗" 20 120 255 255 120 20
+		echo
+		colors::gradient_horizontal "███████╗███████║█████╗  ██║     ██║         ███████╗   ██║   ███████║██████╔╝   ██║   █████╗  ██████╔╝" 40 140 255 255 140 40
+		echo
+		colors::gradient_horizontal "╚════██║██╔══██║██╔══╝  ██║     ██║         ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ██╔══╝  ██╔══██╗" 60 160 255 255 160 60
+		echo
+		colors::gradient_horizontal "███████║██║  ██║███████╗███████╗███████╗    ███████║   ██║   ██║  ██║██║  ██║   ██║   ███████╗██║  ██║" 80 180 255 255 180 80
+		echo
+		colors::gradient_horizontal "╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝    ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝" 100 200 255 255 200 100
+		echo
+	else
+		banner::fallback_block
+	fi
+}
+
+banner::ascii_style() {
+	if colors::has_color && (colors::has_truecolor || colors::has_256color); then
+		echo
+		colors::gradient_horizontal " ____  _          _ _   ____  _             _            " 50 150 255 255 150 50
+		echo
+		colors::gradient_horizontal "/ ___|| |__   ___| | | / ___|| |_ __ _ _ __| |_ ___ _ __ " 70 170 255 255 170 70
+		echo
+		colors::gradient_horizontal "\\___ \\| '_ \\ / _ \\ | | \\___ \\| __/ _\` | '__| __/ _ \\ '__|" 90 190 255 255 190 90
+		echo
+		colors::gradient_horizontal " ___) | | | |  __/ | |  ___) | || (_| | |  | ||  __/ |   " 110 210 255 255 210 110
+		echo
+		colors::gradient_horizontal "|____/|_| |_|\\___|_|_| |____/ \\__\\__,_|_|   \\__\\___|_|   " 130 230 255 255 230 130
+		echo
+	else
+		banner::fallback_ascii
+	fi
+}
+
+banner::minimal_style() {
+	if colors::has_color && (colors::has_truecolor || colors::has_256color); then
+		echo
+		colors::gradient_horizontal "• Shell Starter •" 100 150 255 255 150 100
+		echo
+	elif colors::has_color; then
+		# Use basic colors if available
+		echo
+		printf '%s• Shell Starter •%s\n' "${COLOR_CYAN}" "${COLOR_RESET}"
+		echo
+	else
+		# Plain text fallback for truly no-color terminals
+		echo
+		echo "• Shell Starter •"
+		echo
+	fi
+}
+
+# Fallback banners for terminals without color support
+banner::fallback_block() {
+	if colors::is_terminal; then
+		cat <<'EOF'
+
+███████╗██╗  ██╗███████╗██╗     ██╗         ███████╗████████╗ █████╗ ██████╗ ████████╗███████╗██████╗
+██╔════╝██║  ██║██╔════╝██║     ██║         ██╔════╝╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██╔════╝██╔══██╗
+███████╗███████║█████╗  ██║     ██║         ███████╗   ██║   ███████║██████╔╝   ██║   █████╗  ██████╔╝
+╚════██║██╔══██║██╔══╝  ██║     ██║         ╚════██║   ██║   ██╔══██║██╔══██╗   ██║   ██╔══╝  ██╔══██╗
+███████║██║  ██║███████╗███████╗███████╗    ███████║   ██║   ██║  ██║██║  ██║   ██║   ███████╗██║  ██║
+╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝    ╚══════╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚══════╝╚═╝  ╚═╝
+
+EOF
+	else
+		# For non-terminal output (pipes, redirects), use plain text
+		cat <<'EOF'
+
+SHELL STARTER
+
+EOF
+	fi
+}
+
+banner::fallback_ascii() {
+	if colors::is_terminal; then
+		cat <<'EOF'
+
+ ____  _          _ _   ____  _             _
+/ ___|| |__   ___| | | / ___|| |_ __ _ _ __| |_ ___ _ __
+\___ \| '_ \ / _ \ | | \___ \| __/ _` | '__| __/ _ \ '__|
+ ___) | | | |  __/ | |  ___) | || (_| | |  | ||  __/ |
+|____/|_| |_|\___|_|_| |____/ \__\__,_|_|   \__\___|_|
+
+EOF
+	else
+		# For non-terminal output (pipes, redirects), use plain text
+		cat <<'EOF'
+
+Shell Starter
+
+EOF
+	fi
+}
+
+# Terminal environment inspection functions (for debugging)
+colors::debug_terminal() {
+	echo "=== Terminal Environment Debug ==="
+	echo "TERM: ${TERM:-unset}"
+	echo "COLORTERM: ${COLORTERM:-unset}"
+	echo "TERM_PROGRAM: ${TERM_PROGRAM:-unset}"
+	echo "NO_COLOR: ${NO_COLOR:-unset}"
+	echo "Output is terminal: $(colors::is_terminal && echo "yes" || echo "no")"
+	echo "Has truecolor: $(colors::has_truecolor && echo "yes" || echo "no")"
+	echo "Has 256color: $(colors::has_256color && echo "yes" || echo "no")"
+	echo "Has basic color: $(colors::has_color && echo "yes" || echo "no")"
+	echo "=================================="
+}

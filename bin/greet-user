@@ -11,6 +11,8 @@ SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 source "${SHELL_STARTER_ROOT}/lib/main.sh"
 
 show_help() {
+	# Show banner header for help
+	banner::shell_starter minimal
 	cat <<EOF
 Usage: $(basename "$0") [OPTIONS] [NAME]
 

@@ -16,6 +16,18 @@ CURL_RETRY_COUNT="${CURL_RETRY_COUNT:-3}"
 # Colors
 RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[1;33m' BLUE='\033[0;34m' NC='\033[0m'
 
+# Banner functions for installation success
+show_installation_banner() {
+	# Simple banner for installation success
+	echo
+	echo -e "${GREEN}╔══════════════════════════════════════════════╗${NC}"
+	echo -e "${GREEN}║            INSTALLATION COMPLETE            ║${NC}"
+	echo -e "${GREEN}║                                              ║${NC}"
+	echo -e "${GREEN}║     🎉 Shell Starter Successfully Installed  ║${NC}"
+	echo -e "${GREEN}╚══════════════════════════════════════════════╝${NC}"
+	echo
+}
+
 # Unified logging function
 log() {
 	local level="$1" && shift
@@ -640,7 +652,7 @@ main() {
 	fi
 
 	# Installation complete
-	log success "Installation complete!"
+	show_installation_banner
 	log info "Scripts installed to: $PREFIX"
 	log info "Libraries installed to: $LIB_PREFIX"
 	log info "Installation manifest: $MANIFEST_FILE"
