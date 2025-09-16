@@ -126,8 +126,11 @@ EOF
 
 		# Initialize temporary files for categorization
 		local temp_dir
-		temp_dir=$(mktemp -d)
-		trap 'rm -rf "$temp_dir"' EXIT
+		temp_dir=$(mktemp -d) || {
+			echo "Error: Failed to create temporary directory" >&2
+			exit 1
+		}
+		trap 'if [[ -n "${temp_dir:-}" && -d "$temp_dir" ]]; then rm -rf "$temp_dir"; fi' EXIT
 
 		true >"$temp_dir/features.tmp"
 		true >"$temp_dir/fixes.tmp"

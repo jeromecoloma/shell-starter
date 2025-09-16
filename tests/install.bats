@@ -99,7 +99,7 @@ teardown() {
     assert_success
     
     # Check manifest contains the installed files (count non-comment lines)
-    run bash -c "grep -v '^#' '$TEST_MANIFEST_FILE' | grep -v '^[[:space:]]*\$' | wc -l"
+    run bash -c "grep -v '^#' '$TEST_MANIFEST_FILE' | grep -v '^[[:space:]]*\$' | wc -l | tr -d ' '"
     assert_success
     assert_output "2"  # Should contain 2 installed files
     
@@ -182,7 +182,7 @@ teardown() {
 @test "install.sh: success messages are displayed" {
     run "$PROJECT_ROOT/install.sh" --prefix "$TEST_PREFIX"
     assert_success
-    assert_output --partial "Installation complete!"
+    assert_output --partial "INSTALLATION COMPLETE"
     assert_output --partial "Scripts installed to: $TEST_PREFIX"
 }
 
