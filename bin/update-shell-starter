@@ -58,8 +58,12 @@ EXAMPLES:
     ${SCRIPT_NAME} --lib-dir custom_lib      # Update custom lib directory
     ${SCRIPT_NAME} --dry-run                 # Preview changes
 
-This tool updates shell-starter library files while preserving your project's
-customizations. It maintains a version file for tracking dependencies.
+This tool updates shell-starter library files and core utilities while preserving
+your project's customizations. It maintains a version file for tracking dependencies.
+
+IMPORTANT: Demo scripts in the demo/ folder are never updated and remain as
+static examples. Only the lib/ directory and bin/ core utilities
+(update-shell-starter, bump-version, generate-ai-workflow) are updated during the update process.
 EOF
 }
 
@@ -178,8 +182,115 @@ create_backup() {
 	local backup_dir="${lib_dir}${BACKUP_SUFFIX}"
 	log::info "Creating backup: ${backup_dir}"
 
+	# Only mention demo preservation if demo folder exists
+	if has_demo_folder; then
+		log::info "Note: Demo scripts in demo/ folder are excluded from backup (preserved as-is)"
+	fi
+
 	if [[ "$DRY_RUN" == "false" ]]; then
 		cp -r "$lib_dir" "$backup_dir"
+	fi
+}
+
+# Check if current project has a demo folder
+has_demo_folder() {
+	local project_root
+	project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+	local demo_dir="${project_root}/demo"
+	[[ -d "$demo_dir" ]]
+}
+
+# Check if source has demo folder (for version compatibility)
+source_has_demo_folder() {
+	local source_dir="$1"
+	[[ -d "${source_dir}/demo" ]]
+}
+
+# Get demo folder status and provide appropriate messaging
+get_demo_status_message() {
+	local source_dir="$1"
+	local has_local_demo
+	local has_source_demo
+
+	has_local_demo=$(has_demo_folder && echo "true" || echo "false")
+	has_source_demo=$(source_has_demo_folder "$source_dir" && echo "true" || echo "false")
+
+	if [[ "$has_local_demo" == "true" ]]; then
+		echo "local_demo_preserved"
+	elif [[ "$has_source_demo" == "true" ]]; then
+		echo "source_has_demo_not_local"
+	else
+		echo "no_demo_folders"
+	fi
+}
+
+# Check if a path should be excluded from updates
+is_excluded_path() {
+	local path="$1"
+	local excluded_dirs=("demo")
+
+	for excluded in "${excluded_dirs[@]}"; do
+		if [[ "$path" == *"/$excluded/"* ]] || [[ "$path" == *"/$excluded" ]] || [[ "$(basename "$path")" == "$excluded" ]]; then
+			return 0 # Path is excluded
+		fi
+	done
+	return 1 # Path is not excluded
+}
+
+# Update core utility scripts in bin/ directory
+update_core_utilities() {
+	local source_bin="$1"
+	local target_bin="$2"
+
+	if [[ ! -d "$source_bin" ]]; then
+		log::error "Source bin directory not found: $source_bin"
+		return 1
+	fi
+
+	# Create target directory if it doesn't exist
+	if [[ "$DRY_RUN" == "false" ]] && [[ ! -d "$target_bin" ]]; then
+		mkdir -p "$target_bin"
+	fi
+
+	# List of core utility scripts to update
+	local core_utilities=(
+		"update-shell-starter"
+		"bump-version"
+		"generate-ai-workflow"
+	)
+
+	log::info "Updating core utility scripts in ${target_bin}..."
+
+	for utility in "${core_utilities[@]}"; do
+		local source_file="${source_bin}/${utility}"
+		local target_file="${target_bin}/${utility}"
+
+		if [[ -f "$source_file" ]]; then
+			if [[ "$DRY_RUN" == "true" ]]; then
+				if [[ -f "$target_file" ]]; then
+					log::info "[DRY-RUN] Would update: ${target_file}"
+				else
+					log::info "[DRY-RUN] Would create: ${target_file}"
+				fi
+			else
+				log::info "Updating: ${target_file}"
+				cp "$source_file" "$target_file"
+				chmod +x "$target_file"
+			fi
+		else
+			log::warn "Core utility not found in source: ${source_file}"
+		fi
+	done
+
+	# Warn about custom scripts that won't be updated
+	if [[ -d "$target_bin" ]]; then
+		while IFS= read -r -d '' custom_file; do
+			local basename_file
+			basename_file=$(basename "$custom_file")
+			if [[ ! " ${core_utilities[*]} " =~ \ ${basename_file}\  ]]; then
+				log::warn "Custom bin script preserved: ${custom_file}"
+			fi
+		done < <(find "$target_bin" -type f -perm +111 -print0 2>/dev/null || find "$target_bin" -type f -exec test -x {} \; -print0)
 	fi
 }
 
@@ -209,6 +320,11 @@ update_library_files() {
 	)
 
 	log::info "Updating library files in ${target_lib}..."
+
+	# Check if demo/ folder exists and inform user it will be preserved
+	if has_demo_folder; then
+		log::info "Demo scripts in demo/ folder will be preserved (not updated)"
+	fi
 
 	for file in "${standard_files[@]}"; do
 		local source_file="${source_lib}/${file}"
@@ -389,8 +505,8 @@ perform_update() {
 		return 0
 	fi
 
-	# Check for breaking changes and show migration guidance
-	if [[ "$current_version" != "unknown" ]]; then
+	# Check for breaking changes and show migration guidance (only when upgrading to newer version)
+	if [[ "$current_version" != "unknown" ]] && version_is_greater "$target_version" "$current_version"; then
 		check_breaking_changes "$current_version" "$target_version"
 		show_migration_guidance "$current_version" "$target_version"
 	fi
@@ -402,13 +518,41 @@ perform_update() {
 		return 1
 	fi
 
+	# Check demo folder compatibility and provide status information
+	local demo_status
+	demo_status=$(get_demo_status_message "$temp_dir")
+	case "$demo_status" in
+	"local_demo_preserved")
+		log::info "Local demo/ folder detected - will be preserved during update"
+		;;
+	"source_has_demo_not_local")
+		log::info "Source contains demo/ folder, but local project doesn't have one"
+		log::info "Demo scripts from source will not be installed (preserving current structure)"
+		;;
+	"no_demo_folders")
+		# Silent - no demo-related messages needed
+		;;
+	esac
+
 	# Create backup if requested
 	if [[ "$CREATE_BACKUP" == "true" ]]; then
 		create_backup "$LIB_DIR"
+
+		# Also backup bin directory for core utilities
+		local project_root
+		project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+		local bin_dir="${project_root}/bin"
+		create_backup "$bin_dir"
 	fi
 
 	# Update library files
 	update_library_files "${temp_dir}/lib" "$LIB_DIR"
+
+	# Update core utility scripts
+	local project_root
+	project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+	local bin_dir="${project_root}/bin"
+	update_core_utilities "${temp_dir}/bin" "$bin_dir"
 
 	# Update version tracking
 	update_version_file "$target_version"
@@ -417,9 +561,17 @@ perform_update() {
 	rm -rf "$temp_dir"
 
 	if [[ "$DRY_RUN" == "false" ]]; then
-		log::info "Shell Starter library updated successfully!"
+		log::info "Shell Starter library and core utilities updated successfully!"
+		log::info "Updated: lib/ directory and bin/ core utilities (update-shell-starter, bump-version, generate-ai-workflow)"
+		if has_demo_folder; then
+			log::info "Demo scripts in demo/ folder were preserved and not modified"
+		fi
 	else
 		log::info "Dry run completed. Use without --dry-run to apply changes."
+		log::info "Would update: lib/ directory and bin/ core utilities"
+		if has_demo_folder; then
+			log::info "Note: Demo scripts in demo/ folder will be preserved during actual update"
+		fi
 	fi
 }
 
