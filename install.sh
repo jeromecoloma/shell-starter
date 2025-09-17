@@ -80,9 +80,26 @@ add_to_path() {
 		return 1
 	fi
 
-	if grep -q "export PATH.*$path_to_add" "$config_file" 2>/dev/null; then
-		log info "PATH entry already exists in $config_file"
-		return 0
+	# Enhanced duplicate detection
+	if [[ -f "$config_file" ]]; then
+		# Check for exact path matches in various PATH formats
+		local escaped_path
+		escaped_path=$(printf '%s\n' "$path_to_add" | sed "s/[[\.*^$()+?{|/]/\\\\&/g")
+
+		# Check for multiple possible PATH entry patterns
+		if grep -E "^export PATH=.*${escaped_path}(:|$)" "$config_file" >/dev/null 2>&1 ||
+			grep -E "^PATH=.*${escaped_path}(:|$)" "$config_file" >/dev/null 2>&1 ||
+			grep -F "# Added by shell-starter installer" "$config_file" >/dev/null 2>&1; then
+			log info "PATH entry already exists in $config_file (detected duplicate or shell-starter entry)"
+			return 0
+		fi
+
+		# Check if the path is already in the current PATH environment
+		if [[ ":$PATH:" == *":$path_to_add:"* ]]; then
+			log info "PATH directory already available in current session"
+			# Still add to config file for persistence, but warn about potential duplicate
+			log warn "Adding to config file for persistence, but directory is already in current PATH"
+		fi
 	fi
 
 	# Create config file if it doesn't exist
@@ -101,18 +118,21 @@ add_to_path() {
 		return 1
 	fi
 
-	# Add PATH entry with error handling
-	if ! {
+	# Improved PATH entry addition with duplicate prevention
+	if {
 		echo ""
-		echo "# Added by shell-starter installer"
-		echo "export PATH=\"$path_to_add:\$PATH\""
+		echo "# Added by shell-starter installer on $(date)"
+		echo "# This line is managed automatically - do not edit manually"
+		echo "if [[ \":\$PATH:\" != *\":$path_to_add:\"* ]]; then"
+		echo "    export PATH=\"$path_to_add:\$PATH\""
+		echo "fi"
 	} >>"$config_file"; then
+		log success "Added PATH entry to $config_file with duplicate prevention"
+	else
 		log error "Failed to write to shell config: $config_file"
 		log error "Please manually add 'export PATH=\"$path_to_add:\$PATH\"' to your shell configuration"
 		return 1
 	fi
-
-	log success "Added PATH entry to $config_file"
 }
 
 # Show usage
@@ -461,33 +481,85 @@ remove_from_path() {
 		return 0
 	}
 
-	grep -q "export PATH.*$path_to_remove" "$config_file" 2>/dev/null || {
-		log info "PATH entry not found in $config_file"
+	# Check for both old and new format PATH entries
+	if ! grep -q "shell-starter installer" "$config_file" 2>/dev/null &&
+		! grep -q "export PATH.*$path_to_remove" "$config_file" 2>/dev/null; then
+		log info "No shell-starter PATH entries found in $config_file"
 		return 0
-	}
+	fi
 
-	log info "Removing PATH entry from $config_file"
+	log info "Removing shell-starter PATH entries from $config_file"
 
-	local temp_file
+	local temp_file backup_file
 	temp_file=$(mktemp)
+	backup_file="${config_file}.backup.$(date +%s)"
 
+	# Create backup
+	if ! cp "$config_file" "$backup_file"; then
+		log error "Failed to create backup: $backup_file"
+		rm -f "$temp_file"
+		return 1
+	fi
+
+	# Enhanced removal to handle both old and new formats
 	awk -v target_path="$path_to_remove" '
+	# Skip old format: comment + PATH line
 	/^# Added by shell-starter installer$/ {
 		getline nextline
-		if (index(nextline, target_path) == 0 || nextline !~ /^export PATH=/) {
+		if (index(nextline, target_path) > 0 && nextline ~ /^export PATH=/) {
+			next
+		} else {
 			print $0
 			print nextline
 		}
 		next
 	}
+
+	# Skip new format: multi-line block
+	/^# Added by shell-starter installer on/ {
+		# Skip the entire block: comment, managed comment, if-block
+		getline managed_comment  # "# This line is managed automatically..."
+		getline if_line         # "if [[ \":$PATH:\" != ..."
+		getline export_line     # "    export PATH=..."
+		getline fi_line         # "fi"
+
+		# Only skip if this block contains our target path
+		if (index(if_line target_path export_line, target_path) > 0) {
+			next
+		} else {
+			# Not our block, keep it
+			print $0
+			print managed_comment
+			print if_line
+			print export_line
+			print fi_line
+		}
+		next
+	}
+
+	# Remove any direct PATH entries that contain our path
+	/^export PATH=.*/ || /^PATH=.*/ {
+		if (index($0, target_path) > 0) {
+			next
+		}
+		print
+		next
+	}
+
+	# Keep all other lines
 	{ print }
 	' "$config_file" >"$temp_file"
 
+	# Apply changes or report failure
 	if mv "$temp_file" "$config_file"; then
-		log success "Removed PATH entry from $config_file"
+		log success "Removed shell-starter PATH entries from $config_file"
+		log info "Backup created: $backup_file"
 	else
 		log error "Failed to update $config_file"
+		# Restore from backup
+		mv "$backup_file" "$config_file" 2>/dev/null
 		rm -f "$temp_file"
+		return 1
 	fi
 }
 
