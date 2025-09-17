@@ -121,8 +121,13 @@ parse_args() {
 
 # Get current shell-starter version from tracking file
 get_current_version() {
-	if [[ -f "$SHELL_STARTER_VERSION_FILE" ]]; then
-		cat "$SHELL_STARTER_VERSION_FILE"
+	# Look for version file relative to script location (project root)
+	local project_root
+	project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+	local version_file="${project_root}/${SHELL_STARTER_VERSION_FILE}"
+
+	if [[ -f "$version_file" ]]; then
+		cat "$version_file"
 	else
 		echo "unknown"
 	fi
@@ -355,10 +360,15 @@ show_migration_guidance() {
 update_version_file() {
 	local version="$1"
 
+	# Look for version file relative to script location (project root)
+	local project_root
+	project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+	local version_file="${project_root}/${SHELL_STARTER_VERSION_FILE}"
+
 	if [[ "$DRY_RUN" == "true" ]]; then
 		log::info "[DRY-RUN] Would update version file to: v${version}"
 	else
-		echo "$version" >"$SHELL_STARTER_VERSION_FILE"
+		echo "$version" >"$version_file"
 		log::info "Updated ${SHELL_STARTER_VERSION_FILE} to v${version}"
 	fi
 }
@@ -438,6 +448,13 @@ check_for_updates() {
 # Main execution
 main() {
 	parse_args "$@"
+
+	# If using default lib directory, make it relative to project root
+	if [[ "$LIB_DIR" == "$DEFAULT_LIB_DIR" ]]; then
+		local project_root
+		project_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+		LIB_DIR="${project_root}/${DEFAULT_LIB_DIR}"
+	fi
 
 	# Validate lib directory exists or can be created
 	if [[ ! -d "$LIB_DIR" ]] && [[ "$DRY_RUN" == "false" ]]; then
