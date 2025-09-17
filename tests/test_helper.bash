@@ -38,7 +38,17 @@ teardown() {
 run_script() {
     local script_name="$1"
     shift
-    run "${PROJECT_ROOT}/bin/${script_name}" "$@"
+
+    # Check if script exists in demo/ directory first (example scripts)
+    if [[ -f "${PROJECT_ROOT}/demo/${script_name}" ]]; then
+        run "${PROJECT_ROOT}/demo/${script_name}" "$@"
+    # Otherwise check bin/ directory (core utilities)
+    elif [[ -f "${PROJECT_ROOT}/bin/${script_name}" ]]; then
+        run "${PROJECT_ROOT}/bin/${script_name}" "$@"
+    else
+        # Script not found in either location
+        run false
+    fi
 }
 
 # Helper function to check if a command exists
