@@ -14,23 +14,37 @@ git clone https://github.com/jeromecoloma/shell-starter.git my-cli-project
 cd my-cli-project
 
 # Explore the example scripts to understand Shell Starter's capabilities:
-./bin/hello-world --help
-./bin/show-colors
-./bin/long-task
+./demo/hello-world --help
+./demo/show-colors
+./demo/long-task
 ```
 
-### Your CLI Distribution
+### Important: Installation vs Usage
 
-Once you build your CLI tool, users install it with the built-in installer:
+**Shell Starter itself is NOT installed** - it's a template you clone to build your own CLI tools:
 
 ```bash
-# Your users run this to install YOUR CLI tool:
-curl -fsSL https://raw.githubusercontent.com/your-username/your-cli-tool/main/install.sh | bash
+# ✅ How developers use Shell Starter
+git clone https://github.com/jeromecoloma/shell-starter.git my-project
+cd my-project
+# Build your CLI tool using Shell Starter's libraries and structure
 ```
 
-**Custom Installation Path**: The installer supports `--prefix /custom/path` (default: `~/.config/your-project/bin`)
+**The install.sh and uninstall.sh are templates** for distributing CLI tools you build with Shell Starter:
 
-**Uninstallation**: Built-in uninstaller via `./install.sh --uninstall` or standalone `./uninstall.sh` script
+```bash
+# ✅ How end users install CLI tools built with Shell Starter
+curl -fsSL https://your-domain.com/your-cli-tool/install.sh | bash
+# or
+./install.sh --prefix ~/.local/bin
+```
+
+**Key Points**:
+- `install.sh` installs scripts from your project's `bin/` directory to user's system
+- `demo/` scripts are examples only and are NOT installed
+- `lib/` files are installed as dependencies for your CLI tools
+- **Custom Installation Path**: Supports `--prefix /custom/path` (default: `~/.config/your-project/bin`)
+- **Uninstallation**: Built-in uninstaller via `./install.sh --uninstall` or `./uninstall.sh`
 
 ## 📋 Features
 
@@ -51,7 +65,8 @@ curl -fsSL https://raw.githubusercontent.com/your-username/your-cli-tool/main/in
 
 ```
 shell-starter/
-├── bin/                # CLI scripts (kebab-case, no .sh suffix)
+├── bin/                # Core utility scripts (bump-version, generate-ai-workflow, etc.)
+├── demo/               # Example scripts demonstrating Shell Starter capabilities
 ├── lib/                # Shared utilities (colors, logging, spinners)
 ├── scripts/            # Helper scripts in other languages
 ├── tests/              # Bats testing framework tests
@@ -59,14 +74,15 @@ shell-starter/
 ├── .github/workflows/  # CI/CD configuration
 ├── VERSION             # Centralized version file (SemVer)
 ├── .shell-starter-version  # Shell Starter dependency version tracking
-├── install.sh          # Installer with curl support
-└── uninstall.sh        # Manifest-based uninstaller
+├── install.sh          # Template installer for your CLI tools (NOT for Shell Starter itself)
+└── uninstall.sh        # Template uninstaller for your CLI tools (NOT for Shell Starter itself)
 ```
 
 ## 🎯 Example Scripts
 
-Shell Starter includes several example scripts to demonstrate features:
+Shell Starter includes example scripts (in `demo/`) and core utilities (in `bin/`):
 
+### Demo Scripts (`demo/` - Examples Only)
 | Script | Purpose |
 |--------|---------|
 | `hello-world` | Basic script structure with argument parsing |
@@ -76,24 +92,35 @@ Shell Starter includes several example scripts to demonstrate features:
 | `my-cli` | Multi-command dispatcher (git-like subcommands) |
 | `ai-action` | Template for AI API integration with secure key handling |
 | `polyglot-example` | Bash + Python integration example |
+| `show-banner` | Demonstrates banner/branding system |
+| `debug-colors` | Color palette testing and debugging |
+| `update-tool` | Example of update management functionality |
+
+### Core Utilities (`bin/` - Actual Tools)
+| Script | Purpose |
+|--------|---------|
 | `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
 | `update-shell-starter` | Updates shell-starter library dependencies in derived projects |
 | `bump-version` | Intelligent version bumping for shell-starter and cloned projects |
 
-**Built-in Features**: All example scripts support standard flags including `--help`, `--version`, `--update`, `--check-version`, `--notify-config`, and `--uninstall` (for removing Shell Starter installation).
+**Built-in Features**: All example scripts support standard flags including `--help`, `--version`, `--update`, `--check-version`, `--notify-config`, and `--uninstall` (for removing CLI tool installation).
 
 ### Try the examples:
 
 ```bash
-# Run examples directly from the bin/ directory
-./bin/hello-world --help
-./bin/show-colors
-./bin/long-task
-./bin/greet-user --formal "Developer"
-./bin/my-cli status
-./bin/ai-action --help
-./bin/polyglot-example demo
+# Run example scripts from the demo/ directory
+./demo/hello-world --help
+./demo/show-colors
+./demo/long-task
+./demo/greet-user --formal "Developer"
+./demo/my-cli status
+./demo/ai-action --help
+./demo/polyglot-example demo
+
+# Run core utilities from the bin/ directory
 ./bin/generate-ai-workflow --help
+./bin/bump-version --help
+./bin/update-shell-starter --help
 ```
 
 ## 🔧 Development

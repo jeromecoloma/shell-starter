@@ -384,6 +384,11 @@ install_scripts() {
 	validate_directory_permissions "$LIB_PREFIX" "libraries"
 
 	log info "Installing scripts from: $working_dir/bin/"
+	# Note: demo/ scripts are not installed by default (they are examples only)
+	if [[ -d "$working_dir/demo" ]]; then
+		log info "Note: Found demo/ directory with example scripts (not installed)"
+	fi
+
 	# Install scripts from bin/
 	for script in "$working_dir"/bin/*; do
 		if [[ -f "$script" && -x "$script" ]]; then
