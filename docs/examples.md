@@ -2,6 +2,15 @@
 
 This document provides detailed examples and usage patterns for Shell Starter scripts. Use these examples as templates for creating new scripts or understanding existing ones.
 
+## 📂 Directory Structure Note
+
+Shell Starter organizes scripts into two main directories:
+
+- **`demo/`** - Example scripts for learning Shell Starter features and conventions
+- **`bin/`** - Core utility scripts that are part of Shell Starter's functionality
+
+The examples in this document are primarily from the `demo/` directory, showing how to build CLI tools using Shell Starter patterns. The core utilities in `bin/` (like `generate-ai-workflow`, `bump-version`, `update-shell-starter`) demonstrate advanced patterns for production tools.
+
 ## 🎯 Basic Script Examples
 
 ### 1. Hello World Script
@@ -1429,7 +1438,7 @@ main "$@"
 
 ### 10. Bats Test File
 
-Example test file structure:
+Example test file structure (for demo scripts, you would typically add them to PATH or reference them explicitly from demo/):
 
 ```bash
 #!/usr/bin/env bats

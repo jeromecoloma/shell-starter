@@ -2,21 +2,30 @@
 
 This document outlines the coding standards and conventions used in Shell Starter. Following these conventions ensures consistency, maintainability, and compatibility with the project's architecture.
 
-## 📋 Quick Reference: Example Scripts
+## 📋 Quick Reference: Example Scripts and Core Utilities
 
-All conventions are demonstrated in working example scripts in the `bin/` directory:
+Conventions are demonstrated in both example scripts (`demo/`) and core utilities (`bin/`):
 
+### Demo Scripts (`demo/` - Examples for Learning)
 | Script | Demonstrates |
 |--------|-------------|
-| `bin/hello-world` | Basic structure, standard header, help/version patterns |
-| `bin/greet-user` | Argument parsing, input validation, multiple options |
-| `bin/show-colors` | Color usage, output formatting |
-| `bin/long-task` | Logging functions, spinner usage, progress indicators |
-| `bin/my-cli` | Multi-command structure, subcommand routing |
-| `bin/ai-action` | Dependency checking, external tool integration |
-| `bin/polyglot-example` | Polyglot scripts, `run::script` function |
+| `demo/hello-world` | Basic structure, standard header, help/version patterns |
+| `demo/greet-user` | Argument parsing, input validation, multiple options |
+| `demo/show-colors` | Color usage, output formatting |
+| `demo/long-task` | Logging functions, spinner usage, progress indicators |
+| `demo/my-cli` | Multi-command structure, subcommand routing |
+| `demo/ai-action` | Dependency checking, external tool integration |
+| `demo/polyglot-example` | Polyglot scripts, `run::script` function |
+| `demo/show-banner` | Banner system, visual branding |
+| `demo/debug-colors` | Color debugging, terminal compatibility |
+| `demo/update-tool` | Update management demonstration |
+
+### Core Utilities (`bin/` - Production Tools)
+| Script | Demonstrates |
+|--------|-------------|
 | `bin/generate-ai-workflow` | Complex argument parsing, file generation |
 | `bin/update-shell-starter` | Dependency management, version tracking, breaking change detection |
+| `bin/bump-version` | Version management, repository detection |
 
 **Test Examples**: `tests/hello-world.bats`, `tests/library-functions.bats`
 
@@ -25,17 +34,43 @@ All conventions are demonstrated in working example scripts in the `bin/` direct
 ### Directory Structure
 ```
 shell-starter/
-├── bin/                # Executable scripts (no .sh extension)
+├── bin/                # Core utility scripts (no .sh extension)
+├── demo/               # Example scripts for learning (no .sh extension)
 ├── lib/                # Shared library functions (.sh extension)
 ├── scripts/            # Helper scripts in other languages
 ├── tests/              # Bats test files (.bats extension)
 └── docs/               # Documentation files (.md extension)
 ```
 
+### Directory Purpose Guidelines
+
+#### `bin/` - Core Utilities
+- **Purpose**: Production-ready tools that are part of Shell Starter's core functionality
+- **Audience**: Shell Starter maintainers and advanced users
+- **Installation**: These scripts are installed when using Shell Starter as a dependency
+- **Examples**: `update-shell-starter`, `bump-version`, `generate-ai-workflow`
+
+#### `demo/` - Example Scripts
+- **Purpose**: Educational examples demonstrating Shell Starter features and conventions
+- **Audience**: Developers learning Shell Starter or building new CLI tools
+- **Installation**: These scripts are NOT installed by `install.sh` - they remain as local examples
+- **Examples**: `hello-world`, `show-colors`, `my-cli`, `greet-user`
+
+#### `lib/` - Shared Library Functions
+- **Purpose**: Reusable shell functions that provide Shell Starter's core functionality
+- **Audience**: All Shell Starter scripts (both bin/ and demo/) and derived projects
+- **Installation**: These files are installed alongside CLI tools and sourced by scripts
+- **Examples**: `main.sh` (main entry point), `colors.sh`, `logging.sh`, `spinner.sh`, `utils.sh`
+- **Usage**: Scripts source `lib/main.sh` which automatically includes all other library files
+
 ### Naming Conventions
 
-- **Executable Scripts** (`bin/`): Use kebab-case without file extensions
-  - ✅ `hello-world`, `my-cli`, `greet-user` (see `bin/hello-world`, `bin/my-cli`)
+- **Core Utility Scripts** (`bin/`): Use kebab-case without file extensions
+  - ✅ `generate-ai-workflow`, `update-shell-starter`, `bump-version`
+  - ❌ `generate_ai_workflow.sh`, `updateShellStarter`, `bump-version.bash`
+
+- **Example Scripts** (`demo/`): Use kebab-case without file extensions
+  - ✅ `hello-world`, `my-cli`, `greet-user` (see `demo/hello-world`, `demo/my-cli`)
   - ❌ `hello_world.sh`, `myScript`, `greet-user.bash`
 
 - **Library Files** (`lib/`): Use kebab-case with `.sh` extension
@@ -49,7 +84,7 @@ shell-starter/
 ## 📜 Script Structure
 
 ### Standard Header Template
-Every script should start with this template (example: `bin/hello-world`):
+Every script should start with this template (example: `demo/hello-world`):
 
 ```bash
 #!/bin/bash
@@ -92,7 +127,7 @@ function validate_input() {
 ### Colors and Logging
 - Use the provided logging functions instead of raw `echo`
 - Prefer semantic colors over direct color codes
-- **Examples**: See `bin/long-task` for logging, `bin/show-colors` for color usage
+- **Examples**: See `demo/long-task` for logging, `demo/show-colors` for color usage
 
 ```bash
 # ✅ Good
@@ -137,7 +172,7 @@ current_date=`date +%Y-%m-%d`
 ## 🔧 Argument Parsing
 
 ### Standard Pattern
-Use this pattern for consistent argument parsing (example: `bin/greet-user`):
+Use this pattern for consistent argument parsing (example: `demo/greet-user`):
 
 ```bash
 show_help() {
@@ -213,7 +248,7 @@ spinner::start "Loading data..."
 # Long running operation
 spinner::stop
 ```
-**Example**: See `bin/long-task` for spinner usage
+**Example**: See `demo/long-task` for spinner usage
 
 #### Utility Functions
 ```bash
@@ -224,8 +259,8 @@ version="$(get_version)"
 run::script "scripts/analyze.py" "$input_file"
 ```
 **Examples**: 
-- Version handling: `bin/hello-world --version`
-- Polyglot scripts: `bin/polyglot-example`
+- Version handling: `demo/hello-world --version`
+- Polyglot scripts: `demo/polyglot-example`
 
 ## 🧪 Testing Conventions
 
@@ -295,7 +330,7 @@ log::debug "Connecting to API at $API_URL"
 ## 📦 Dependencies
 
 ### Optional Dependencies
-Handle optional dependencies gracefully (example: `bin/ai-action`):
+Handle optional dependencies gracefully (example: `demo/ai-action`):
 
 ```bash
 check_dependencies() {
@@ -502,7 +537,7 @@ The project includes a `.shellcheckrc` file that configures shellcheck for shell
 
 ```bash
 # Check if shellcheck passes
-shellcheck lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
+shellcheck lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
 ```
 
 The configuration suppresses warnings that are expected in a shell library project:
@@ -516,10 +551,10 @@ Use `shfmt` to ensure consistent formatting:
 
 ```bash
 # Check formatting
-shfmt -d lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
+shfmt -d lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
 
 # Apply formatting fixes
-shfmt -w lib/*.sh scripts/*.sh bin/* install.sh uninstall.sh
+shfmt -w lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
 ```
 
 ### Continuous Integration
