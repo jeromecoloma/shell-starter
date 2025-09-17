@@ -23,6 +23,8 @@ jobs:
       run: |
         if ls lib/*.sh 1> /dev/null 2>&1; then shellcheck lib/*.sh; fi
         if ls bin/* 1> /dev/null 2>&1; then shellcheck bin/*; fi
+        if ls demo/* 1> /dev/null 2>&1; then shellcheck demo/*; fi
+        if ls scripts/*.sh 1> /dev/null 2>&1; then shellcheck scripts/*.sh; fi
         if [ -f install.sh ]; then shellcheck install.sh; fi
         if [ -f uninstall.sh ]; then shellcheck uninstall.sh; fi
 
@@ -42,6 +44,8 @@ jobs:
       run: |
         if ls lib/*.sh 1> /dev/null 2>&1; then shfmt -d lib/*.sh; fi
         if ls bin/* 1> /dev/null 2>&1; then shfmt -d bin/*; fi
+        if ls demo/* 1> /dev/null 2>&1; then shfmt -d demo/*; fi
+        if ls scripts/*.sh 1> /dev/null 2>&1; then shfmt -d scripts/*.sh; fi
         if [ -f install.sh ]; then shfmt -d install.sh; fi
         if [ -f uninstall.sh ]; then shfmt -d uninstall.sh; fi
 
