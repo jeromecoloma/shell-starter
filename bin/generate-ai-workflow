@@ -59,19 +59,28 @@ else
 
 	# Enhanced logging functions with visual indicators
 	log::info() {
-		printf '%b[INFO]%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+		printf '%bℹ%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
 	}
 
 	log::warn() {
-		printf '%b[WARN]%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+		printf '%b⚠%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
 	}
 
 	log::error() {
-		printf '%b[ERROR]%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+		printf '%b✗%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
 	}
 
 	log::success() {
 		printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+	}
+
+	# Section header and divider functions
+	section_header() {
+		printf '\n%b─── %s ───%b\n' "${COLOR_BOLD}" "$*" "${COLOR_RESET}"
+	}
+
+	section_divider() {
+		printf '%b%s%b\n' "${COLOR_INFO}" "$(printf '%.50s' "──────────────────────────────────────────────────")" "${COLOR_RESET}"
 	}
 
 	# Minimal banner support
@@ -183,9 +192,11 @@ EOF
 generate_state_files() {
 	local project_name="$1"
 
-	log::info "Creating state management files for $project_name..."
+	section_header "Creating State Management Files"
+	log::info "Project: $project_name"
 
 	mkdir -p .ai-workflow/state
+	log::success "Created directory: .ai-workflow/state"
 
 	# Generate tasks.md
 	local project_upper=$(echo "$project_name" | tr '[:lower:]' '[:upper:]')
@@ -442,6 +453,9 @@ EOF
 - Ready to start development with /dev start
 
 EOF
+	log::success "Created file: .ai-workflow/state/tasks.md"
+	log::success "Created file: .ai-workflow/state/requirements.md"
+	log::success "Created file: .ai-workflow/state/progress.log"
 }
 
 generate_specific_tasks() {
@@ -926,7 +940,9 @@ EOF
 generate_claude_commands() {
 	local project_name="$1"
 
+	section_header "Generating Claude Code Commands"
 	mkdir -p .ai-workflow/commands/.claude/commands
+	log::success "Created directory: .ai-workflow/commands/.claude/commands"
 
 	# /dev command
 	cat >.ai-workflow/commands/.claude/commands/dev.md <<'EOF'
@@ -1123,13 +1139,20 @@ Next Steps: [any follow-up actions needed]
 
 Begin dependency management now.
 EOF
+	log::success "Created file: .ai-workflow/commands/.claude/commands/dev.md"
+	log::success "Created file: .ai-workflow/commands/.claude/commands/qa.md"
+	log::success "Created file: .ai-workflow/commands/.claude/commands/status.md"
+	log::success "Created file: .ai-workflow/commands/.claude/commands/deps.md"
 }
 
 generate_other_agent_commands() {
 	local project_name="$1"
 
+	section_header "Generating Other Agent Commands"
+
 	# Cursor commands (markdown format)
 	mkdir -p .ai-workflow/commands/.cursor/commands
+	log::success "Created directory: .ai-workflow/commands/.cursor/commands"
 	cp .ai-workflow/commands/.claude/commands/dev.md .ai-workflow/commands/.cursor/commands/
 	cp .ai-workflow/commands/.claude/commands/qa.md .ai-workflow/commands/.cursor/commands/
 	cp .ai-workflow/commands/.claude/commands/status.md .ai-workflow/commands/.cursor/commands/
@@ -1520,6 +1543,9 @@ Next Steps: [any follow-up actions needed]
 Begin dependency management now.
 """
 EOF
+	log::success "Created directory: .ai-workflow/commands/.opencode/command"
+	log::success "Created directory: .ai-workflow/commands/.gemini/commands"
+	log::success "Generated command files for Cursor, OpenCode, and Gemini CLI"
 }
 
 main() {

@@ -16,21 +16,21 @@ setup() {
     run log::info "Test info message"
     assert_success
     assert_output --partial "[$(date '+%Y-%m-%d')"
-    assert_output --partial "INFO:"
+    assert_output --partial "ℹ:"
     assert_output --partial "Test info message"
 }
 
 @test "log::warn displays warning messages" {
     run log::warn "Test warning message"
     assert_success
-    assert_output --partial "WARN:"
+    assert_output --partial "⚠:"
     assert_output --partial "Test warning message"
 }
 
 @test "log::error displays error messages" {
     run log::error "Test error message"
     assert_success
-    assert_output --partial "ERROR:"
+    assert_output --partial "✗:"
     assert_output --partial "Test error message"
 }
 
@@ -38,7 +38,7 @@ setup() {
     export LOG_LEVEL="DEBUG"
     run log::debug "Test debug message"
     assert_success
-    assert_output --partial "DEBUG:"
+    assert_output --partial "🔍:"
     assert_output --partial "Test debug message"
 }
 
@@ -46,7 +46,7 @@ setup() {
     export LOG_LEVEL="INFO"
     run log::debug "Test debug message"
     assert_success
-    refute_output --partial "DEBUG:"
+    refute_output --partial "🔍:"
     refute_output --partial "Test debug message"
 }
 
@@ -54,28 +54,28 @@ setup() {
     export LOG_LEVEL="WARN"
     run log::debug "Test debug message"
     assert_success
-    refute_output --partial "DEBUG:"
+    refute_output --partial "🔍:"
 }
 
 @test "log::info is suppressed when LOG_LEVEL is WARN" {
     export LOG_LEVEL="WARN"
     run log::info "Test info message"
     assert_success
-    refute_output --partial "INFO:"
+    refute_output --partial "ℹ:"
 }
 
 @test "log::warn is suppressed when LOG_LEVEL is ERROR" {
     export LOG_LEVEL="ERROR"
     run log::warn "Test warning message"
     assert_success
-    refute_output --partial "WARN:"
+    refute_output --partial "⚠:"
 }
 
 @test "log::error is always shown regardless of LOG_LEVEL" {
     export LOG_LEVEL="ERROR"
     run log::error "Test error message"
     assert_success
-    assert_output --partial "ERROR:"
+    assert_output --partial "✗:"
     assert_output --partial "Test error message"
 }
 

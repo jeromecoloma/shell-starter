@@ -67,7 +67,7 @@ teardown() {
 @test "bump-version: version flag" {
 	run "$TEST_DIR/bin/bump-version" --version
 	assert_success
-	assert_output --partial "version"
+	assert_output --partial "Bump Version Tool"
 }
 
 # Current version display tests
@@ -107,7 +107,7 @@ teardown() {
 @test "bump-version: check-repo flag shows detection details" {
 	run "$TEST_DIR/bin/bump-version" --check-repo
 	assert_success
-	assert_output --partial "Repository detection results:"
+	assert_output --partial "Repository Detection Results"
 	assert_output --partial "Detected type:"
 	assert_output --partial "Shell-starter indicators:"
 	assert_output --partial "Files that will be updated:"

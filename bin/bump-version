@@ -51,19 +51,28 @@ if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
 
 	# Enhanced logging functions with visual indicators
 	log::info() {
-		printf '%b[INFO]%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+		printf '%bℹ%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
 	}
 
 	log::warn() {
-		printf '%b[WARN]%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+		printf '%b⚠%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
 	}
 
 	log::error() {
-		printf '%b[ERROR]%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+		printf '%b✗%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
 	}
 
 	log::success() {
 		printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+	}
+
+	# Section header and divider functions
+	section_header() {
+		printf '\n%b─── %s ───%b\n' "${COLOR_BOLD}" "$*" "${COLOR_RESET}"
+	}
+
+	section_divider() {
+		printf '%b%s%b\n' "${COLOR_INFO}" "$(printf '%.40s' "────────────────────────────────────────")" "${COLOR_RESET}"
 	}
 
 	show_version() {
@@ -305,10 +314,9 @@ show_repo_check() {
 	)
 
 	repo_type=$(detect_repository_type)
-	log::info "Repository detection results:"
+	section_header "Repository Detection Results"
 	log::info "Detected type: ${repo_type}"
-	log::info ""
-	log::info "Shell-starter indicators:"
+	printf '\n%bShell-starter indicators:%b\n' "${COLOR_BOLD}" "${COLOR_RESET}"
 
 	for indicator in "${indicators[@]}"; do
 		if [[ -f "${PROJECT_ROOT}/${indicator}" ]]; then
@@ -318,8 +326,7 @@ show_repo_check() {
 		fi
 	done
 
-	log::info ""
-	log::info "Files that will be updated:"
+	printf '\n%bFiles that will be updated:%b\n' "${COLOR_BOLD}" "${COLOR_RESET}"
 	log::info "  • ${VERSION_FILE} (always)"
 	if [[ "$repo_type" == "shell-starter" ]]; then
 		log::info "  • ${SHELL_STARTER_VERSION_FILE} (shell-starter repo)"
@@ -338,6 +345,7 @@ perform_bump() {
 	repo_type=$(detect_repository_type)
 	current_version=$(get_current_version)
 
+	section_header "Version Bump Summary"
 	log::info "Repository type: ${repo_type}"
 	log::info "Current version: ${current_version}"
 

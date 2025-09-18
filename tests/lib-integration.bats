@@ -32,9 +32,9 @@ load bats-assert/load
     expected_version=$(cat "${PROJECT_ROOT}/VERSION" | tr -d '\n')
     assert_output --partial "Version: $expected_version"
     assert_output --partial "All functions available"
-    assert_output --partial "INFO:"
+    assert_output --partial "ℹ:"
     assert_output --partial "Integration test running"
-    assert_output --partial "WARN:"
+    assert_output --partial "⚠:"
     assert_output --partial "Warning message with colors"
 }
 
@@ -131,7 +131,7 @@ load bats-assert/load
         echo 'Cleanup successful'
     "
     assert_success
-    assert_output --partial "ERROR:"
+    assert_output --partial "✗:"
     assert_output --partial "Test error message"
     assert_output --partial "Script file not found"
     assert_output --partial "Error caught"

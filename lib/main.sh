@@ -92,3 +92,12 @@ enable_background_updates() {
 	# It respects user configuration and rate limiting
 	optional_update_check "$GITHUB_REPO" "$(basename "$0")" &>/dev/null || true
 }
+
+# Section header and divider functions for visual hierarchy
+section_header() {
+	printf '\n%b─── %s ───%b\n' "${COLOR_BOLD}" "$*" "${COLOR_RESET}"
+}
+
+section_divider() {
+	printf '%b%s%b\n' "${COLOR_INFO}" "$(printf '%.50s' "──────────────────────────────────────────────────")" "${COLOR_RESET}"
+}

@@ -51,19 +51,28 @@ if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
 
 	# Enhanced logging functions with visual indicators
 	log::info() {
-		printf '%b[INFO]%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+		printf '%bℹ%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
 	}
 
 	log::warn() {
-		printf '%b[WARN]%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+		printf '%b⚠%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
 	}
 
 	log::error() {
-		printf '%b[ERROR]%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+		printf '%b✗%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
 	}
 
 	log::success() {
 		printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+	}
+
+	# Section header and divider functions
+	section_header() {
+		printf '\n%b─── %s ───%b\n' "${COLOR_BOLD}" "$*" "${COLOR_RESET}"
+	}
+
+	section_divider() {
+		printf '%b%s%b\n' "${COLOR_INFO}" "$(printf '%.50s' "──────────────────────────────────────────────────")" "${COLOR_RESET}"
 	}
 
 	show_version() {

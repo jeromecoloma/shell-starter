@@ -33,7 +33,15 @@ _log() {
 	shift 2
 
 	if _should_log "$level"; then
-		printf "${color}[%s] %s:${COLOR_RESET} %s\n" "$timestamp" "$level" "$*" >&2
+		local indicator
+		case "$level" in
+		INFO) indicator="ℹ" ;;
+		WARN) indicator="⚠" ;;
+		ERROR) indicator="✗" ;;
+		DEBUG) indicator="🔍" ;;
+		*) indicator="•" ;;
+		esac
+		printf "${color}[%s] %s:${COLOR_RESET} %s\n" "$timestamp" "$indicator" "$*" >&2
 	fi
 }
 
