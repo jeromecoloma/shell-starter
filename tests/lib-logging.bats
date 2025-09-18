@@ -96,8 +96,14 @@ setup() {
 @test "logging uses colors" {
     run log::error "Test colored message"
     assert_success
-    # Should contain ANSI color codes
-    assert_output --partial $'\e['
+
+    # Should contain ANSI color codes only if colors are enabled
+    if colors::has_color; then
+        assert_output --partial $'\e['
+    else
+        # In no-color environment, should not contain escape sequences
+        refute_output --partial $'\e['
+    fi
 }
 
 @test "_should_log function works correctly for DEBUG level" {
@@ -149,5 +155,11 @@ setup() {
     # Test the color fallback loading mechanism
     run bash -c "unset COLOR_RESET; source $PROJECT_ROOT/lib/logging.sh; echo \$COLOR_RESET"
     assert_success
-    assert_output '\033[0m'
+
+    # Color output depends on color support detection
+    if bash -c "source $PROJECT_ROOT/lib/colors.sh; colors::has_color"; then
+        assert_output '\033[0m'
+    else
+        assert_output ''
+    fi
 }

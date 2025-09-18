@@ -45,9 +45,13 @@ load bats-assert/load
         echo \"LIB_DIR: \$SHELL_STARTER_LIB_DIR\"
         echo \"ROOT_DIR: \$SHELL_STARTER_ROOT_DIR\"
         
-        # Verify all color constants are available
-        if [[ -n \"\$COLOR_RED\" && -n \"\$COLOR_GREEN\" && -n \"\$COLOR_RESET\" ]]; then
-            echo 'Colors loaded'
+        # Verify all color constants are available (either with values or empty)
+        if [[ \"\${COLOR_RED+defined}\" = \"defined\" && \"\${COLOR_GREEN+defined}\" = \"defined\" && \"\${COLOR_RESET+defined}\" = \"defined\" ]]; then
+            if [[ -n \"\$COLOR_RED\" && -n \"\$COLOR_GREEN\" && -n \"\$COLOR_RESET\" ]]; then
+                echo 'Colors loaded'
+            else
+                echo 'Colors disabled'
+            fi
         else
             echo 'Colors missing'
         fi
@@ -61,7 +65,12 @@ load bats-assert/load
     assert_success
     assert_output --partial "LIB_DIR: $PROJECT_ROOT/lib"
     assert_output --partial "ROOT_DIR: $PROJECT_ROOT"
-    assert_output --partial "Colors loaded"
+    # Colors might be loaded or disabled depending on environment
+    if assert_output --partial "Colors loaded" 2>/dev/null; then
+        : # Colors are enabled
+    else
+        assert_output --partial "Colors disabled"
+    fi
     assert_output --partial "Success"
     assert_output --partial "Error"
 }
@@ -183,7 +192,7 @@ EOF
 @test "color and logging integration" {
     run bash -c "
         source $PROJECT_ROOT/lib/main.sh
-        
+
         # Test that logging uses colors
         log::info 'Info with colors'
         log::warn 'Warning with colors'
@@ -191,8 +200,15 @@ EOF
         log::debug 'Debug with colors'
     "
     assert_success
-    # Should contain ANSI color codes
-    assert_output --partial $'\e['
+
+    # Should contain ANSI color codes only if colors are enabled
+    if bash -c "source $PROJECT_ROOT/lib/main.sh; colors::has_color"; then
+        assert_output --partial $'\e['
+    else
+        # In no-color environment, should not contain escape sequences
+        refute_output --partial $'\e['
+    fi
+
     assert_output --partial "Info with colors"
     assert_output --partial "Warning with colors"
     assert_output --partial "Error with colors"

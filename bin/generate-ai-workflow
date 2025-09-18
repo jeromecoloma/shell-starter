@@ -20,12 +20,96 @@
 
 set -euo pipefail
 
-# Source the Shell Starter library
+# Source the Shell Starter library with fallback support
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LIB_DIR="$(dirname "$SCRIPT_DIR")/lib"
 
-# shellcheck source=../lib/main.sh
-source "$LIB_DIR/main.sh"
+# Try to source lib/main.sh with error handling
+if [[ -f "$LIB_DIR/main.sh" ]]; then
+	# shellcheck source=../lib/main.sh
+	source "$LIB_DIR/main.sh"
+else
+	# Enhanced fallback functionality when lib/main.sh is not available
+	colors_has_color() {
+		[[ "${NO_COLOR:-}" == "" ]] && {
+			[[ "${TERM:-}" != "dumb" ]] &&
+				[[ "${TERM:-}" != "" ]] &&
+				[[ -t 1 ]]
+		}
+	}
+
+	# Enhanced color variables with fallback support (guard against redefinition)
+	if ! declare -p COLOR_RESET >/dev/null 2>&1; then
+		if colors_has_color; then
+			readonly COLOR_INFO='\033[0;34m'    # Blue
+			readonly COLOR_SUCCESS='\033[0;32m' # Green
+			readonly COLOR_WARNING='\033[1;33m' # Yellow
+			readonly COLOR_ERROR='\033[0;31m'   # Red
+			readonly COLOR_RESET='\033[0m'
+			readonly COLOR_BOLD='\033[1m'
+		else
+			readonly COLOR_INFO=''
+			readonly COLOR_SUCCESS=''
+			readonly COLOR_WARNING=''
+			readonly COLOR_ERROR=''
+			readonly COLOR_RESET=''
+			readonly COLOR_BOLD=''
+		fi
+	fi
+
+	# Enhanced logging functions with visual indicators
+	log::info() {
+		printf '%b[INFO]%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+	}
+
+	log::warn() {
+		printf '%b[WARN]%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+	}
+
+	log::error() {
+		printf '%b[ERROR]%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+	}
+
+	log::success() {
+		printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+	}
+
+	# Minimal banner support
+	banner_minimal() {
+		if colors_has_color; then
+			printf '%b• AI Workflow Generator •%b\n' "${COLOR_INFO}" "${COLOR_RESET}"
+		else
+			echo "• AI Workflow Generator •"
+		fi
+	}
+
+	# Basic spinner fallback (no-op for simplicity)
+	spinner::start() { echo "$*"; }
+	spinner::stop() { :; }
+
+	# Basic argument parsing fallback
+	parse_common_args() {
+		local script_name="$1"
+		shift
+		case "$1" in
+		--version | -v)
+			printf '%bAI Workflow Generator%b v1.0.0\n' "${COLOR_BOLD}" "${COLOR_RESET}"
+			exit 0
+			;;
+		--help | -h)
+			show_help
+			exit 0
+			;;
+		*)
+			log::error "Fallback mode: limited functionality without lib/main.sh"
+			exit 1
+			;;
+		esac
+	}
+
+	# No-op for update functions in fallback mode
+	enable_background_updates() { :; }
+fi
 
 # Script metadata
 SCRIPT_NAME="generate-ai-workflow"
@@ -401,8 +485,8 @@ EOF
 	spinner::stop
 	rm "$ai_prompt"
 
-	log::info "✓ Generated specific tasks based on your PRD"
-	log::info "Review .ai-workflow/state/tasks.md to see project-specific implementation steps"
+	log::success "Generated specific tasks based on your PRD"
+	log::info "→ Review .ai-workflow/state/tasks.md to see project-specific implementation steps"
 }
 
 analyze_prd_and_generate_tasks() {
@@ -1489,8 +1573,8 @@ main() {
 		log::info "Updating tasks for project: $project_name"
 		generate_specific_tasks "$project_name"
 
-		log::info "✓ Updated tasks.md with project-specific implementation steps"
-		log::info "Ready to start development with: /dev start"
+		log::success "Updated tasks.md with project-specific implementation steps"
+		log::info "→ Ready to start development with: /dev start"
 	else
 		# Initial generation mode
 		log::info "Generating AI workflow for project: $project_name"
@@ -1512,19 +1596,19 @@ main() {
 		generate_claude_commands "$project_name"
 		generate_other_agent_commands "$project_name"
 
-		log::info "✓ AI workflow generated successfully!"
+		log::success "AI workflow generated successfully!"
 		echo
 		log::info "Next steps:"
-		log::info "1. Edit .ai-workflow/state/requirements.md with your project details"
-		log::info "   • Use docs/prompting-guide.md for help generating comprehensive PRDs"
-		log::info "2. Generate specific tasks: $SCRIPT_NAME --update-tasks $project_name"
-		log::info "3. Copy commands to your AI coding agent:"
-		log::info "   • Claude Code:  mkdir -p .claude && cp -r .ai-workflow/commands/.claude/commands .claude/"
-		log::info "   • Cursor:       mkdir -p .cursor && cp -r .ai-workflow/commands/.cursor/commands .cursor/"
-		log::info "   • Gemini CLI:   mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/"
-		log::info "   • OpenCode:     mkdir -p .opencode && cp -r .ai-workflow/commands/.opencode/command .opencode/"
-		log::info "4. Start development with: /dev start"
-		log::info "5. Manage Shell Starter dependencies with: /deps"
+		printf '%b→%b 1. Edit .ai-workflow/state/requirements.md with your project details\n' "${COLOR_INFO}" "${COLOR_RESET}"
+		printf '%b  •%b Use docs/prompting-guide.md for help generating comprehensive PRDs\n' "${COLOR_INFO}" "${COLOR_RESET}"
+		printf '%b→%b 2. Generate specific tasks: %b%s --update-tasks %s%b\n' "${COLOR_INFO}" "${COLOR_RESET}" "${COLOR_BOLD}" "$SCRIPT_NAME" "$project_name" "${COLOR_RESET}"
+		printf '%b→%b 3. Copy commands to your AI coding agent:\n' "${COLOR_INFO}" "${COLOR_RESET}"
+		printf '%b  •%b Claude Code:  mkdir -p .claude && cp -r .ai-workflow/commands/.claude/commands .claude/\n' "${COLOR_SUCCESS}" "${COLOR_RESET}"
+		printf '%b  •%b Cursor:       mkdir -p .cursor && cp -r .ai-workflow/commands/.cursor/commands .cursor/\n' "${COLOR_SUCCESS}" "${COLOR_RESET}"
+		printf '%b  •%b Gemini CLI:   mkdir -p .gemini && cp -r .ai-workflow/commands/.gemini/commands .gemini/\n' "${COLOR_SUCCESS}" "${COLOR_RESET}"
+		printf '%b  •%b OpenCode:     mkdir -p .opencode && cp -r .ai-workflow/commands/.opencode/command .opencode/\n' "${COLOR_SUCCESS}" "${COLOR_RESET}"
+		printf '%b→%b 4. Start development with: %b/dev start%b\n' "${COLOR_INFO}" "${COLOR_RESET}" "${COLOR_BOLD}" "${COLOR_RESET}"
+		printf '%b→%b 5. Manage Shell Starter dependencies with: %b/deps%b\n' "${COLOR_INFO}" "${COLOR_RESET}" "${COLOR_BOLD}" "${COLOR_RESET}"
 	fi
 }
 

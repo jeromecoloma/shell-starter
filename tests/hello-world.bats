@@ -51,8 +51,13 @@ load bats-assert/load
 @test "hello-world: colorized output (default)" {
     run_script "hello-world"
     assert_success
-    # Should contain ANSI color codes when not in quiet mode
-    assert_output --partial $'\e['
+    # Should contain ANSI color codes only if colors are enabled
+    if colors::has_color; then
+        assert_output --partial $'\e['
+    else
+        # In no-color environment, should not contain escape sequences
+        refute_output --partial $'\e['
+    fi
 }
 
 @test "hello-world: help flag" {

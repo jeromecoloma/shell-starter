@@ -19,12 +19,65 @@ for lib_path in \
 	fi
 done
 
-# If main.sh not found, provide basic functionality
-if [[ -z "${COLORS_LOADED:-}" ]]; then
-	log::info() { echo "[INFO] $*"; }
-	log::warn() { echo "[WARN] $*"; }
-	log::error() { echo "[ERROR] $*" >&2; }
-	show_version() { echo "Shell Starter Update Tool v0.1.0"; }
+# Enhanced fallback functionality when lib/main.sh is not available
+if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
+	# Color detection and fallback functions
+	colors_has_color() {
+		[[ "${NO_COLOR:-}" == "" ]] && {
+			[[ "${TERM:-}" != "dumb" ]] &&
+				[[ "${TERM:-}" != "" ]] &&
+				[[ -t 1 ]]
+		}
+	}
+
+	# Enhanced color variables with fallback support (guard against redefinition)
+	if ! declare -p COLOR_RESET >/dev/null 2>&1; then
+		if colors_has_color; then
+			readonly COLOR_INFO='\033[0;34m'    # Blue
+			readonly COLOR_SUCCESS='\033[0;32m' # Green
+			readonly COLOR_WARNING='\033[1;33m' # Yellow
+			readonly COLOR_ERROR='\033[0;31m'   # Red
+			readonly COLOR_RESET='\033[0m'
+			readonly COLOR_BOLD='\033[1m'
+		else
+			readonly COLOR_INFO=''
+			readonly COLOR_SUCCESS=''
+			readonly COLOR_WARNING=''
+			readonly COLOR_ERROR=''
+			readonly COLOR_RESET=''
+			readonly COLOR_BOLD=''
+		fi
+	fi
+
+	# Enhanced logging functions with visual indicators
+	log::info() {
+		printf '%b[INFO]%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+	}
+
+	log::warn() {
+		printf '%b[WARN]%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+	}
+
+	log::error() {
+		printf '%b[ERROR]%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+	}
+
+	log::success() {
+		printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+	}
+
+	show_version() {
+		printf '%bShell Starter Update Tool%b v0.1.0\n' "${COLOR_BOLD}" "${COLOR_RESET}"
+	}
+
+	# Minimal banner support
+	banner_minimal() {
+		if colors_has_color; then
+			printf '%b• Shell Starter Update •%b\n' "${COLOR_INFO}" "${COLOR_RESET}"
+		else
+			echo "• Shell Starter Update •"
+		fi
+	}
 fi
 
 # Configuration
@@ -273,7 +326,7 @@ update_core_utilities() {
 					log::info "[DRY-RUN] Would create: ${target_file}"
 				fi
 			else
-				log::info "Updating: ${target_file}"
+				log::success "Updating: ${target_file}"
 				cp "$source_file" "$target_file"
 				chmod +x "$target_file"
 			fi
@@ -338,7 +391,7 @@ update_library_files() {
 					log::info "[DRY-RUN] Would create: ${target_file}"
 				fi
 			else
-				log::info "Updating: ${target_file}"
+				log::success "Updating: ${target_file}"
 				cp "$source_file" "$target_file"
 			fi
 		fi
@@ -561,16 +614,16 @@ perform_update() {
 	rm -rf "$temp_dir"
 
 	if [[ "$DRY_RUN" == "false" ]]; then
-		log::info "Shell Starter library and core utilities updated successfully!"
-		log::info "Updated: lib/ directory and bin/ core utilities (update-shell-starter, bump-version, generate-ai-workflow)"
+		log::success "Shell Starter library and core utilities updated successfully!"
+		printf '%b→%b Updated: lib/ directory and bin/ core utilities (update-shell-starter, bump-version, generate-ai-workflow)\n' "${COLOR_INFO}" "${COLOR_RESET}"
 		if has_demo_folder; then
-			log::info "Demo scripts in demo/ folder were preserved and not modified"
+			printf '%b→%b Demo scripts in demo/ folder were preserved and not modified\n' "${COLOR_INFO}" "${COLOR_RESET}"
 		fi
 	else
 		log::info "Dry run completed. Use without --dry-run to apply changes."
-		log::info "Would update: lib/ directory and bin/ core utilities"
+		printf '%b→%b Would update: lib/ directory and bin/ core utilities\n' "${COLOR_INFO}" "${COLOR_RESET}"
 		if has_demo_folder; then
-			log::info "Note: Demo scripts in demo/ folder will be preserved during actual update"
+			printf '%b→%b Note: Demo scripts in demo/ folder will be preserved during actual update\n' "${COLOR_INFO}" "${COLOR_RESET}"
 		fi
 	fi
 }

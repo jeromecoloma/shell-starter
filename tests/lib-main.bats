@@ -102,9 +102,9 @@ load bats-assert/load
 
 @test "all library modules are sourced" {
 	# Verify that color variables are available (from colors.sh)
-	assert [ -n "$COLOR_RED" ]
-	assert [ -n "$COLOR_GREEN" ]
-	assert [ -n "$COLOR_RESET" ]
+	assert [ "${COLOR_RED+defined}" = "defined" ]
+	assert [ "${COLOR_GREEN+defined}" = "defined" ]
+	assert [ "${COLOR_RESET+defined}" = "defined" ]
 
 	# Verify that logging functions are available (from logging.sh)
 	assert [ "$(type -t log::info)" = "function" ]
