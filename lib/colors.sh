@@ -148,7 +148,7 @@ colors::gradient_horizontal() {
 		output+="$(colors::rgb "$r" "$g" "$b")${text:$i:1}"
 	done
 
-	printf '%b%b' "$output" "${COLOR_RESET}"
+	printf '%b%b\n' "$output" "${COLOR_RESET}"
 }
 
 # Banner functions
@@ -275,6 +275,84 @@ colors::debug_terminal() {
 	echo "Has 256color: $(colors::has_256color && echo "yes" || echo "no")"
 	echo "Has basic color: $(colors::has_color && echo "yes" || echo "no")"
 	echo "=================================="
+}
+
+# JSON syntax highlighting functions
+colors::json_key() {
+	local key="$1"
+	printf '%b"%s"%b' "${COLOR_CYAN}" "$key" "${COLOR_RESET}"
+}
+
+colors::json_string() {
+	local value="$1"
+	printf '%b"%s"%b' "${COLOR_GREEN}" "$value" "${COLOR_RESET}"
+}
+
+colors::json_number() {
+	local value="$1"
+	printf '%b%s%b' "${COLOR_MAGENTA}" "$value" "${COLOR_RESET}"
+}
+
+colors::json_boolean() {
+	local value="$1"
+	if [[ "$value" == "true" ]]; then
+		printf '%b%s%b' "${COLOR_BRIGHT_GREEN}" "$value" "${COLOR_RESET}"
+	else
+		printf '%b%s%b' "${COLOR_BRIGHT_RED}" "$value" "${COLOR_RESET}"
+	fi
+}
+
+colors::json_null() {
+	printf '%b%s%b' "${COLOR_DIM}" "null" "${COLOR_RESET}"
+}
+
+colors::json_structure() {
+	local char="$1"
+	printf '%b%s%b' "${COLOR_BOLD}" "$char" "${COLOR_RESET}"
+}
+
+# JSON syntax highlighting function for complete JSON strings
+colors::json_syntax() {
+	local json_input="$1"
+
+	# Check if colors are disabled
+	if [[ "${NO_COLOR:-}" != "" ]] || ! colors::has_color; then
+		echo "$json_input"
+		return
+	fi
+
+	# Simple JSON syntax highlighting using color variables
+	# Process line by line to maintain proper formatting
+	local colored_output=""
+	while IFS= read -r line; do
+		# Color JSON keys (quoted strings followed by colon)
+		line=$(echo "$line" | sed "s/\"\\([^\"]*\\)\":/$(printf '%b' "${COLOR_CYAN}")\"\\1\"$(printf '%b' "${COLOR_RESET}"):/g")
+
+		# Color string values (quoted strings after colon)
+		line=$(echo "$line" | sed "s/: \"\\([^\"]*\\)\"/: $(printf '%b' "${COLOR_GREEN}")\"\\1\"$(printf '%b' "${COLOR_RESET}")/g")
+
+		# Color numeric values (including standalone numbers)
+		line=$(echo "$line" | sed "s/: \\([0-9]\\+\\(\\.[0-9]\\+\\)\\?\\)\\([,}\\]]\\|$\\)/: $(printf '%b' "${COLOR_MAGENTA}")\\1$(printf '%b' "${COLOR_RESET}")\\3/g")
+		# Color numeric values after spaces (for arrays)
+		line=$(echo "$line" | sed "s/  \\([0-9]\\+\\(\\.[0-9]\\+\\)\\?\\)\\([,]\\|$\\)/  $(printf '%b' "${COLOR_MAGENTA}")\\1$(printf '%b' "${COLOR_RESET}")\\3/g")
+
+		# Color boolean true
+		line=$(echo "$line" | sed "s/: true/: $(printf '%b' "${COLOR_BRIGHT_GREEN}")true$(printf '%b' "${COLOR_RESET}")/g")
+
+		# Color boolean false
+		line=$(echo "$line" | sed "s/: false/: $(printf '%b' "${COLOR_BRIGHT_RED}")false$(printf '%b' "${COLOR_RESET}")/g")
+
+		# Color null
+		line=$(echo "$line" | sed "s/: null/: $(printf '%b' "${COLOR_DIM}")null$(printf '%b' "${COLOR_RESET}")/g")
+
+		# Color structural characters
+		line=$(echo "$line" | sed "s/\\([{}\\[\\],]\\)/$(printf '%b' "${COLOR_BOLD}")\\1$(printf '%b' "${COLOR_RESET}")/g")
+
+		colored_output+="$line"$'\n'
+	done <<<"$json_input"
+
+	# Remove trailing newline and add final newline
+	echo "${colored_output%$'\n'}"
 }
 
 # Colors are now initialized inline above based on NO_COLOR and terminal support

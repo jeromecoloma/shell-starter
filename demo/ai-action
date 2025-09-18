@@ -167,19 +167,19 @@ EOF
 	if [[ "$output_format" == "json" ]]; then
 		echo ""
 		echo -e "${COLOR_DIM}JSON Output:${COLOR_RESET}"
-		cat <<EOF
-{
-  "analysis_type": "$analysis_type",
-  "content_length": $(echo "$content" | wc -w),
-  "processing_time": "2.1s",
-  "confidence": 0.85,
-  "recommendations": [
-    "Content is well-structured",
-    "Consider adding more examples",
-    "Technical accuracy is high"
-  ]
-}
-EOF
+		local json_output=""
+		json_output+="{"$'\n'
+		json_output+="  \"analysis_type\": \"$analysis_type\","$'\n'
+		json_output+="  \"content_length\": $(echo "$content" | wc -w),"$'\n'
+		json_output+="  \"processing_time\": \"2.1s\","$'\n'
+		json_output+="  \"confidence\": 0.85,"$'\n'
+		json_output+="  \"recommendations\": ["$'\n'
+		json_output+="    \"Content is well-structured\","$'\n'
+		json_output+="    \"Consider adding more examples\","$'\n'
+		json_output+="    \"Technical accuracy is high\""$'\n'
+		json_output+="  ]"$'\n'
+		json_output+="}"
+		colors::json_syntax "$json_output"
 	fi
 
 	log::info "Analysis completed successfully"

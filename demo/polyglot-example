@@ -176,7 +176,12 @@ EOF
 
 	echo -e "${COLOR_BOLD}${COLOR_CYAN}Processing Results:${COLOR_RESET}"
 	echo "==================="
-	echo "$result"
+	# Apply JSON syntax highlighting if the result looks like JSON
+	if [[ "$result" =~ ^\s*[\[{] ]]; then
+		colors::json_syntax "$result"
+	else
+		echo "$result"
+	fi
 
 	if [[ -n "$output_file" ]]; then
 		echo -e "${COLOR_SUCCESS}✓ Results saved to: ${COLOR_BOLD}$output_file${COLOR_RESET}"
@@ -380,7 +385,12 @@ EOF
 	if [[ -z "$output_file" ]]; then
 		echo -e "${COLOR_BOLD}${COLOR_CYAN}Generated Data:${COLOR_RESET}"
 		echo "==============="
-		echo "$result"
+		# Apply JSON syntax highlighting if the result looks like JSON
+		if [[ "$result" =~ ^\s*[\[{] ]]; then
+			colors::json_syntax "$result"
+		else
+			echo "$result"
+		fi
 	else
 		echo -e "${COLOR_SUCCESS}✓ Generated data saved to: ${COLOR_BOLD}$output_file${COLOR_RESET}"
 	fi

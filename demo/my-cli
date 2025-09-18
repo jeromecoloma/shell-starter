@@ -92,16 +92,19 @@ EOF
 	echo "================================"
 
 	if [[ "$format" == "json" ]]; then
-		echo "{"
-		echo "  \"timestamp\": \"$(date -Iseconds)\","
-		echo "  \"hostname\": \"$(hostname)\","
-		echo "  \"uptime\": \"$(uptime | sed 's/.*up //' | sed 's/,.*//')\","
-		echo "  \"load_average\": \"$(uptime | awk -F'load average:' '{print $2}' | xargs)\""
+		local json_output=""
+		json_output+="{"$'\n'
+		json_output+="  \"timestamp\": \"$(date -Iseconds)\","$'\n'
+		json_output+="  \"hostname\": \"$(hostname)\","$'\n'
+		json_output+="  \"uptime\": \"$(uptime | sed 's/.*up //' | sed 's/,.*//')\","$'\n'
+		json_output+="  \"load_average\": \"$(uptime | awk -F'load average:' '{print $2}' | xargs)\""
 		if [[ "$detailed" == "true" ]]; then
-			echo "  \"disk_usage\": \"$(df -h / | tail -1 | awk '{print $5}')\","
-			echo "  \"memory_usage\": \"$(free -h | grep '^Mem:' | awk '{print $3}' || echo 'N/A')\""
+			json_output+=","$'\n'
+			json_output+="  \"disk_usage\": \"$(df -h / | tail -1 | awk '{print $5}')\","$'\n'
+			json_output+="  \"memory_usage\": \"$(free -h | grep '^Mem:' | awk '{print $3}' || echo 'N/A')\""
 		fi
-		echo "}"
+		json_output+=$'\n'"}"
+		colors::json_syntax "$json_output"
 	else
 		echo -e "  ${COLOR_GREEN}Hostname:${COLOR_RESET} $(hostname)"
 		echo -e "  ${COLOR_GREEN}Timestamp:${COLOR_RESET} $(date)"
