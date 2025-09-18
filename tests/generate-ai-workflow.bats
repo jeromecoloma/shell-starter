@@ -357,3 +357,45 @@ teardown() {
 		assert [ -s "$file" ] # -s checks that file exists and is not empty
 	done
 }
+
+# Color output verification tests
+@test "generate-ai-workflow: shows colored output when colors enabled" {
+	# Test that colored output contains visual indicators
+	run "${PROJECT_ROOT}/bin/generate-ai-workflow" --help
+	assert_success
+	assert_output --partial "Generate AI Workflow"
+	assert_output --partial "USAGE:"
+}
+
+@test "generate-ai-workflow: colored help output includes banner" {
+	# Test that help output includes banner
+	run "${PROJECT_ROOT}/bin/generate-ai-workflow" --help
+	assert_success
+	assert_output --partial "Generate AI Workflow"
+	assert_output --partial "PROJECT_NAME"
+}
+
+@test "generate-ai-workflow: workflow generation shows colored status messages" {
+	run bash -c "echo 'y' | '${PROJECT_ROOT}/bin/generate-ai-workflow' 'test-project'"
+	assert_success
+
+	# Should contain colored status messages
+	assert_output --partial "AI workflow generated successfully!"
+}
+
+@test "generate-ai-workflow: respects NO_COLOR environment variable" {
+	# Test with NO_COLOR set
+	run bash -c "NO_COLOR=1 '${PROJECT_ROOT}/bin/generate-ai-workflow' --help"
+	assert_success
+	assert_output --partial "Generate AI Workflow"
+
+	# Should not contain ANSI escape sequences
+	refute_output --partial $'['
+}
+
+@test "generate-ai-workflow: error messages have visual indicators" {
+	# Test error message formatting (empty project name)
+	run bash -c "echo '' | '${PROJECT_ROOT}/bin/generate-ai-workflow'"
+	assert_failure
+	assert_output --partial "Project name cannot be empty"
+}

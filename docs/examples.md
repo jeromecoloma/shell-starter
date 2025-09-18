@@ -118,22 +118,39 @@ source "${SHELL_STARTER_ROOT}/lib/main.sh"
 main() {
     echo "${COLOR_BOLD}${COLOR_CYAN}Shell Starter - Color Library Showcase${COLOR_RESET}"
     echo "=========================================="
-    
+
     echo "${COLOR_BOLD}Basic Colors:${COLOR_RESET}"
     echo "  ${COLOR_BLACK}COLOR_BLACK${COLOR_RESET}     - Black text"
     echo "  ${COLOR_RED}COLOR_RED${COLOR_RESET}       - Red text"
     echo "  ${COLOR_GREEN}COLOR_GREEN${COLOR_RESET}     - Green text"
     # ... more color examples
-    
+
     echo
     echo "${COLOR_BOLD}${COLOR_UNDERLINE}Logging Function Examples:${COLOR_RESET}"
     echo
-    
+
     log::success "✓ Success: Operation completed successfully!"
     log::warn "⚠ Warning: This is a warning message"
     log::error "✗ Error: Something went wrong"
     log::info "ℹ Info: Here's some information"
     log::debug "🐛 Debug: Debugging information"
+
+    echo
+    echo "${COLOR_BOLD}${COLOR_UNDERLINE}Enhanced Color Features:${COLOR_RESET}"
+    echo
+
+    # Demonstrate JSON syntax highlighting
+    echo "${COLOR_BOLD}JSON Syntax Highlighting:${COLOR_RESET}"
+    local sample_json='{"name": "Shell Starter", "version": "1.0.0", "active": true, "count": 42, "data": null}'
+    colors::json_syntax "$sample_json"
+
+    echo
+    echo "${COLOR_BOLD}Visual Status Indicators:${COLOR_RESET}"
+    echo "  ✓ Success indicator with colors"
+    echo "  ✗ Error indicator with colors"
+    echo "  ⚠ Warning indicator with colors"
+    echo "  ℹ Info indicator with colors"
+    echo "  → Progress indicator with colors"
 }
 
 main "$@"
@@ -1924,6 +1941,281 @@ teardown() {
     [ "$status" -eq 0 ]
     [[ "$output" =~ "Hello, Alice!" ]]
 }
+```
+
+## 🎨 Enhanced Color Features & Fallback Systems
+
+### JSON Syntax Highlighting
+
+Shell Starter includes enhanced JSON syntax highlighting capabilities:
+
+```bash
+#!/bin/bash
+
+# json-example - Demonstrates JSON syntax highlighting
+source lib/main.sh
+
+# Simple JSON highlighting
+simple_json='{"name": "value", "count": 42, "active": true}'
+colors::json_syntax "$simple_json"
+
+# Complex nested JSON
+complex_json='{
+  "user": {
+    "name": "John Doe",
+    "age": 30,
+    "active": true,
+    "settings": {
+      "theme": "dark",
+      "notifications": false
+    }
+  },
+  "items": [1, 2, 3],
+  "metadata": null
+}'
+colors::json_syntax "$complex_json"
+
+# Individual JSON component highlighting
+echo "Key: $(colors::json_key "username")"
+echo "String: $(colors::json_string "John Doe")"
+echo "Number: $(colors::json_number "42")"
+echo "Boolean: $(colors::json_boolean "true")"
+echo "Null: $(colors::json_null)"
+```
+
+### Production Tool Color Fallback
+
+Production tools in `bin/` include sophisticated fallback color support:
+
+```bash
+#!/bin/bash
+
+# production-tool-example - Shows fallback color functionality
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Try to source lib/main.sh from various locations
+for lib_path in \
+    "${SCRIPT_DIR}/../lib/main.sh" \
+    "${SCRIPT_DIR}/lib/main.sh" \
+    "$(dirname "${SCRIPT_DIR}")/lib/main.sh"; do
+    if [[ -f "$lib_path" ]]; then
+        source "$lib_path"
+        break
+    fi
+done
+
+# Enhanced fallback functionality when lib/main.sh is not available
+if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
+    # Color detection and fallback functions
+    colors_has_color() {
+        [[ "${NO_COLOR:-}" == "" ]] && {
+            [[ "${TERM:-}" != "dumb" ]] &&
+                [[ "${TERM:-}" != "" ]] &&
+                [[ -t 1 ]]
+        }
+    }
+
+    # Enhanced color variables with fallback support
+    if ! declare -p COLOR_RESET >/dev/null 2>&1; then
+        if colors_has_color; then
+            readonly COLOR_INFO='\033[0;34m'    # Blue
+            readonly COLOR_SUCCESS='\033[0;32m' # Green
+            readonly COLOR_WARNING='\033[1;33m' # Yellow
+            readonly COLOR_ERROR='\033[0;31m'   # Red
+            readonly COLOR_RESET='\033[0m'
+            readonly COLOR_BOLD='\033[1m'
+        else
+            readonly COLOR_INFO=''
+            readonly COLOR_SUCCESS=''
+            readonly COLOR_WARNING=''
+            readonly COLOR_ERROR=''
+            readonly COLOR_RESET=''
+            readonly COLOR_BOLD=''
+        fi
+    fi
+
+    # Enhanced logging functions with visual indicators
+    log::info() {
+        printf '%bℹ%b %s\n' "${COLOR_INFO}" "${COLOR_RESET}" "$*"
+    }
+
+    log::warn() {
+        printf '%b⚠%b %s\n' "${COLOR_WARNING}" "${COLOR_RESET}" "$*"
+    }
+
+    log::error() {
+        printf '%b✗%b %s\n' "${COLOR_ERROR}" "${COLOR_RESET}" "$*" >&2
+    }
+
+    log::success() {
+        printf '%b✓%b %s\n' "${COLOR_SUCCESS}" "${COLOR_RESET}" "$*"
+    }
+
+    # Minimal banner support
+    banner_minimal() {
+        if colors_has_color; then
+            printf '%b• Production Tool •%b\n' "${COLOR_INFO}" "${COLOR_RESET}"
+        else
+            echo "• Production Tool •"
+        fi
+    }
+fi
+
+show_help() {
+    banner_minimal
+    cat << EOF
+Usage: $(basename "$0") [OPTIONS]
+
+A production tool demonstrating enhanced color fallback support.
+
+OPTIONS:
+    -h, --help        Show this help message and exit
+    -v, --version     Show version information and exit
+
+EXAMPLES:
+    $(basename "$0")              # Run with colors
+    NO_COLOR=1 $(basename "$0")   # Run without colors
+EOF
+}
+
+main() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            -v|--version)
+                echo "$(basename "$0") v1.0.0"
+                exit 0
+                ;;
+            *)
+                log::error "Unknown option: $1"
+                show_help
+                exit 1
+                ;;
+        esac
+    done
+
+    log::info "Tool starting with enhanced color support"
+    log::success "Colors work with or without lib/main.sh!"
+    log::warn "This shows fallback functionality"
+    log::error "Even errors have visual indicators"
+}
+
+main "$@"
+```
+
+### Color Environment Compatibility
+
+Shell Starter automatically detects and adapts to different terminal environments:
+
+```bash
+# Environment detection examples
+colors::has_color        # Returns true if colors are supported
+colors::has_truecolor    # Returns true if 24-bit colors are supported
+colors::has_256color     # Returns true if 256 colors are supported
+colors::is_terminal      # Returns true if output is going to a terminal
+
+# Respects user preferences
+export NO_COLOR=1        # Disables all colors globally
+export TERM=dumb         # Forces fallback to plain text
+
+# Terminal-specific detection
+export COLORTERM=truecolor      # Enables truecolor support
+export TERM_PROGRAM=iTerm.app   # iTerm2 detection
+export TERM=xterm-256color      # 256-color terminal
+```
+
+### Advanced Color Usage Patterns
+
+```bash
+# Section headers with colors
+section_header() {
+    printf '\n%b─── %s ───%b\n' "${COLOR_BOLD}" "$*" "${COLOR_RESET}"
+}
+
+# Visual dividers
+section_divider() {
+    printf '%b%s%b\n' "${COLOR_INFO}" "$(printf '%.40s' "────────────────────────────────────────")" "${COLOR_RESET}"
+}
+
+# Colored JSON in demo scripts
+demo_status_json() {
+    local json_data='{"status": "ok", "version": "1.0.0", "count": 5}'
+    echo "Status (JSON format):"
+    colors::json_syntax "$json_data"
+}
+
+# Progress indicators with colors
+show_progress() {
+    local steps=("Initialize" "Process" "Validate" "Complete")
+    local current_step="$1"
+
+    echo "Progress:"
+    for i in "${!steps[@]}"; do
+        if [[ $i -lt $current_step ]]; then
+            printf "  %b✓%b %s\n" "${COLOR_SUCCESS}" "${COLOR_RESET}" "${steps[$i]}"
+        elif [[ $i -eq $current_step ]]; then
+            printf "  %b→%b %s\n" "${COLOR_INFO}" "${COLOR_RESET}" "${steps[$i]}"
+        else
+            printf "  %b○%b %s\n" "${COLOR_DIM}" "${COLOR_RESET}" "${steps[$i]}"
+        fi
+    done
+}
+```
+
+### NO_COLOR Compliance
+
+Shell Starter fully respects the [NO_COLOR standard](https://no-color.org/):
+
+```bash
+# Users can disable colors globally
+export NO_COLOR=1
+./bin/bump-version --help    # Shows plain text without colors
+
+# Or per-command
+NO_COLOR=1 ./demo/show-colors
+
+# Detection in scripts
+if [[ "${NO_COLOR:-}" != "" ]]; then
+    echo "Colors are disabled by user preference"
+fi
+
+# All color functions respect this setting automatically
+log::info "This message respects NO_COLOR setting"
+colors::json_syntax '{"key": "value"}'  # Plain text if NO_COLOR=1
+```
+
+### Best Practices for Color Enhancement
+
+```bash
+# 1. Always provide fallback functionality
+if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
+    # Define minimal color fallback functions
+    log::info() { printf 'ℹ %s\n' "$*"; }
+    # ... other fallbacks
+fi
+
+# 2. Use semantic colors consistently
+log::info "Information messages (blue ℹ)"
+log::success "Success messages (green ✓)"
+log::warn "Warning messages (yellow ⚠)"
+log::error "Error messages (red ✗)"
+
+# 3. Include visual indicators beyond just colors
+printf '%b→%b Processing...\n' "${COLOR_INFO}" "${COLOR_RESET}"
+printf '%b✓%b Completed\n' "${COLOR_SUCCESS}" "${COLOR_RESET}"
+
+# 4. Test with NO_COLOR to ensure accessibility
+NO_COLOR=1 your-script --help
+
+# 5. Use guard clauses to prevent redefinition
+if ! declare -p COLOR_RESET >/dev/null 2>&1; then
+    # Define color variables only if not already defined
+fi
 ```
 
 These examples demonstrate the full range of Shell Starter capabilities and provide templates for creating robust, maintainable bash scripts. Each example includes proper error handling, user feedback, and follows the established conventions.

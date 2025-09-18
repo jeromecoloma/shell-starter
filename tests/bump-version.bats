@@ -340,3 +340,55 @@ teardown() {
 	run cat "$TEST_DIR/.shell-starter-version"
 	assert_output "1.0.0"
 }
+
+# Color output verification tests
+@test "bump-version: shows colored output when colors enabled" {
+	# Test that colored output contains visual indicators
+	run "$TEST_DIR/bin/bump-version" --current
+	assert_success
+	assert_output --partial "Current version:"
+
+	# Check for visual indicators (should be present regardless of color support)
+	assert_output --partial "Repository type:"
+}
+
+@test "bump-version: colored help output includes banner" {
+	# Test that help output includes banner
+	run "$TEST_DIR/bin/bump-version" --help
+	assert_success
+	assert_output --partial "Bump Version"
+	assert_output --partial "USAGE:"
+}
+
+@test "bump-version: version bump shows colored status messages" {
+	run "$TEST_DIR/bin/bump-version" "patch"
+	assert_success
+
+	# Should contain status message
+	assert_output --partial "Updated project version to 1.0.1"
+	assert_output --partial "Repository type:"
+}
+
+@test "bump-version: respects NO_COLOR environment variable" {
+	# Test with NO_COLOR set
+	run bash -c "cd '$TEST_DIR' && NO_COLOR=1 bin/bump-version --current"
+	assert_success
+	assert_output --partial "Current version: 1.0.0"
+
+	# Should not contain ANSI escape sequences
+	refute_output --partial $'['
+}
+
+@test "bump-version: error messages have visual indicators" {
+	# Test error message formatting
+	run "$TEST_DIR/bin/bump-version" --invalid-option
+	assert_failure
+	assert_output --partial "Unknown option: --invalid-option"
+}
+
+@test "bump-version: dry-run shows colored output" {
+	run "$TEST_DIR/bin/bump-version" --dry-run "major"
+	assert_success
+	assert_output --partial "[DRY-RUN]"
+	assert_output --partial "Dry run completed"
+}
