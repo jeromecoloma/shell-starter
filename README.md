@@ -102,6 +102,7 @@ Shell Starter includes example scripts (in `demo/`) and core utilities (in `bin/
 | `generate-ai-workflow` | Creates multi-agent AI development workflows for autonomous coding |
 | `update-shell-starter` | Updates shell-starter library dependencies in derived projects |
 | `bump-version` | Intelligent version bumping for shell-starter and cloned projects |
+| `cleanup-shell-path` | Removes duplicate and orphaned PATH entries from shell configuration files |
 
 **Built-in Features**: All example scripts support standard flags including `--help`, `--version`, `--update`, `--check-version`, `--notify-config`, and `--uninstall` (for removing CLI tool installation).
 
@@ -111,6 +112,7 @@ Shell Starter includes example scripts (in `demo/`) and core utilities (in `bin/
 # Run example scripts from the demo/ directory
 ./demo/hello-world --help
 ./demo/show-colors
+./demo/show-banner
 ./demo/long-task
 ./demo/greet-user --formal "Developer"
 ./demo/my-cli status
@@ -121,6 +123,7 @@ Shell Starter includes example scripts (in `demo/`) and core utilities (in `bin/
 ./bin/generate-ai-workflow --help
 ./bin/bump-version --help
 ./bin/update-shell-starter --help
+./bin/cleanup-shell-path --help
 ```
 
 ## 🔧 Development

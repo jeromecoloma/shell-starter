@@ -26,6 +26,7 @@ Conventions are demonstrated in both example scripts (`demo/`) and core utilitie
 | `bin/generate-ai-workflow` | Complex argument parsing, file generation |
 | `bin/update-shell-starter` | Dependency management, version tracking, breaking change detection |
 | `bin/bump-version` | Version management, repository detection |
+| `bin/cleanup-shell-path` | Shell configuration management, PATH cleanup |
 
 **Test Examples**: `tests/hello-world.bats`, `tests/library-functions.bats`
 

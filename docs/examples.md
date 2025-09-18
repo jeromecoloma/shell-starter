@@ -11,6 +11,10 @@ Shell Starter organizes scripts into two main directories:
 
 The examples in this document are primarily from the `demo/` directory, showing how to build CLI tools using Shell Starter patterns. The core utilities in `bin/` (like `generate-ai-workflow`, `bump-version`, `update-shell-starter`) demonstrate advanced patterns for production tools.
 
+**Important**: All example scripts shown below are located in the `demo/` directory, not `bin/`. The `bin/` directory contains production utilities that come with Shell Starter itself.
+
+**Note**: The actual scripts in the `demo/` directory have been enhanced beyond the basic examples shown in this documentation. The real scripts include features like banner headers, background update notifications, comprehensive argument parsing with `parse_common_args`, and standardized help formatting. The examples below demonstrate the core patterns and functionality, but refer to the actual files in `demo/` for the complete, current implementations with all modern Shell Starter features.
+
 ## 🎯 Basic Script Examples
 
 ### 1. Hello World Script
@@ -180,9 +184,432 @@ main() {
 main "$@"
 ```
 
+### 3. Banner Showcase Script
+
+Demonstrates the Shell Starter banner system with gradient colors and multiple styles:
+
+```bash
+#!/bin/bash
+
+# show-banner - Demonstrates Shell Starter banner system with multiple styles
+# This script showcases the visual branding capabilities including gradient colors,
+# multiple banner styles, and terminal compatibility detection
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+source "${SHELL_STARTER_ROOT}/lib/main.sh"
+
+show_help() {
+    # Show banner header for help
+    banner::shell_starter minimal
+    cat <<EOF
+Usage: $(basename "$0") [OPTIONS] [STYLE]
+
+Demonstrates the Shell Starter banner system with gradient colors and multiple styles.
+
+ARGUMENTS:
+    STYLE             Banner style to display (block, ascii, minimal, all)
+                      Default: all
+
+OPTIONS:
+    -h, --help        Show this help message and exit
+    -v, --version     Show version information and exit
+    --update          Check for available updates
+    --check-version   Show detailed version status and check for updates
+    --notify-config   Configure update notification settings
+    --uninstall       Remove Shell Starter installation
+    --no-info         Skip terminal compatibility information
+    --debug           Show terminal environment debug information
+    --plain           Force plain text output (no colors)
+
+STYLES:
+    block            Unicode block characters with gradient (default style)
+    pixel            Alias for block style
+    ascii            Traditional ASCII art with gradient
+    minimal          Simple bullet-point design with gradient
+    all              Show all available styles
+
+EXAMPLES:
+    $(basename "$0")              # Show all banner styles with info
+    $(basename "$0") block        # Show only block style banner
+    $(basename "$0") ascii        # Show only ASCII art banner
+    $(basename "$0") --debug      # Show banners with debug info
+    $(basename "$0") --plain      # Show banners without colors
+    $(basename "$0") --no-info    # Show banners without compatibility info
+EOF
+}
+
+show_terminal_info() {
+    echo -e "${COLOR_BOLD}${COLOR_CYAN}Terminal Compatibility Information:${COLOR_RESET}"
+    echo "=============================================="
+    echo "TERM: ${TERM:-unset}"
+    echo "COLORTERM: ${COLORTERM:-unset}"
+    echo "TERM_PROGRAM: ${TERM_PROGRAM:-unset}"
+    echo "NO_COLOR: ${NO_COLOR:-unset}"
+    echo
+    echo "Detected capabilities:"
+    echo "  Output is terminal: $(colors::is_terminal && echo "yes" || echo "no")"
+    echo "  Has truecolor: $(colors::has_truecolor && echo "yes" || echo "no")"
+    echo "  Has 256color: $(colors::has_256color && echo "yes" || echo "no")"
+    echo "  Has basic color: $(colors::has_color && echo "yes" || echo "no")"
+    echo
+}
+
+display_banner() {
+    local style="$1"
+    local show_info="$2"
+
+    echo -e "${COLOR_BOLD}${COLOR_YELLOW}$(echo "$style" | tr '[:lower:]' '[:upper:]') STYLE:${COLOR_RESET}"
+    echo "=================================="
+
+    if [[ "$show_info" == "true" ]]; then
+        show_style_info "$style"
+        echo
+    fi
+
+    banner::shell_starter "$style"
+    echo
+}
+
+main() {
+    local style="all"
+    local show_info=true
+    local show_debug=false
+    local force_plain=false
+
+    # Enable optional background update notifications
+    enable_background_updates
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+        --no-info)
+            show_info=false
+            shift
+            ;;
+        --debug)
+            show_debug=true
+            shift
+            ;;
+        --plain)
+            force_plain=true
+            export NO_COLOR=1
+            shift
+            ;;
+        --help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
+            parse_common_args "$(basename "$0")" "$@"
+            ;;
+        -*)
+            log::error "Unknown option: $1"
+            echo "Use --help for usage information."
+            exit 1
+            ;;
+        *)
+            # Validate style argument
+            case "$1" in
+            "block" | "pixel" | "ascii" | "minimal" | "all")
+                style="$1"
+                ;;
+            *)
+                log::error "Invalid style: $1"
+                echo "Valid styles: block, pixel, ascii, minimal, all"
+                echo "Use --help for usage information."
+                exit 1
+                ;;
+            esac
+            shift
+            ;;
+        esac
+    done
+
+    # Welcome banner for the script
+    banner::shell_starter minimal
+    echo -e "${COLOR_BOLD}${COLOR_MAGENTA}Banner System Showcase${COLOR_RESET}"
+    echo "======================"
+    echo
+
+    if [[ "$show_debug" == "true" ]]; then
+        colors::debug_terminal
+        echo
+    elif [[ "$show_info" == "true" ]]; then
+        show_terminal_info
+    fi
+
+    case "$style" in
+    "all")
+        display_all_banners "$show_info"
+        ;;
+    *)
+        display_banner "$style" "$show_info"
+        ;;
+    esac
+
+    echo -e "${COLOR_BOLD}Banner Features:${COLOR_RESET}"
+    echo "• Gradient color implementation with RGB support"
+    echo "• Multiple styles: Block/Pixel, ASCII Art, and Minimalist"
+    echo "• Terminal compatibility detection and fallback"
+    echo "• NO_COLOR environment variable support"
+    echo "• Graceful degradation for all terminal types"
+    echo
+
+    log::info "Banner demonstration completed"
+}
+
+main "$@"
+```
+
+### 4. Debug Colors Script
+
+Simple utility for debugging color support in terminals:
+
+```bash
+#!/bin/bash
+
+# debug-colors - Debug color support in the current terminal
+# This script helps identify why colors might not be displaying correctly
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+source "${SHELL_STARTER_ROOT}/lib/main.sh"
+
+echo "=== Terminal Color Debug Information ==="
+echo
+echo "Basic environment:"
+echo "  TERM: ${TERM:-unset}"
+echo "  COLORTERM: ${COLORTERM:-unset}"
+echo "  TERM_PROGRAM: ${TERM_PROGRAM:-unset}"
+echo "  NO_COLOR: ${NO_COLOR:-unset}"
+echo
+echo "Detection results:"
+echo "  Output is terminal: $(colors::is_terminal && echo "yes" || echo "no")"
+echo "  Has truecolor: $(colors::has_truecolor && echo "yes" || echo "no")"
+echo "  Has 256color: $(colors::has_256color && echo "yes" || echo "no")"
+echo "  Has basic color: $(colors::has_color && echo "yes" || echo "no")"
+echo
+
+echo "Color test (if you see color names in color, your terminal works):"
+echo -e "  ${COLOR_RED}RED${COLOR_RESET}"
+echo -e "  ${COLOR_GREEN}GREEN${COLOR_RESET}"
+echo -e "  ${COLOR_BLUE}BLUE${COLOR_RESET}"
+echo -e "  ${COLOR_YELLOW}YELLOW${COLOR_RESET}"
+echo -e "  ${COLOR_CYAN}CYAN${COLOR_RESET}"
+echo -e "  ${COLOR_MAGENTA}MAGENTA${COLOR_RESET}"
+echo
+
+echo "Raw color codes (should show literal escape codes):"
+printf "  RED: '%s'\n" "$COLOR_RED"
+printf "  RESET: '%s'\n" "$COLOR_RESET"
+echo
+
+echo "If colors appear as literal text like [0;31m instead of actual colors,"
+echo "your terminal may not support ANSI colors or colors may be disabled."
+echo "Try:"
+echo "  - Using a different terminal (iTerm2, Terminal.app, etc.)"
+echo "  - Checking if NO_COLOR environment variable is set"
+echo "  - Running: export TERM=xterm-256color"
+```
+
+### 5. Update Management Tool
+
+Comprehensive demonstration of update management features:
+
+```bash
+#!/bin/bash
+
+# update-tool - Comprehensive update management demonstration
+# This script showcases all Shell Starter update management features
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SHELL_STARTER_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+
+source "${SHELL_STARTER_ROOT}/lib/main.sh"
+
+show_help() {
+    # Show banner header for help
+    banner::shell_starter minimal
+    cat <<EOF
+Usage: $(basename "$0") [OPTIONS] [COMMAND]
+
+A comprehensive tool demonstrating Shell Starter's update management system.
+
+COMMANDS:
+    check               Check for available updates (default)
+    status              Show detailed version status and configuration
+    config              Manage update notification settings
+    install <version>   Install a specific version (demonstration)
+    history             Show release history
+
+OPTIONS:
+    -h, --help          Show this help message and exit
+    -v, --version       Show version information and exit
+    --update            Check for available updates
+    --check-version     Show detailed version status and check for updates
+    --notify-config     Configure update notification settings
+    --uninstall         Remove Shell Starter installation
+    -q, --quiet         Suppress colorful output
+    --verbose           Show detailed operation information
+
+UPDATE NOTIFICATION COMMANDS:
+    config enable       Enable automatic update notifications
+    config disable      Disable automatic update notifications
+    config interval <hours>  Set check interval in hours
+    config quiet <on|off>    Enable/disable quiet notifications
+    config status       Show current notification configuration
+
+EXAMPLES:
+    $(basename "$0")                    # Check for updates
+    $(basename "$0") status             # Show detailed status
+    $(basename "$0") config enable      # Enable notifications
+    $(basename "$0") config interval 12 # Check every 12 hours
+    $(basename "$0") history            # Show release history
+EOF
+}
+
+cmd_check() {
+    log::info "Checking for available updates..."
+
+    # Simulate update check
+    spinner::start "Contacting update server"
+    sleep 2
+    spinner::stop
+
+    log::success "Update check completed"
+    echo "Current version: $(get_version)"
+    echo "Latest version:  1.2.0"
+    echo "Status: Update available"
+    echo
+    log::info "Run '$(basename "$0") install 1.2.0' to update"
+}
+
+cmd_status() {
+    log::info "Version Status Information"
+    echo "=========================="
+    echo "Current version: $(get_version)"
+    echo "Shell Starter version: $(get_shell_starter_version)"
+    echo "Update notifications: $(update::get_notification_status)"
+    echo "Check interval: $(update::get_check_interval) hours"
+    echo "Last check: $(update::get_last_check_time)"
+    echo
+}
+
+cmd_config() {
+    local subcommand="${1:-status}"
+    case "$subcommand" in
+        enable)
+            log::info "Enabling update notifications..."
+            update::enable_notifications
+            log::success "Update notifications enabled"
+            ;;
+        disable)
+            log::info "Disabling update notifications..."
+            update::disable_notifications
+            log::success "Update notifications disabled"
+            ;;
+        status)
+            cmd_status
+            ;;
+        *)
+            log::error "Unknown config command: $subcommand"
+            echo "Valid commands: enable, disable, status"
+            exit 1
+            ;;
+    esac
+}
+
+cmd_install() {
+    local version="${1:-}"
+    if [[ -z "$version" ]]; then
+        log::error "Version required for install command"
+        echo "Usage: $(basename "$0") install <version>"
+        exit 1
+    fi
+
+    log::info "Installing version $version..."
+    spinner::start "Downloading and installing"
+    sleep 3
+    spinner::stop
+    log::success "Version $version installed successfully"
+}
+
+cmd_history() {
+    log::info "Release History"
+    echo "==============="
+    echo "v1.2.0 - 2024-01-15 - Added banner system and enhanced colors"
+    echo "v1.1.0 - 2024-01-10 - Improved update management"
+    echo "v1.0.0 - 2024-01-01 - Initial release"
+}
+
+main() {
+    local command="check"
+    local verbose=false
+    local quiet=false
+
+    # Enable optional background update notifications
+    enable_background_updates
+
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+        --verbose)
+            verbose=true
+            shift
+            ;;
+        -q|--quiet)
+            quiet=true
+            shift
+            ;;
+        --help | -h | --version | -v | --update | --check-version | --notify-config | --uninstall)
+            parse_common_args "$(basename "$0")" "$@"
+            ;;
+        -*)
+            log::error "Unknown option: $1"
+            echo "Use --help for usage information."
+            exit 1
+            ;;
+        *)
+            command="$1"
+            shift
+            break
+            ;;
+        esac
+    done
+
+    case "$command" in
+    check)
+        cmd_check
+        ;;
+    status)
+        cmd_status
+        ;;
+    config)
+        cmd_config "$@"
+        ;;
+    install)
+        cmd_install "$@"
+        ;;
+    history)
+        cmd_history
+        ;;
+    *)
+        log::error "Unknown command: $command"
+        echo "Use --help for usage information."
+        exit 1
+        ;;
+    esac
+}
+
+main "$@"
+```
+
 ## 🔧 Advanced Script Patterns
 
-### 4. Interactive User Input Script
+### 6. Interactive User Input Script
 
 Demonstrates input validation and interactive prompts:
 
@@ -361,7 +788,7 @@ main() {
 main "$@"
 ```
 
-### 5. Multi-Command Dispatcher
+### 7. Multi-Command Dispatcher
 
 Pattern for creating git-like subcommand interfaces:
 
@@ -644,7 +1071,7 @@ main() {
 main "$@"
 ```
 
-### 6. AI Workflow Generator Script
+### 8. AI Workflow Generator Script
 
 A sophisticated script that generates multi-agent AI development workflows:
 
@@ -884,7 +1311,7 @@ main "$@"
 # Start autonomous development with /dev start
 ```
 
-### 7. Version Management Script
+### 9. Version Management Script
 
 The `bump-version` script provides intelligent version bumping with automatic repository detection:
 
@@ -1035,7 +1462,7 @@ main "$@"
 - **Automatic detection**: Uses project markers to determine repository type
 - **Smart defaults**: Appropriate behavior for each context without user intervention
 
-### 8. Dependency Management Script
+### 10. Dependency Management Script
 
 The `update-shell-starter` script demonstrates advanced dependency management patterns:
 
@@ -1248,7 +1675,7 @@ cat .shell-starter-version
 
 ## 🔗 Polyglot Integration Examples
 
-### 8. Bash + Python Integration
+### 11. Bash + Python Integration
 
 Demonstrates calling Python scripts from Bash:
 
@@ -1298,7 +1725,7 @@ main() {
 main "$@"
 ```
 
-### 9. API Integration Script
+### 12. API Integration Script
 
 Example of calling external APIs with error handling:
 
@@ -1436,9 +1863,9 @@ main "$@"
 
 ## 🧪 Testing Examples
 
-### 10. Bats Test File
+### 13. Bats Test File
 
-Example test file structure (for demo scripts, you would typically add them to PATH or reference them explicitly from demo/):
+Example test file structure for demo scripts:
 
 ```bash
 #!/usr/bin/env bats
@@ -1447,8 +1874,8 @@ Example test file structure (for demo scripts, you would typically add them to P
 
 # Setup function runs before each test
 setup() {
-    # Add the bin directory to PATH for testing
-    export PATH="$BATS_TEST_DIRNAME/../bin:$PATH"
+    # Add the demo directory to PATH for testing
+    export PATH="$BATS_TEST_DIRNAME/../demo:$PATH"
     
     # Create temporary directory for test files
     export BATS_TMPDIR="$(mktemp -d)"
