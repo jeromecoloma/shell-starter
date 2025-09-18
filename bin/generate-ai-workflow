@@ -91,6 +91,17 @@ else
 			echo "• AI Workflow Generator •"
 		fi
 	}
+fi
+
+# Ensure banner_minimal function is available regardless of lib loading
+if ! declare -f banner_minimal >/dev/null 2>&1; then
+	banner_minimal() {
+		if [[ "${NO_COLOR:-}" == "" ]] && [[ "${TERM:-}" != "dumb" ]] && [[ -t 1 ]]; then
+			printf '\033[0;34m• AI Workflow Generator •\033[0m\n'
+		else
+			echo "• AI Workflow Generator •"
+		fi
+	}
 
 	# Basic spinner fallback (no-op for simplicity)
 	spinner::start() { echo "$*"; }
@@ -125,7 +136,14 @@ SCRIPT_NAME="generate-ai-workflow"
 SCRIPT_DESCRIPTION="Generate multi-agent AI development workflow"
 
 show_help() {
+	echo
+	if command -v banner::shell_starter >/dev/null 2>&1; then
+		banner::shell_starter minimal
+	else
+		banner_minimal
+	fi
 	cat <<EOF
+
 $SCRIPT_NAME - $SCRIPT_DESCRIPTION
 
 USAGE:

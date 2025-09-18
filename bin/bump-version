@@ -89,13 +89,31 @@ if [[ -z "${SHELL_STARTER_LIB_DIR:-}" ]]; then
 	}
 fi
 
+# Ensure banner_minimal function is available regardless of lib loading
+if ! declare -f banner_minimal >/dev/null 2>&1; then
+	banner_minimal() {
+		if [[ "${NO_COLOR:-}" == "" ]] && [[ "${TERM:-}" != "dumb" ]] && [[ -t 1 ]]; then
+			printf '\033[0;34m• Bump Version •\033[0m\n'
+		else
+			echo "• Bump Version •"
+		fi
+	}
+fi
+
 # Configuration
 VERSION_FILE="VERSION"
 SHELL_STARTER_VERSION_FILE=".shell-starter-version"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 usage() {
+	echo
+	if command -v banner::shell_starter >/dev/null 2>&1; then
+		banner::shell_starter minimal
+	else
+		banner_minimal
+	fi
 	cat <<EOF
+
 ${SCRIPT_NAME} - Intelligent version bumping for shell-starter and cloned projects
 
 USAGE:
