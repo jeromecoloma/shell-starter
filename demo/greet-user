@@ -281,7 +281,7 @@ main() {
 	fi
 
 	echo ""
-	log::info "Greeting completed for user: $name"
+	log::success "Greeting completed for user: $name"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

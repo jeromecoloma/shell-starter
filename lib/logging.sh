@@ -39,6 +39,7 @@ _log() {
 		WARN) indicator="⚠" ;;
 		ERROR) indicator="✗" ;;
 		DEBUG) indicator="🔍" ;;
+		SUCCESS) indicator="✓" ;;
 		*) indicator="•" ;;
 		esac
 		printf "${color}[%s] %s:${COLOR_RESET} %s\n" "$timestamp" "$indicator" "$*" >&2
@@ -60,4 +61,8 @@ log::warn() {
 
 log::error() {
 	_log "ERROR" "$COLOR_ERROR" "$@"
+}
+
+log::success() {
+	_log "SUCCESS" "$COLOR_SUCCESS" "$@"
 }

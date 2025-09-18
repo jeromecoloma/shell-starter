@@ -71,7 +71,7 @@ main() {
 		echo -e "${COLOR_GREEN}Hello, ${COLOR_BOLD}$name${COLOR_RESET}${COLOR_GREEN}!${COLOR_RESET}"
 	fi
 
-	log::info "Greeting completed successfully"
+	log::success "Greeting completed successfully"
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then

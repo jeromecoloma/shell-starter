@@ -187,7 +187,7 @@ EOF
 		echo -e "${COLOR_SUCCESS}✓ Results saved to: ${COLOR_BOLD}$output_file${COLOR_RESET}"
 	fi
 
-	log::info "Data processing completed successfully"
+	log::success "Data processing completed successfully"
 }
 
 cmd_demo() {
@@ -297,7 +297,7 @@ EOF
 	echo "  • Handle errors gracefully across language boundaries"
 	echo "  • Use virtual environments automatically"
 
-	log::info "Polyglot demo completed successfully"
+	log::success "Polyglot demo completed successfully"
 }
 
 cmd_generate() {
@@ -395,7 +395,7 @@ EOF
 		echo -e "${COLOR_SUCCESS}✓ Generated data saved to: ${COLOR_BOLD}$output_file${COLOR_RESET}"
 	fi
 
-	log::info "Data generation completed successfully"
+	log::success "Data generation completed successfully"
 }
 
 cmd_pipeline() {

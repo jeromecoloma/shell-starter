@@ -134,7 +134,7 @@ cmd_config() {
 		echo -e "  ${COLOR_CYAN}app.version${COLOR_RESET}: $(get_version)"
 		echo -e "  ${COLOR_CYAN}app.environment${COLOR_RESET}: development"
 		echo -e "  ${COLOR_CYAN}logging.level${COLOR_RESET}: info"
-		log::info "Configuration listed successfully"
+		log::success "Configuration listed successfully"
 		;;
 	set)
 		local key="${1:-}"
@@ -270,7 +270,7 @@ EOF
 		echo -e "${COLOR_INFO}[DRY RUN] Would deploy $app_name to $environment${COLOR_RESET}"
 	else
 		echo -e "${COLOR_SUCCESS}✓ Successfully deployed $app_name to $environment${COLOR_RESET}"
-		log::info "Deployment completed: $app_name -> $environment"
+		log::success "Deployment completed: $app_name -> $environment"
 	fi
 }
 
