@@ -148,7 +148,7 @@ colors::gradient_horizontal() {
 		output+="$(colors::rgb "$r" "$g" "$b")${text:$i:1}"
 	done
 
-	printf '%b%b\n' "$output" "${COLOR_RESET}"
+	printf '%b%b' "$output" "${COLOR_RESET}"
 }
 
 # Banner functions

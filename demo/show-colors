@@ -160,6 +160,7 @@ main() {
 	# Welcome banner for the script
 	banner::shell_starter minimal
 
+	echo ""
 	echo -e "${COLOR_BOLD}${COLOR_CYAN}Color Library Showcase${COLOR_RESET}"
 	echo "========================="
 

@@ -11,7 +11,7 @@ if [[ -z "${COLOR_RESET:-}" ]]; then
 fi
 
 # GitHub repository configuration
-GITHUB_REPO="${GITHUB_REPO:-shell-starter/shell-starter}"
+GITHUB_REPO="${GITHUB_REPO:-jeromecoloma/shell-starter}"
 GITHUB_API_URL="https://api.github.com"
 
 # Function to compare semantic versions

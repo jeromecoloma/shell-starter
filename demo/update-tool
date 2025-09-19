@@ -64,7 +64,7 @@ check_updates() {
 	current_version=$(get_version)
 
 	if [[ "$quiet" != "true" ]]; then
-		echo "Current version: ${COLOR_BOLD}$current_version${COLOR_RESET}"
+		echo -e "Current version: ${COLOR_BOLD}$current_version${COLOR_RESET}"
 	fi
 
 	# Check for updates
@@ -79,8 +79,8 @@ check_updates() {
 			echo -e "${COLOR_GREEN}✅ Update available!${COLOR_RESET}"
 			echo
 			echo "To install the update:"
-			echo "  1. Download: curl -sSL https://raw.githubusercontent.com/shell-starter/shell-starter/main/install.sh | bash"
-			echo "  2. Or visit: https://github.com/shell-starter/shell-starter/releases/latest"
+			echo "  1. Download: curl -sSL https://raw.githubusercontent.com/jeromecoloma/shell-starter/main/install.sh | bash"
+			echo "  2. Or visit: https://github.com/jeromecoloma/shell-starter/releases/latest"
 		else
 			echo "Update available: $current_version → $latest_version"
 		fi
@@ -191,7 +191,7 @@ show_history() {
 	echo "v1.3.0 - CI/CD improvements and testing"
 	echo
 	echo "For complete history, visit:"
-	echo "https://github.com/shell-starter/shell-starter/releases"
+	echo "https://github.com/jeromecoloma/shell-starter/releases"
 }
 
 install_version() {
@@ -221,7 +221,7 @@ install_version() {
 		echo "5. Verify installation success"
 		echo
 		echo "To manually install a specific version:"
-		echo "curl -sSL https://raw.githubusercontent.com/shell-starter/shell-starter/$version/install.sh | bash"
+		echo "curl -sSL https://raw.githubusercontent.com/jeromecoloma/shell-starter/$version/install.sh | bash"
 	else
 		echo "Demo: Would install version $version"
 	fi

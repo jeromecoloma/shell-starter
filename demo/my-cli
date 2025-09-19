@@ -13,6 +13,7 @@ source "${SHELL_STARTER_ROOT}/lib/main.sh"
 show_help() {
 	# Show banner header for help
 	banner::shell_starter minimal
+	echo ""
 	cat <<EOF
 Usage: $(basename "$0") [OPTIONS] <COMMAND> [ARGS...]
 
