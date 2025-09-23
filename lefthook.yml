@@ -1,0 +1,40 @@
+# Lefthook configuration for shell-starter
+# This runs validation checks before pushing to prevent CI failures
+
+pre-push:
+  commands:
+    shellcheck:
+      run: |
+        echo "🔍 Running ShellCheck..."
+        if command -v shellcheck >/dev/null 2>&1; then
+          # Run shellcheck on all shell files following the project's quality commands
+          shellcheck lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
+        else
+          echo "⚠️  ShellCheck not found. Install with: brew install shellcheck"
+          exit 1
+        fi
+      glob: "*.sh"
+      
+    shfmt:
+      run: |
+        echo "🎨 Checking code formatting with shfmt..."
+        if command -v shfmt >/dev/null 2>&1; then
+          # Check formatting on all shell files following the project's quality commands
+          shfmt -d lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
+        else
+          echo "⚠️  shfmt not found. Install with: brew install shfmt"
+          exit 1
+        fi
+      glob: "*.sh"
+      
+    tests:
+      run: |
+        echo "🧪 Running tests..."
+        if [ -f "./tests/bats-core/bin/bats" ]; then
+          # Run all bats tests following the project's testing approach
+          ./tests/bats-core/bin/bats tests/*.bats
+        else
+          echo "⚠️  Bats testing framework not found. Run tests/setup-bats.sh first."
+          exit 1
+        fi
+      glob: "*.{sh,bats}"

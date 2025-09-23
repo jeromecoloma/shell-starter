@@ -508,13 +508,29 @@ sleep 1
 
 ## 🔍 Code Quality Tools
 
+### Git Hooks Setup
+
+For the best development experience, set up automated Git hooks:
+
+```bash
+# Install hooks (runs validation before every push)
+./scripts/setup-hooks.sh
+
+# Verify installation
+./scripts/setup-hooks.sh --check
+```
+
+This prevents pushing code that would fail in CI and ensures consistent quality.
+
+### Manual Tool Usage
+
 ### Tool Installation
 
 Before contributing, install the required development tools:
 
 **macOS (Homebrew):**
 ```bash
-brew install shellcheck shfmt
+brew install shellcheck shfmt lefthook
 ```
 
 **Ubuntu/Debian:**
@@ -525,6 +541,10 @@ sudo apt-get install -y shellcheck
 # shfmt  
 curl -L -o /tmp/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64
 sudo install /tmp/shfmt /usr/local/bin/shfmt
+
+# lefthook
+curl -L -o /tmp/lefthook https://github.com/evilmartians/lefthook/releases/latest/download/lefthook_linux_amd64
+sudo install /tmp/lefthook /usr/local/bin/lefthook
 ```
 
 **Windows:**
@@ -557,6 +577,26 @@ shfmt -d lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
 # Apply formatting fixes
 shfmt -w lib/*.sh scripts/*.sh bin/* demo/* install.sh uninstall.sh
 ```
+
+### Automated Git Hooks
+
+The project supports automated Git hooks using Lefthook for pre-push validation:
+
+```bash
+# Setup Git hooks
+./scripts/setup-hooks.sh
+
+# Check hook installation status
+./scripts/setup-hooks.sh --check
+```
+
+The hooks automatically run before every push:
+- Shellcheck linting on all shell files
+- Code formatting verification with shfmt
+- All Bats tests
+- Prevents pushing code that would fail CI
+
+**Bypassing Hooks**: Use `git push --no-verify` if you need to bypass validation temporarily.
 
 ### Continuous Integration
 

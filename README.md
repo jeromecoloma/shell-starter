@@ -74,6 +74,7 @@ shell-starter/
 ├── .github/workflows/  # CI/CD configuration
 ├── VERSION             # Centralized version file (SemVer)
 ├── .shell-starter-version  # Shell Starter dependency version tracking
+├── lefthook.yml        # Git hooks configuration for automated quality checks
 ├── install.sh          # Template installer for your CLI tools (NOT for Shell Starter itself)
 └── uninstall.sh        # Template uninstaller for your CLI tools (NOT for Shell Starter itself)
 ```
@@ -294,7 +295,7 @@ Install the required development tools:
 **macOS (using Homebrew):**
 ```bash
 # Install code quality tools
-brew install shellcheck shfmt
+brew install shellcheck shfmt lefthook
 
 # Optional: Install act for local CI testing
 brew install act
@@ -310,6 +311,10 @@ sudo apt-get install -y shellcheck
 curl -L -o /tmp/shfmt https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_linux_amd64
 sudo install /tmp/shfmt /usr/local/bin/shfmt
 
+# Install lefthook
+curl -L -o /tmp/lefthook https://github.com/evilmartians/lefthook/releases/latest/download/lefthook_linux_amd64
+sudo install /tmp/lefthook /usr/local/bin/lefthook
+
 # Optional: Install act for local CI testing
 curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash
 ```
@@ -317,11 +322,32 @@ curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo ba
 **Other Systems:**
 - **ShellCheck**: See [shellcheck.net](https://www.shellcheck.net/wiki/Installing) for installation options
 - **shfmt**: Download from [mvdan/sh releases](https://github.com/mvdan/sh/releases)
+- **lefthook**: Download from [lefthook releases](https://github.com/evilmartians/lefthook/releases)
 - **Act**: See [nektos/act](https://github.com/nektos/act#installation) for installation options
 
 ### Code Quality
 
-Run code quality checks locally:
+#### Automated Git Hooks (Recommended)
+
+Set up automated quality checks that run before every push:
+
+```bash
+# Install git hooks
+./scripts/setup-hooks.sh
+
+# Check installation status
+./scripts/setup-hooks.sh --check
+
+# What the hooks do:
+# - Run shellcheck on all shell files
+# - Check code formatting with shfmt
+# - Run all bats tests
+# - Prevent pushing code that would fail in CI
+```
+
+#### Manual Quality Checks
+
+You can also run quality checks manually:
 
 ```bash
 # Lint all scripts (configured via .shellcheckrc)
