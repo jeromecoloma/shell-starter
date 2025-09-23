@@ -30,11 +30,11 @@ pre-push:
     tests:
       run: |
         echo "🧪 Running tests..."
-        if [ -f "./tests/run-tests.sh" ]; then
-          chmod +x ./tests/run-tests.sh
-          ./tests/run-tests.sh --ci
+        if [ -f "./tests/run-tests-ci.sh" ]; then
+          chmod +x ./tests/run-tests-ci.sh
+          ./tests/run-tests-ci.sh
         else
-          echo "⚠️  Test runner not found: ./tests/run-tests.sh"
+          echo "⚠️  Test runner not found: ./tests/run-tests-ci.sh"
           exit 1
         fi
       glob: "*.{sh,bats}"
