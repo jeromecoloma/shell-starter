@@ -26,15 +26,15 @@ pre-push:
           exit 1
         fi
       glob: "*.sh"
-      
+    
     tests:
       run: |
         echo "🧪 Running tests..."
-        if [ -f "./tests/bats-core/bin/bats" ]; then
-          # Run all bats tests following the project's testing approach
-          ./tests/bats-core/bin/bats tests/*.bats
+        if [ -f "./tests/run-tests.sh" ]; then
+          chmod +x ./tests/run-tests.sh
+          ./tests/run-tests.sh --ci
         else
-          echo "⚠️  Bats testing framework not found. Run tests/setup-bats.sh first."
+          echo "⚠️  Test runner not found: ./tests/run-tests.sh"
           exit 1
         fi
       glob: "*.{sh,bats}"
